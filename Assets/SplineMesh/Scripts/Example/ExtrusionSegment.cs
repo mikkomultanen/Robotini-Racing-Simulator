@@ -13,6 +13,7 @@ namespace SplineMesh {
         private MeshFilter mf;
         private Mesh result;
         private List<Vertex> shapeVertices = new List<Vertex>();
+        private bool loopAround = true;
         private CubicBezierCurve curve;
         private float textureScale = 1;
         private float textureOffset = 0;
@@ -45,6 +46,11 @@ namespace SplineMesh {
         /// <param name="update">If let to true, update the resulting mesh immediatly.</param>
         public void SetShapeVertices(List<Vertex> shapeVertices, bool update = true) {
             this.shapeVertices = shapeVertices;
+            if (update) Compute();
+        }
+
+        public void SetLoopAround(bool loopAround, bool update = true) {
+            this.loopAround = loopAround;
             if (update) Compute();
         }
 
@@ -118,12 +124,14 @@ namespace SplineMesh {
                     int b = index;
                     int c = index + offset;
                     int d = index + offset + shapeVertices.Count;
-                    triangleIndices.Add(c);
-                    triangleIndices.Add(b);
-                    triangleIndices.Add(a);
-                    triangleIndices.Add(a);
-                    triangleIndices.Add(d);
-                    triangleIndices.Add(c);
+                    if (loopAround || offset == 1) {
+                        triangleIndices.Add(c);
+                        triangleIndices.Add(b);
+                        triangleIndices.Add(a);
+                        triangleIndices.Add(a);
+                        triangleIndices.Add(d);
+                        triangleIndices.Add(c);
+                    }
                     index++;
                 }
             }

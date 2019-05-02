@@ -22,13 +22,14 @@ namespace SplineMesh {
     /// This component doesn't offer much control as Unity is not a modeling tool. That said, you should be able to create your own version easily.
     /// </summary>
     [ExecuteInEditMode]
-    [RequireComponent(typeof(Spline))]
+    [DisallowMultipleComponent]
     public class SplineExtrusion : MonoBehaviour {
-        private Spline spline;
+        private Spline spline = null;
         private bool toUpdate = true;
         private GameObject generated;
 
         public List<ExtrusionSegment.Vertex> shapeVertices = new List<ExtrusionSegment.Vertex>();
+        public bool loopAround = true;
         public Material material;
         public float textureScale = 1;
 
@@ -54,10 +55,12 @@ namespace SplineMesh {
             generated = generatedTranform != null ? generatedTranform.gameObject : UOUtility.Create(generatedName, gameObject);
 
             spline = GetComponentInParent<Spline>();
+            if (spline == null) return;
             spline.NodeListChanged += (s, e) => toUpdate = true;
         }
 
         private void Update() {
+            if (spline == null) return;
             if (toUpdate) {
                 GenerateMesh();
                 toUpdate = false;
@@ -79,6 +82,7 @@ namespace SplineMesh {
                 go.GetComponent<MeshRenderer>().material = material;
                 ExtrusionSegment mb = go.GetComponent<ExtrusionSegment>();
                 mb.SetShapeVertices(shapeVertices, false);
+                mb.SetLoopAround(loopAround, false);
                 mb.SetTextureScale(textureScale, false);
                 mb.SetCurve(curve, true);
                 mb.SetTextureOffset(textureOffset, true);

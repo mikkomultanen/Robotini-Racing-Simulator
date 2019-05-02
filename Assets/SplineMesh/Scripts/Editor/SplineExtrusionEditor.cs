@@ -11,6 +11,7 @@ namespace SplineMesh {
         private SerializedProperty textureScale;
         private SerializedProperty material;
         private SerializedProperty vertices;
+        private SerializedProperty loopAround;
 
         private SplineExtrusion se;
         private ExtrusionSegment.Vertex selection = null;
@@ -20,6 +21,7 @@ namespace SplineMesh {
             textureScale = serializedObject.FindProperty("textureScale");
             material = serializedObject.FindProperty("material");
             vertices = serializedObject.FindProperty("shapeVertices");
+            loopAround = serializedObject.FindProperty("loopAround");
         }
 
         void OnSceneGUI() {
@@ -34,7 +36,11 @@ namespace SplineMesh {
             if (e.type == EventType.MouseUp) {
                 mustCreateNewNode = false;
             }
-            var spline = se.GetComponent<Spline>();
+            var spline = se.GetComponentInParent<Spline>();
+            if (spline == null) {
+                return;
+            }
+
 
             CurveSample startSample = spline.GetSample(0);
             Quaternion q = startSample.Rotation;
@@ -105,10 +111,12 @@ namespace SplineMesh {
                 // draw a line between that vertex and the next one
                 int index = se.shapeVertices.IndexOf(v);
                 int nextIndex = index == se.shapeVertices.Count - 1 ? 0 : index + 1;
-                ExtrusionSegment.Vertex next = se.shapeVertices[nextIndex];
-                Handles.color = CURVE_COLOR;
-                Vector3 vAtSplineEnd = se.transform.TransformPoint(q * next.point + startSample.location);
-                Handles.DrawLine(point, vAtSplineEnd);
+                if (se.loopAround || nextIndex > 0) {
+                    ExtrusionSegment.Vertex next = se.shapeVertices[nextIndex];
+                    Handles.color = CURVE_COLOR;
+                    Vector3 vAtSplineEnd = se.transform.TransformPoint(q * next.point + startSample.location);
+                    Handles.DrawLine(point, vAtSplineEnd);
+                }
             }
         }
 
@@ -144,6 +152,7 @@ namespace SplineMesh {
             // Properties
             EditorGUILayout.PropertyField(textureScale, true);
             EditorGUILayout.PropertyField(material, true);
+            EditorGUILayout.PropertyField(loopAround, true);
 
             EditorGUILayout.PropertyField(vertices);
             EditorGUI.indentLevel += 1;
