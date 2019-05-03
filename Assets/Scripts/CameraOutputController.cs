@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraOutputController : MonoBehaviour
 {
+    private static string SCREENSHOT_FILE = "./screenshot.png";
     public Camera camera;
     private float lastSaved = 0;
 
@@ -16,10 +17,11 @@ public class CameraOutputController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Time.time < lastSaved + 0.03)
+        if (Time.time < lastSaved + 0.03 || System.IO.File.Exists(SCREENSHOT_FILE))
         {
             return;
         }
+
         lastSaved = Time.time;
         int width = 128;
         int height = 80;
@@ -47,7 +49,7 @@ public class CameraOutputController : MonoBehaviour
         byte[] bytes;
         bytes = virtualPhoto.EncodeToPNG();
 
-        System.IO.File.WriteAllBytes("./screenshot.png", bytes);
+        System.IO.File.WriteAllBytes(SCREENSHOT_FILE, bytes);
         // virtualCam.SetActive(false); ... no great need for this.
     }
 }
