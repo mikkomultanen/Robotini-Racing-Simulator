@@ -5,6 +5,7 @@ using UnityEngine;
 public class CameraOutputController : MonoBehaviour
 {
     public Camera camera;
+    private float lastSaved = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -15,6 +16,11 @@ public class CameraOutputController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Time.time < lastSaved + 0.03)
+        {
+            return;
+        }
+        lastSaved = Time.time;
         int width = 128;
         int height = 80;
 
