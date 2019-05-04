@@ -96,8 +96,6 @@ public class AsynchronousSocketListener
     // Thread signal.  
     public static ManualResetEvent allDone = new ManualResetEvent(false);
     static Socket listener = null;
-    static StateObject globalState = null;
-    static bool sending = false;
     static ConcurrentQueue<byte[]> sendQueue = new ConcurrentQueue<byte[]>();
 
     public async static void SendFrame(byte[] data)
@@ -148,44 +146,10 @@ public class AsynchronousSocketListener
                 allDone.WaitOne();
             }
         }).Start();
-
-        new Thread(() =>
-        {
-            while (listener != null)
-            {
-                byte[] data;
-                if (sendQueue.TryDequeue(out data) && globalState != null)
-                {
-                    if (data.Length > 65535) throw new Exception("Max image size exceeded");
-                    byte lowerByte = (byte)(data.Length & 0xff);
-                    byte higherByte = (byte)((data.Length & 0xff00) >> 8);
-                    // Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
-                    byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
-                    try
-                    {
-                        globalState.workSocket.Send(lengthAsBytes.Concat(data).ToArray());
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.Log("Socket send failed:" + e.ToString());
-                        globalState = null;
-                    }
-                }
-                else
-                {
-                    Thread.Sleep(10);
-                }
-            }
-        }).Start();
-
     }
 
     public static void EndListening()
     {
-        if (globalState != null) {
-            globalState.Dispose();
-            globalState = null;
-        }
         if (listener != null) {
             listener.Dispose();
             listener = null;
@@ -202,13 +166,42 @@ public class AsynchronousSocketListener
         Socket socket = listener.EndAccept(ar);
 
         // Create the state object.  
-        globalState = new StateObject();
-        globalState.workSocket = socket;
+        var state = new StateObject();
+        state.workSocket = socket;
         socket.SendBufferSize = 20000;
         socket.NoDelay = true;
 
         Debug.Log("Client connected");
+        Boolean stopped = false;
 
+        new Thread(() =>
+        {
+            while (listener != null && !stopped)
+            {
+                byte[] data;
+                if (sendQueue.TryDequeue(out data))
+                {
+                    if (data.Length > 65535) throw new Exception("Max image size exceeded");
+                    byte lowerByte = (byte)(data.Length & 0xff);
+                    byte higherByte = (byte)((data.Length & 0xff00) >> 8);
+                    // Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
+                    byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
+                    try
+                    {
+                        socket.Send(lengthAsBytes.Concat(data).ToArray());
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log("Socket send failed:" + e.ToString());
+                        stopped = true;
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(10);
+                }
+            }
+        }).Start();
     }
 
     public static void ReadCallback(IAsyncResult ar)
