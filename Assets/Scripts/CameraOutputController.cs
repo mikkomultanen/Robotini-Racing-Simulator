@@ -7,15 +7,25 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
+[RequireComponent(typeof(Camera))]
 public class CameraOutputController : MonoBehaviour
 {
-    public Camera camera;
+    private Camera mCamera;
     private float lastSaved = 0;
 
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
-        AsynchronousSocketListener.StartListening();
+       AsynchronousSocketListener.StartListening();
+    }
+
+    private void OnDisable()
+    {
+        AsynchronousSocketListener.EndListening();
+    }
+
+    private void Start()
+    {
+        mCamera = GetComponent<Camera>();
     }
 
     // Update is called once per frame
@@ -30,15 +40,16 @@ public class CameraOutputController : MonoBehaviour
         int width = 128;
         int height = 80;
 
-        camera.aspect = 1.0f;
+        float originalAspect = GetComponent<Camera>().aspect;
+        mCamera.aspect = 1.0f;
         // recall that the height is now the "actual" size from now on
 
         RenderTexture tempRT = new RenderTexture(width, height, 24);
         // the 24 can be 0,16,24, formats like
         // RenderTextureFormat.Default, ARGB32 etc.
 
-        camera.targetTexture = tempRT;
-        camera.Render();
+        mCamera.targetTexture = tempRT;
+        mCamera.Render();
 
         RenderTexture.active = tempRT;
         Texture2D virtualPhoto =
@@ -47,7 +58,8 @@ public class CameraOutputController : MonoBehaviour
         virtualPhoto.ReadPixels(new Rect(0, 0, width, height), 0, 0);
 
         RenderTexture.active = null; //can help avoid errors 
-        camera.targetTexture = null;
+        mCamera.targetTexture = null;
+        mCamera.aspect = originalAspect;
         // consider ... Destroy(tempRT);
 
         byte[] bytes;
@@ -59,7 +71,7 @@ public class CameraOutputController : MonoBehaviour
 }
 
 // State object for reading client data asynchronously  
-public class StateObject
+public class StateObject : IDisposable
 {
     // Client  socket.  
     public Socket workSocket = null;
@@ -69,13 +81,19 @@ public class StateObject
     public byte[] buffer = new byte[BufferSize];
     // Received data string.  
     public StringBuilder sb = new StringBuilder();
+
+    public void Dispose() {
+        if (workSocket == null) return;
+        workSocket.Dispose();
+        workSocket = null;
+    }
 }
 
 public class AsynchronousSocketListener
 {
     // Thread signal.  
     public static ManualResetEvent allDone = new ManualResetEvent(false);
-    static bool listening = false;
+    static Socket listener = null;
     static StateObject globalState = null;
     static bool sending = false;
 
@@ -117,8 +135,7 @@ public class AsynchronousSocketListener
 
     public static void StartListening()
     {
-        if (listening) return;
-        listening = true;
+        if (listener != null) return;
         // Establish the local endpoint for the socket.  
         // The DNS name of the computer  
         // running the listener is "host.contoso.com".  
@@ -126,7 +143,7 @@ public class AsynchronousSocketListener
         IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
 
         // Create a TCP/IP socket.  
-        Socket listener = new Socket(ipAddress.AddressFamily,
+        listener = new Socket(ipAddress.AddressFamily,
             SocketType.Stream, ProtocolType.Tcp);
 
         listener.Bind(localEndPoint);
@@ -136,7 +153,7 @@ public class AsynchronousSocketListener
 
         new Thread(() =>
         {
-            while (true)
+            while (listener != null)
             {
                 // Set the event to nonsignaled state.  
                 allDone.Reset();
@@ -152,6 +169,18 @@ public class AsynchronousSocketListener
             }
         }).Start();
 
+    }
+
+    public static void EndListening()
+    {
+        if (globalState != null) {
+            globalState.Dispose();
+            globalState = null;
+        }
+        if (listener != null) {
+            listener.Dispose();
+            listener = null;
+        }
     }
 
     public static void AcceptCallback(IAsyncResult ar)
