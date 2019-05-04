@@ -7,10 +7,12 @@ public class CarController : MonoBehaviour
     public WheelCollider frontLeftWC, frontRightWC, rearLeftWC, rearRightWC;
     public Transform frontLeftT, frontRightT, rearLeftT, rearRightT;
     public float maxSteerAngle = 30;
-    public float motorForce = 5000;
+    public float motorForce = 50;
+    public float maxAngleChangePerSecond = 10;
 
     private float angle;
     private float forward;
+    private float targetAngle = 0;
     private float lastBotCommandTime = 0;
 
     public void GetInput()
@@ -20,6 +22,11 @@ public class CarController : MonoBehaviour
             // 300ms pause in bot commands -> return to manual control
             angle = Input.GetAxis("Horizontal");
             forward = Input.GetAxis("Vertical");
+        }
+        else
+        {
+            var angleDelta = targetAngle - angle;
+            angle += Mathf.Sign(angleDelta) * Mathf.Min(maxAngleChangePerSecond * Time.fixedDeltaTime, Mathf.Abs(angleDelta));
         }
         Debug.Log("angle " + angle + " forward " + forward);
     }
@@ -79,7 +86,7 @@ public class CarController : MonoBehaviour
                 forward = command.value;
             } else if (command.action == "turn")
             {
-                angle = -command.value; // bot uses -1 right, +1 left
+                targetAngle = -command.value; // bot uses -1 right, +1 left
             }
         }
     }
