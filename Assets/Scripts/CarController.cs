@@ -28,7 +28,7 @@ public class CarController : MonoBehaviour
             var angleDelta = targetAngle - angle;
             angle += Mathf.Sign(angleDelta) * Mathf.Min(maxAngleChangePerSecond * Time.fixedDeltaTime, Mathf.Abs(angleDelta));
         }
-        Debug.Log("angle " + angle + " forward " + forward);
+        //Debug.Log("angle " + angle + " forward " + forward);
     }
 
     private void Steer()
