@@ -4,7 +4,10 @@
 public class CameraOutputController : MonoBehaviour
 {
     private Camera mCamera;
+    private Texture2D virtualPhoto;
     private float lastSaved = 0;
+    private int width = 128;
+    private int height = 80;
 
     private void OnEnable()
     {
@@ -19,6 +22,7 @@ public class CameraOutputController : MonoBehaviour
     private void Start()
     {
         mCamera = GetComponent<Camera>();
+        virtualPhoto = new Texture2D(width, height, TextureFormat.RGB24, false);
     }
 
     // Update is called once per frame
@@ -30,8 +34,6 @@ public class CameraOutputController : MonoBehaviour
         }
 
         lastSaved = Time.time;
-        int width = 128;
-        int height = 80;
 
         Rect originalRect = mCamera.rect;
         mCamera.rect = new Rect(0, 0, 1, 1);
@@ -47,9 +49,6 @@ public class CameraOutputController : MonoBehaviour
         mCamera.Render();
 
         RenderTexture.active = tempRT;
-        Texture2D virtualPhoto =
-            new Texture2D(width, height, TextureFormat.RGB24, false);
-        // false, meaning no need for mipmaps
         virtualPhoto.ReadPixels(new Rect(0, 0, width, height), 0, 0);
 
         RenderTexture.active = null; //can help avoid errors 
