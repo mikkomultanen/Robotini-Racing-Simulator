@@ -80,7 +80,7 @@ public class CarController : MonoBehaviour
         foreach (var command in commands)
         {
             lastBotCommandTime = Time.time;
-            Debug.Log("Processing " + JsonUtility.ToJson(command));
+            //Debug.Log("Processing " + JsonUtility.ToJson(command));
             if (command.action == "forward")
             {
                 forward = command.value;
