@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 [RequireComponent(typeof(Camera))]
 public class CameraOutputController : MonoBehaviour
@@ -97,41 +98,57 @@ public class AsynchronousSocketListener
     static StateObject globalState = null;
     static bool sending = false;
 
-    public AsynchronousSocketListener()
-    {
-    }
 
-    public static void SendFrame(byte[] data)
+    public async static void SendFrame(byte[] data)
     {
         if (globalState != null && !sending)
         {
             sending = true;
 
-            string base64Encoded = System.Convert.ToBase64String(data) + "\n";
-
-            byte[] encodedBytes = System.Text.Encoding.ASCII.GetBytes(base64Encoded);
-
-
             Socket socket = globalState.workSocket;
             Debug.Log("Sending data to TCP socket");
-            // Begin sending the data to the remote device.
-            AsyncCallback callback = new AsyncCallback((IAsyncResult ar) => {
-                try
-                {
-                    int bytesSent = socket.EndSend(ar);
-                    Debug.Log("Sent " + encodedBytes.Length + " bytes to client.");
-                }
-                catch (Exception e)
-                {
-                    Debug.Log("Socket send failed:" + e.ToString());
-                    globalState = null;
-                }
-                sending = false;
-            });
 
-            socket.BeginSend(encodedBytes, 0, encodedBytes.Length, 0, callback, socket);
+            try
+            {
+                if (data.Length > 65535) throw new Exception("Max image size exceeded");
+                byte lowerByte = (byte)(data.Length & 0xff);
+                byte higherByte = (byte)((data.Length & 0xff00) >> 8);
+                Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
+                byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
+                await SendAsync(socket, lengthAsBytes);
+                await SendAsync(socket, data);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Socket send failed:" + e.ToString());
+                globalState = null;
+            }
+            finally
+            {
+                sending = false;
+            }
         }
     }
+
+    static Task SendAsync(Socket socket, byte[] data)
+    {
+        var task = new TaskCompletionSource<int>();
+        AsyncCallback callback = new AsyncCallback((IAsyncResult ar) => {
+            try
+            {
+                int bytesSent = socket.EndSend(ar);
+                task.SetResult(data.Length);
+            }
+            catch (Exception e)
+            {
+                task.SetException(e);
+            }
+        });
+
+        socket.BeginSend(data, 0, data.Length, 0, callback, socket);
+        return task.Task;
+    }
+
 
     public static void StartListening()
     {
