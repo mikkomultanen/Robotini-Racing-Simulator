@@ -106,14 +106,14 @@ public class AsynchronousSocketListener
             sending = true;
 
             Socket socket = globalState.workSocket;
-            Debug.Log("Sending data to TCP socket");
+            //Debug.Log("Sending data to TCP socket");
 
             try
             {
                 if (data.Length > 65535) throw new Exception("Max image size exceeded");
                 byte lowerByte = (byte)(data.Length & 0xff);
                 byte higherByte = (byte)((data.Length & 0xff00) >> 8);
-                Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
+                // Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
                 byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
                 await SendAsync(socket, lengthAsBytes);
                 await SendAsync(socket, data);
