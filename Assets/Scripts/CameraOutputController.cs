@@ -67,7 +67,6 @@ public class CameraOutputController : MonoBehaviour
         bytes = virtualPhoto.EncodeToPNG();
 
         AsynchronousSocketListener.SendFrame(bytes);
-        // virtualCam.SetActive(false); ... no great need for this.
     }
 }
 
