@@ -1,14 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Linq;
-using UnityEngine;
-using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
 public class CameraOutputController : MonoBehaviour
@@ -18,12 +8,12 @@ public class CameraOutputController : MonoBehaviour
 
     private void OnEnable()
     {
-       AsynchronousSocketListener.StartListening();
+       BotSocket.StartListening();
     }
 
     private void OnDisable()
     {
-        AsynchronousSocketListener.EndListening();
+        BotSocket.EndListening();
     }
 
     private void Start()
@@ -68,144 +58,6 @@ public class CameraOutputController : MonoBehaviour
         byte[] bytes;
         bytes = virtualPhoto.EncodeToPNG();
 
-        AsynchronousSocketListener.SendFrame(bytes);
-    }
-}
-
-// State object for reading client data asynchronously  
-public class StateObject : IDisposable
-{
-    // Client  socket.  
-    public Socket workSocket = null;
-    // Size of receive buffer.  
-    public const int BufferSize = 1024;
-    // Receive buffer.  
-    public byte[] buffer = new byte[BufferSize];
-    // Received data string.  
-    public StringBuilder sb = new StringBuilder();
-
-    public void Dispose() {
-        if (workSocket == null) return;
-        workSocket.Dispose();
-        workSocket = null;
-    }
-}
-
-public class AsynchronousSocketListener
-{
-    // Thread signal.  
-    public static ManualResetEvent allDone = new ManualResetEvent(false);
-    static Socket listener = null;
-    static ConcurrentQueue<byte[]> sendQueue = new ConcurrentQueue<byte[]>();
-
-    public static void SendFrame(byte[] data)
-    {
-        if (sendQueue.Count > 5)
-        {
-            Debug.Log("Queue full");
-        }
-        else
-        {
-            sendQueue.Enqueue(data);
-        }
-    }
-
-
-    public static void StartListening()
-    {
-        if (listener != null) return;
-        // Establish the local endpoint for the socket.  
-        // The DNS name of the computer  
-        // running the listener is "host.contoso.com".  
-        IPAddress ipAddress = IPAddress.Any;
-        IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
-
-        // Create a TCP/IP socket.  
-        listener = new Socket(ipAddress.AddressFamily,
-            SocketType.Stream, ProtocolType.Tcp);
-
-        listener.Bind(localEndPoint);
-        listener.Listen(100);
-
-        Debug.Log("Starting thread");
-
-        new Thread(() =>
-        {
-            while (listener != null)
-            {
-                // Set the event to nonsignaled state.  
-                allDone.Reset();
-
-                // Start an asynchronous socket to listen for connections.  
-                Debug.Log("Waiting for a connection...");
-                listener.BeginAccept(
-                    new AsyncCallback(AcceptCallback),
-                    listener);
-
-                // Wait until a connection is made before continuing.  
-                allDone.WaitOne();
-            }
-        }).Start();
-    }
-
-    public static void EndListening()
-    {
-        if (listener != null) {
-            listener.Dispose();
-            listener = null;
-        }
-    }
-
-    public static void AcceptCallback(IAsyncResult ar)
-    {
-        // Signal the main thread to continue.  
-        allDone.Set();
-
-        // Get the socket that handles the client request.  
-        Socket listener = (Socket)ar.AsyncState;
-        Socket socket = listener.EndAccept(ar);
-
-        // Create the state object.  
-        var state = new StateObject();
-        state.workSocket = socket;
-        socket.SendBufferSize = 20000;
-        socket.NoDelay = true;
-
-        Debug.Log("Client connected");
-        Boolean stopped = false;
-
-        new Thread(() =>
-        {
-            while (listener != null && !stopped)
-            {
-                byte[] data;
-                if (sendQueue.TryDequeue(out data))
-                {
-                    if (data.Length > 65535) throw new Exception("Max image size exceeded");
-                    byte lowerByte = (byte)(data.Length & 0xff);
-                    byte higherByte = (byte)((data.Length & 0xff00) >> 8);
-                    // Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
-                    byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
-                    try
-                    {
-                        socket.Send(lengthAsBytes.Concat(data).ToArray());
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.Log("Socket send failed:" + e.ToString());
-                        stopped = true;
-                    }
-                }
-                else
-                {
-                    Thread.Sleep(10);
-                }
-            }
-        }).Start();
-    }
-
-    public static void ReadCallback(IAsyncResult ar)
-    {
-
+        BotSocket.SendFrame(bytes);
     }
 }

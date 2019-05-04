@@ -63,5 +63,10 @@ public class CarController : MonoBehaviour
     private void Update()
     {
         UpdateWheelPoses();
+        var commands = BotSocket.ReceiveCommands();
+        foreach (var command in commands)
+        {
+            Debug.Log("Processing " + JsonUtility.ToJson(command));
+        }
     }
 }
