@@ -11,11 +11,17 @@ public class CarController : MonoBehaviour
 
     private float angle;
     private float forward;
+    private float lastBotCommandTime = 0;
 
     public void GetInput()
     {
-        angle = Input.GetAxis("Horizontal");
-        forward = Input.GetAxis("Vertical");
+        if (Time.time > lastBotCommandTime + 0.3)
+        {
+            // 300ms pause in bot commands -> return to manual control
+            angle = Input.GetAxis("Horizontal");
+            forward = Input.GetAxis("Vertical");
+        }
+        Debug.Log("angle " + angle + " forward " + forward);
     }
 
     private void Steer()
@@ -63,5 +69,18 @@ public class CarController : MonoBehaviour
     private void Update()
     {
         UpdateWheelPoses();
+        var commands = BotSocket.ReceiveCommands();
+        foreach (var command in commands)
+        {
+            lastBotCommandTime = Time.time;
+            Debug.Log("Processing " + JsonUtility.ToJson(command));
+            if (command.action == "forward")
+            {
+                forward = command.value;
+            } else if (command.action == "turn")
+            {
+                angle = -command.value; // bot uses -1 right, +1 left
+            }
+        }
     }
 }
