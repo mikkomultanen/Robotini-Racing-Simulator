@@ -98,7 +98,7 @@ public class AsynchronousSocketListener
     static Socket listener = null;
     static ConcurrentQueue<byte[]> sendQueue = new ConcurrentQueue<byte[]>();
 
-    public async static void SendFrame(byte[] data)
+    public static void SendFrame(byte[] data)
     {
         if (sendQueue.Count > 5)
         {
