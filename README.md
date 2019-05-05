@@ -13,9 +13,9 @@ feed you PNG images from the car's front camera. Like this
 2. PNG image data
 3. goto 1
 
-The simulator accepts control commands from the AI:
+The simulator accepts control commands as a JSON string terminated with \n from the AI:
 
-- `{ "action": "forward", "value": 0.5}` where value is the throttle value between 0 and 1.
-- `{ "action": "turn", "value": -0.1}` where value is the direction for the front wheels. 1.0 is full left and -1.0 is full right. 
+- `{ "action": "forward", "value": 0.5}\n` where value is the throttle value between 0 and 1.
+- `{ "action": "turn", "value": -0.1}\n` where value is the direction for the front wheels. 1.0 is full left and -1.0 is full right. 
 
 Enjoy!
