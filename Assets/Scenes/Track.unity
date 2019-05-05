@@ -5334,7 +5334,7 @@ MonoBehaviour:
   rearLeftT: {fileID: 73127174}
   rearRightT: {fileID: 501547373}
   maxSteerAngle: 30
-  motorForce: 50
+  motorForce: 150
   maxAngleChangePerSecond: 10
 --- !u!1 &1106287250
 GameObject:
