@@ -6,7 +6,7 @@ Clone this repo and open it in Unity. Run and enjoy!
 
 At start, you can control the car with arrow keys. But this is not the point.
 
-The point is to connect your AI to localhost:10000. The simulator will
+The point is to connect your AI to localhost:11000. The simulator will
 feed you PNG images from the car's front camera. Like this
 
 1. two bytes indicating the size of the next image (higher byte first)
