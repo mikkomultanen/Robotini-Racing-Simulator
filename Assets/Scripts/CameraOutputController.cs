@@ -35,10 +35,8 @@ public class CameraOutputController : MonoBehaviour
 
         lastSaved = Time.time;
 
-        Rect originalRect = mCamera.rect;
         mCamera.rect = new Rect(0, 0, 1, 1);
-        float originalAspect = GetComponent<Camera>().aspect;
-        mCamera.aspect = 1.0f;
+        mCamera.aspect = 1.0f * width / height;
         // recall that the height is now the "actual" size from now on
 
         RenderTexture tempRT = new RenderTexture(width, height, 24);
@@ -53,8 +51,9 @@ public class CameraOutputController : MonoBehaviour
 
         RenderTexture.active = null; //can help avoid errors 
         mCamera.targetTexture = null;
-        mCamera.aspect = originalAspect;
-        mCamera.rect = originalRect;
+        float widthOnScreen = Screen.width * 0.2f;
+        float heightOnScreen = widthOnScreen / mCamera.aspect;
+        mCamera.pixelRect = new Rect(0, 0, widthOnScreen, heightOnScreen);
         // consider ... Destroy(tempRT);
 
         byte[] bytes;
