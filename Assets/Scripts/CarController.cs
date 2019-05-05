@@ -28,7 +28,7 @@ public class CarController : MonoBehaviour
             var angleDelta = targetAngle - angle;
             angle += Mathf.Sign(angleDelta) * Mathf.Min(maxAngleChangePerSecond * Time.fixedDeltaTime, Mathf.Abs(angleDelta));
         }
-        Debug.Log("angle " + angle + " forward " + forward);
+        //Debug.Log("angle " + angle + " forward " + forward);
     }
 
     private void Steer()
@@ -80,7 +80,7 @@ public class CarController : MonoBehaviour
         foreach (var command in commands)
         {
             lastBotCommandTime = Time.time;
-            Debug.Log("Processing " + JsonUtility.ToJson(command));
+            //Debug.Log("Processing " + JsonUtility.ToJson(command));
             if (command.action == "forward")
             {
                 forward = command.value;
