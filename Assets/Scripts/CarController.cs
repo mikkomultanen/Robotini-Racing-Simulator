@@ -10,10 +10,16 @@ public class CarController : MonoBehaviour
     public float motorForce = 50;
     public float maxAngleChangePerSecond = 10;
 
-    private float angle;
-    private float forward;
+    public float angle;
+    public float forward;
     private float targetAngle = 0;
     private float lastBotCommandTime = 0;
+    private Rigidbody rigidBody;
+
+    private void OnEnable()
+    {
+        rigidBody = GetComponent<Rigidbody>();
+    }
 
     public void GetInput()
     {
@@ -76,6 +82,11 @@ public class CarController : MonoBehaviour
     private void Update()
     {
         UpdateWheelPoses();
+        ProcessBotCommands();
+    }
+
+    private void ProcessBotCommands()
+    {
         var commands = BotSocket.ReceiveCommands();
         foreach (var command in commands)
         {
@@ -84,7 +95,8 @@ public class CarController : MonoBehaviour
             if (command.action == "forward")
             {
                 forward = command.value;
-            } else if (command.action == "turn")
+            }
+            else if (command.action == "turn")
             {
                 targetAngle = -command.value; // bot uses -1 right, +1 left
             }
