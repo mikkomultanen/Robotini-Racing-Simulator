@@ -106,8 +106,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nodes:
-  - position: {x: 4.3995404, y: 0, z: 7.4836774}
-    direction: {x: 5.033156, y: 0, z: 4.722517}
+  - position: {x: 2.7, y: 0, z: 0.6}
+    direction: {x: 2, y: 0, z: 0.6}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -116,8 +116,8 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: 2.2316287, y: 0, z: 2.5614948}
-    direction: {x: 1.0769825, y: 0, z: 1.9719954}
+  - position: {x: 1.1, y: 0, z: 0.6}
+    direction: {x: 0.82, y: 0, z: 0.6}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -126,8 +126,8 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: -7.150958, y: 0, z: -1.181535}
-    direction: {x: -8.946831, y: 0, z: -1.7925923}
+  - position: {x: 0.6, y: 0, z: 1.1}
+    direction: {x: 0.6, y: 0, z: 1.38}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -136,8 +136,8 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: -9.656566, y: 0, z: 2.9990437}
-    direction: {x: -9.621862, y: 0, z: 6.0029373}
+  - position: {x: 0.6, y: 0, z: 3.1}
+    direction: {x: 0.6, y: 0, z: 3.38}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -146,8 +146,8 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: -6.212388, y: 0, z: 8.969346}
-    direction: {x: -4.736134, y: 0, z: 9.367167}
+  - position: {x: 1.1, y: 0, z: 3.6}
+    direction: {x: 1.38, y: 0, z: 3.6}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -156,8 +156,8 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: -4.375961, y: 0, z: 6.939442}
-    direction: {x: -5.023926, y: 0, z: 5.919211}
+  - position: {x: 1.4, y: 0, z: 3.6}
+    direction: {x: 1.68, y: 0, z: 3.6}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -166,8 +166,8 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: -6.632031, y: 0, z: 3.4877656}
-    direction: {x: -7.294585, y: 0, z: 2.5051184}
+  - position: {x: 1.85, y: 0, z: 3}
+    direction: {x: 1.7648443, y: 0, z: 2.7001638}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -176,8 +176,8 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: -5.125697, y: 0, z: 2.1865432}
-    direction: {x: -3.9142761, y: 0, z: 3.0855324}
+  - position: {x: 1.5591683, y: 0, z: 2.2287612}
+    direction: {x: 1.4496753, y: 0, z: 1.9142778}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -186,8 +186,8 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: 0.31468582, y: 0, z: 6.4900513}
-    direction: {x: 1.0833551, y: 0, z: 7.247735}
+  - position: {x: 2, y: 0, z: 1.6}
+    direction: {x: 2.3, y: 0, z: 1.6}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -196,8 +196,8 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: -0.54347414, y: 0, z: 8.170048}
-    direction: {x: -1.5783143, y: 0, z: 7.9782248}
+  - position: {x: 4.1, y: 0, z: 1.6}
+    direction: {x: 4.38, y: 0, z: 1.6}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -206,8 +206,8 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: -0.95563453, y: 0, z: 10.027262}
-    direction: {x: 0.29973042, y: 0, z: 10.587138}
+  - position: {x: 4.6, y: 0, z: 2.1}
+    direction: {x: 4.6, y: 0, z: 2.38}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -216,8 +216,58 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - position: {x: 4.3995404, y: 0, z: 7.4836774}
-    direction: {x: 5.033156, y: 0, z: 4.722517}
+  - position: {x: 4.1, y: 0, z: 2.6}
+    direction: {x: 3.82, y: 0, z: 2.6}
+    up: {x: 0, y: 1, z: 0}
+    scale: {x: 1, y: 1}
+    roll: 0
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - position: {x: 3.6, y: 0, z: 3.1}
+    direction: {x: 3.6, y: 0, z: 3.38}
+    up: {x: 0, y: 1, z: 0}
+    scale: {x: 1, y: 1}
+    roll: 0
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - position: {x: 4.1, y: 0, z: 3.6}
+    direction: {x: 4.38, y: 0, z: 3.6}
+    up: {x: 0, y: 1, z: 0}
+    scale: {x: 1, y: 1}
+    roll: 0
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - position: {x: 5.6, y: 0, z: 2.1}
+    direction: {x: 5.6, y: 0, z: 0.8}
+    up: {x: 0, y: 1, z: 0}
+    scale: {x: 1, y: 1}
+    roll: 0
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - position: {x: 4.1, y: 0, z: 0.6}
+    direction: {x: 3.82, y: 0, z: 0.6}
+    up: {x: 0, y: 1, z: 0}
+    scale: {x: 1, y: 1}
+    roll: 0
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - position: {x: 2.7, y: 0, z: 0.6}
+    direction: {x: 2, y: 0, z: 0.6}
     up: {x: 0, y: 1, z: 0}
     scale: {x: 1, y: 1}
     roll: 0
@@ -228,8 +278,8 @@ MonoBehaviour:
         Culture=neutral, PublicKeyToken=null
   curves:
   - n1:
-      position: {x: 4.3995404, y: 0, z: 7.4836774}
-      direction: {x: 5.033156, y: 0, z: 4.722517}
+      position: {x: 2.7, y: 0, z: 0.6}
+      direction: {x: 2, y: 0, z: 0.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -239,8 +289,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: 2.2316287, y: 0, z: 2.5614948}
-      direction: {x: 1.0769825, y: 0, z: 1.9719954}
+      position: {x: 1.1, y: 0, z: 0.6}
+      direction: {x: 0.82, y: 0, z: 0.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -255,8 +305,8 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - n1:
-      position: {x: 2.2316287, y: 0, z: 2.5614948}
-      direction: {x: 1.0769825, y: 0, z: 1.9719954}
+      position: {x: 1.1, y: 0, z: 0.6}
+      direction: {x: 0.82, y: 0, z: 0.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -266,8 +316,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: -7.150958, y: 0, z: -1.181535}
-      direction: {x: -8.946831, y: 0, z: -1.7925923}
+      position: {x: 0.6, y: 0, z: 1.1}
+      direction: {x: 0.6, y: 0, z: 1.38}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -282,8 +332,8 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - n1:
-      position: {x: -7.150958, y: 0, z: -1.181535}
-      direction: {x: -8.946831, y: 0, z: -1.7925923}
+      position: {x: 0.6, y: 0, z: 1.1}
+      direction: {x: 0.6, y: 0, z: 1.38}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -293,8 +343,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: -9.656566, y: 0, z: 2.9990437}
-      direction: {x: -9.621862, y: 0, z: 6.0029373}
+      position: {x: 0.6, y: 0, z: 3.1}
+      direction: {x: 0.6, y: 0, z: 3.38}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -309,8 +359,8 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - n1:
-      position: {x: -9.656566, y: 0, z: 2.9990437}
-      direction: {x: -9.621862, y: 0, z: 6.0029373}
+      position: {x: 0.6, y: 0, z: 3.1}
+      direction: {x: 0.6, y: 0, z: 3.38}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -320,8 +370,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: -6.212388, y: 0, z: 8.969346}
-      direction: {x: -4.736134, y: 0, z: 9.367167}
+      position: {x: 1.1, y: 0, z: 3.6}
+      direction: {x: 1.38, y: 0, z: 3.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -336,8 +386,8 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - n1:
-      position: {x: -6.212388, y: 0, z: 8.969346}
-      direction: {x: -4.736134, y: 0, z: 9.367167}
+      position: {x: 1.1, y: 0, z: 3.6}
+      direction: {x: 1.38, y: 0, z: 3.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -347,8 +397,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: -4.375961, y: 0, z: 6.939442}
-      direction: {x: -5.023926, y: 0, z: 5.919211}
+      position: {x: 1.4, y: 0, z: 3.6}
+      direction: {x: 1.68, y: 0, z: 3.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -363,8 +413,8 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - n1:
-      position: {x: -4.375961, y: 0, z: 6.939442}
-      direction: {x: -5.023926, y: 0, z: 5.919211}
+      position: {x: 1.4, y: 0, z: 3.6}
+      direction: {x: 1.68, y: 0, z: 3.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -374,8 +424,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: -6.632031, y: 0, z: 3.4877656}
-      direction: {x: -7.294585, y: 0, z: 2.5051184}
+      position: {x: 1.85, y: 0, z: 3}
+      direction: {x: 1.7648443, y: 0, z: 2.7001638}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -390,8 +440,8 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - n1:
-      position: {x: -6.632031, y: 0, z: 3.4877656}
-      direction: {x: -7.294585, y: 0, z: 2.5051184}
+      position: {x: 1.85, y: 0, z: 3}
+      direction: {x: 1.7648443, y: 0, z: 2.7001638}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -401,8 +451,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: -5.125697, y: 0, z: 2.1865432}
-      direction: {x: -3.9142761, y: 0, z: 3.0855324}
+      position: {x: 1.5591683, y: 0, z: 2.2287612}
+      direction: {x: 1.4496753, y: 0, z: 1.9142778}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -417,8 +467,8 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - n1:
-      position: {x: -5.125697, y: 0, z: 2.1865432}
-      direction: {x: -3.9142761, y: 0, z: 3.0855324}
+      position: {x: 1.5591683, y: 0, z: 2.2287612}
+      direction: {x: 1.4496753, y: 0, z: 1.9142778}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -428,8 +478,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: 0.31468582, y: 0, z: 6.4900513}
-      direction: {x: 1.0833551, y: 0, z: 7.247735}
+      position: {x: 2, y: 0, z: 1.6}
+      direction: {x: 2.3, y: 0, z: 1.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -444,8 +494,8 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - n1:
-      position: {x: 0.31468582, y: 0, z: 6.4900513}
-      direction: {x: 1.0833551, y: 0, z: 7.247735}
+      position: {x: 2, y: 0, z: 1.6}
+      direction: {x: 2.3, y: 0, z: 1.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -455,8 +505,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: -0.54347414, y: 0, z: 8.170048}
-      direction: {x: -1.5783143, y: 0, z: 7.9782248}
+      position: {x: 4.1, y: 0, z: 1.6}
+      direction: {x: 4.38, y: 0, z: 1.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -471,8 +521,8 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - n1:
-      position: {x: -0.54347414, y: 0, z: 8.170048}
-      direction: {x: -1.5783143, y: 0, z: 7.9782248}
+      position: {x: 4.1, y: 0, z: 1.6}
+      direction: {x: 4.38, y: 0, z: 1.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -482,8 +532,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: -0.95563453, y: 0, z: 10.027262}
-      direction: {x: 0.29973042, y: 0, z: 10.587138}
+      position: {x: 4.6, y: 0, z: 2.1}
+      direction: {x: 4.6, y: 0, z: 2.38}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -498,8 +548,8 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - n1:
-      position: {x: -0.95563453, y: 0, z: 10.027262}
-      direction: {x: 0.29973042, y: 0, z: 10.587138}
+      position: {x: 4.6, y: 0, z: 2.1}
+      direction: {x: 4.6, y: 0, z: 2.38}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -509,8 +559,8 @@ MonoBehaviour:
         m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
     n2:
-      position: {x: 4.3995404, y: 0, z: 7.4836774}
-      direction: {x: 5.033156, y: 0, z: 4.722517}
+      position: {x: 4.1, y: 0, z: 2.6}
+      direction: {x: 3.82, y: 0, z: 2.6}
       up: {x: 0, y: 1, z: 0}
       scale: {x: 1, y: 1}
       roll: 0
@@ -524,7 +574,142 @@ MonoBehaviour:
         m_Calls: []
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  Length: 58.82646
+  - n1:
+      position: {x: 4.1, y: 0, z: 2.6}
+      direction: {x: 3.82, y: 0, z: 2.6}
+      up: {x: 0, y: 1, z: 0}
+      scale: {x: 1, y: 1}
+      roll: 0
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    n2:
+      position: {x: 3.6, y: 0, z: 3.1}
+      direction: {x: 3.6, y: 0, z: 3.38}
+      up: {x: 0, y: 1, z: 0}
+      scale: {x: 1, y: 1}
+      roll: 0
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - n1:
+      position: {x: 3.6, y: 0, z: 3.1}
+      direction: {x: 3.6, y: 0, z: 3.38}
+      up: {x: 0, y: 1, z: 0}
+      scale: {x: 1, y: 1}
+      roll: 0
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    n2:
+      position: {x: 4.1, y: 0, z: 3.6}
+      direction: {x: 4.38, y: 0, z: 3.6}
+      up: {x: 0, y: 1, z: 0}
+      scale: {x: 1, y: 1}
+      roll: 0
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - n1:
+      position: {x: 4.1, y: 0, z: 3.6}
+      direction: {x: 4.38, y: 0, z: 3.6}
+      up: {x: 0, y: 1, z: 0}
+      scale: {x: 1, y: 1}
+      roll: 0
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    n2:
+      position: {x: 5.6, y: 0, z: 2.1}
+      direction: {x: 5.6, y: 0, z: 0.8}
+      up: {x: 0, y: 1, z: 0}
+      scale: {x: 1, y: 1}
+      roll: 0
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - n1:
+      position: {x: 5.6, y: 0, z: 2.1}
+      direction: {x: 5.6, y: 0, z: 0.8}
+      up: {x: 0, y: 1, z: 0}
+      scale: {x: 1, y: 1}
+      roll: 0
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    n2:
+      position: {x: 4.1, y: 0, z: 0.6}
+      direction: {x: 3.82, y: 0, z: 0.6}
+      up: {x: 0, y: 1, z: 0}
+      scale: {x: 1, y: 1}
+      roll: 0
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - n1:
+      position: {x: 4.1, y: 0, z: 0.6}
+      direction: {x: 3.82, y: 0, z: 0.6}
+      up: {x: 0, y: 1, z: 0}
+      scale: {x: 1, y: 1}
+      roll: 0
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    n2:
+      position: {x: 2.7, y: 0, z: 0.6}
+      direction: {x: 2, y: 0, z: 0.6}
+      up: {x: 0, y: 1, z: 0}
+      scale: {x: 1, y: 1}
+      roll: 0
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  Length: 19.432844
   isLoop: 1
   CurveChanged:
     m_PersistentCalls:
