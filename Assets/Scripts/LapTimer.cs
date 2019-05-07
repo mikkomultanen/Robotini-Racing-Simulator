@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -10,11 +9,7 @@ public class LapTimer : MonoBehaviour
     [SerializeField] private GameObject lapTimeList;
     [SerializeField] private GameObject lapTimeRowPrefab;
 
-    public void ToggleLapTimeList()
-    {
-        Debug.Log("TAP");
-        lapTimeList?.SetActive(!lapTimeList.activeSelf);
-    }
+    public void ToggleLapTimeList() => lapTimeList?.SetActive(!lapTimeList.activeSelf);
 
     public void CarHitTrigger(GameObject carObject)
     {
@@ -34,7 +29,6 @@ public class LapTimer : MonoBehaviour
                     rect.anchoredPosition = new Vector2(0, -25);
                 }
                 timers[carName].NewLapTime();
-                NewLapTime(carName, timers[carName]);
             }
             else
             {
@@ -42,11 +36,6 @@ public class LapTimer : MonoBehaviour
                 timers[carName] = new TimeWrapper();
             }
         }
-    }
-
-    private void NewLapTime(string carName, TimeWrapper timeWrapper)
-    {
-        Debug.Log("Lap time for " + carName + ": " + timeWrapper.time);
     }
 
     void FixedUpdate()
@@ -88,7 +77,7 @@ public class LapTimer : MonoBehaviour
         private string FormattedTime(float inputTime)
         {
             int minutes = (int)(inputTime / 60);
-            int seconds = (int)(inputTime) % 60;
+            int seconds = (int)inputTime % 60;
             return string.Format("{0:00}:{1:00}{2:.000}", minutes, seconds, inputTime - Mathf.Floor(inputTime));
         }
     }
