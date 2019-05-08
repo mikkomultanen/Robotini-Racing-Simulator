@@ -51,9 +51,6 @@ public class CameraOutputController : MonoBehaviour
 
         RenderTexture.active = null; //can help avoid errors 
         mCamera.targetTexture = null;
-        float widthOnScreen = Screen.width * 0.2f;
-        float heightOnScreen = widthOnScreen / mCamera.aspect;
-        mCamera.pixelRect = new Rect(0, 0, widthOnScreen, heightOnScreen);
         // consider ... Destroy(tempRT);
 
         byte[] bytes;
