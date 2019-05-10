@@ -22,8 +22,8 @@ public class LapTimer : MonoBehaviour
                 if (!timers[carName].timeListElement)
                 {
                     GameObject row = Instantiate(lapTimeRowPrefab);
-                    row.transform.Find("TeamName").GetComponent<TextMeshProUGUI>().text = carName;
                     timers[carName].timeListElement = row;
+                    row.transform.Find("TeamName").GetComponent<TextMeshProUGUI>().text = carName;
                     row.transform.parent = lapTimeList.transform;
                     RectTransform rect = row.GetComponent<RectTransform>();
                     rect.localScale = Vector3.one;
