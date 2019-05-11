@@ -110,9 +110,17 @@ public class BotSocket
             var reader = new StreamReader(stream);
             while (listener != null && !stopped)
             {
-                var line = reader.ReadLine();
-                var command = JsonUtility.FromJson<JsonControlCommand>(line);
-                commandQueue.Enqueue(command);
+                try 
+                {
+                    var line = reader.ReadLine();
+                    var command = JsonUtility.FromJson<JsonControlCommand>(line);
+                    commandQueue.Enqueue(command);
+                } 
+                catch(Exception e) 
+                {
+                    Debug.Log("Socket read failed:" + e.ToString());
+                    stopped = true;
+                }
             }
 
         }).Start();
