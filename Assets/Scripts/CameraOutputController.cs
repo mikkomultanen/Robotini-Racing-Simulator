@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections.Concurrent;
+using System;
+using System.Linq;
+using System.Net.Sockets;
+using System.Threading;
+using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
 public class CameraOutputController : MonoBehaviour
@@ -6,18 +11,10 @@ public class CameraOutputController : MonoBehaviour
     private Camera mCamera;
     private Texture2D virtualPhoto;
     private float lastSaved = 0;
-    private int width = 128;
-    private int height = 80;
-
-    private void OnEnable()
-    {
-       BotSocket.StartListening();
-    }
-
-    private void OnDisable()
-    {
-        BotSocket.EndListening();
-    }
+    private const int width = 128;
+    private const int height = 80;
+    private readonly ConcurrentQueue<byte[]> sendQueue = new ConcurrentQueue<byte[]>();
+    private volatile Socket socket;
 
     private void Start()
     {
@@ -28,7 +25,7 @@ public class CameraOutputController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Time.time < lastSaved + 0.03)
+        if (Time.time < lastSaved + 0.03 || sendQueue.Count > 5 || socket == null)
         {
             return;
         }
@@ -53,9 +50,52 @@ public class CameraOutputController : MonoBehaviour
         mCamera.targetTexture = null;
         // consider ... Destroy(tempRT);
 
-        byte[] bytes;
-        bytes = virtualPhoto.EncodeToPNG();
+        sendQueue.Enqueue(virtualPhoto.EncodeToPNG());
+    }
 
-        BotSocket.SendFrame(bytes);
+    private void OnDestroy()
+    {
+        if (this.socket != null)
+        {
+            this.socket = null;
+        }
+    }
+
+    public void SetSocket(Socket socket)
+    {
+        if (this.socket != null) return;
+
+        this.socket = socket;
+
+        Boolean stopped = false;
+        new Thread(() =>
+        {
+            while (this.socket != null && !stopped)
+            {
+                byte[] data;
+
+                if (sendQueue.TryDequeue(out data))
+                {
+                    if (data.Length > 65535) throw new Exception("Max image size exceeded");
+                    byte lowerByte = (byte)(data.Length & 0xff);
+                    byte higherByte = (byte)((data.Length & 0xff00) >> 8);
+                    //Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
+                    byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
+                    try
+                    {
+                        socket.Send(lengthAsBytes.Concat(data).ToArray());
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log("Socket send failed:" + e.ToString());
+                        stopped = true;
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(10);
+                }
+            }
+        }).Start();
     }
 }
