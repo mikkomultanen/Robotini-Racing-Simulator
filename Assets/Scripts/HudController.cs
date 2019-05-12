@@ -23,7 +23,7 @@ public class HudController : MonoBehaviour
         var angle = -controller.angle;
         var forward = controller.forward;
 
-        speedText.text = "S " + f(rigidBody.velocity.magnitude);
+        speedText.text = "S " + f(controller.velocity);
         turnText.text = "T " + f(angle);
         throttleText.text = "F " + f(forward) ;
     }
