@@ -154,6 +154,10 @@ public class CarController : MonoBehaviour
             {
                 forward = command.value;
             }
+            else if (command.action == "reverse")
+            {
+                forward = -command.value;
+            }
             else if (command.action == "turn")
             {
                 targetAngle = -command.value; // bot uses -1 right, +1 left
