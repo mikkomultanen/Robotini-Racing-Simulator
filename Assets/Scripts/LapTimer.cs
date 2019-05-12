@@ -4,7 +4,7 @@ using TMPro;
 
 public class LapTimer : MonoBehaviour
 {
-    private Dictionary<string, TimeWrapper> timers = new Dictionary<string, TimeWrapper>();
+    public static Dictionary<string, TimeWrapper> timers = new Dictionary<string, TimeWrapper>();
 
     [SerializeField] private GameObject lapTimeList;
     [SerializeField] private GameObject lapTimeRowPrefab;
@@ -47,39 +47,47 @@ public class LapTimer : MonoBehaviour
             timers[key].time += stepSize;
         }
     }
+}
 
-    private class TimeWrapper
+public class TimeWrapper
+{
+    internal float time;
+    internal float bestTime = float.MaxValue;
+    internal float lastTime = 0;
+    internal float lastLapRecordedAt = 0;
+    internal int lapCount;
+
+    internal GameObject timeListElement;
+
+    internal void NewLapTime()
     {
-        internal float time;
-        internal float bestTime = float.MaxValue;
-        internal float lastTime = 0;
-        internal int lapCount;
-
-        internal GameObject timeListElement;
-
-        internal void NewLapTime()
+        lapCount++;
+        lastTime = time;
+        lastLapRecordedAt = Time.time;
+        if (time < bestTime)
         {
-            lapCount++;
-            lastTime = time;
-            if (time < bestTime)
-            {
-                bestTime = time;
-            }
-            time = 0;
-
-            if (timeListElement)
-            {
-                timeListElement.transform.Find("LastLap").GetComponent<TextMeshProUGUI>().text = FormattedTime(lastTime);
-                timeListElement.transform.Find("BestLap").GetComponent<TextMeshProUGUI>().text = FormattedTime(bestTime);
-                timeListElement.transform.Find("LapCount").GetComponent<TextMeshProUGUI>().text = lapCount.ToString();
-            }
+            bestTime = time;
         }
+        time = 0;
 
-        private string FormattedTime(float inputTime)
+        if (timeListElement)
         {
-            int minutes = (int)(inputTime / 60);
-            int seconds = (int)inputTime % 60;
-            return string.Format("{0:00}:{1:00}{2:.000}", minutes, seconds, inputTime - Mathf.Floor(inputTime));
+            timeListElement.transform.Find("LastLap").GetComponent<TextMeshProUGUI>().text = FormattedTime(lastTime);
+            timeListElement.transform.Find("BestLap").GetComponent<TextMeshProUGUI>().text = FormattedTime(bestTime);
+            timeListElement.transform.Find("LapCount").GetComponent<TextMeshProUGUI>().text = lapCount.ToString();
         }
+    }
+
+    public static string FormattedTime(float inputTime)
+    {
+        int minutes = (int)(inputTime / 60);
+        int seconds = (int)inputTime % 60;
+        return string.Format("{0:00}:{1:00}{2:.000}", minutes, seconds, inputTime - Mathf.Floor(inputTime));
+    }
+
+    public static string FormattedDiff(float inputTime)
+    {
+        int seconds = (int)inputTime % 60;
+        return string.Format("{0:0}{1:.000}", seconds, inputTime - Mathf.Floor(inputTime));
     }
 }
