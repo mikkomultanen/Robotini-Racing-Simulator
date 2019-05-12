@@ -157,9 +157,15 @@ public class CarController : MonoBehaviour
             {
                 forward = command.value;
             }
-            else if (command.action == "reverse" && velocity <= 0)
+            else if (command.action == "reverse")
             {
-                forward = -command.value;
+                if (velocity <= 0.01)
+                {
+                    forward = -command.value;
+                } else
+                {
+                    forward = 0;
+                }
             }
             else if (command.action == "turn")
             {
