@@ -100,8 +100,7 @@ public class CarController : MonoBehaviour
     {
         UpdateWheelPoses();
         ProcessBotCommands();
-        var velocityAngle = Vector3.Angle(rigidBody.transform.forward, rigidBody.velocity);
-        velocity = rigidBody.velocity.magnitude * ((velocityAngle <= 90) ? 1 : -1);
+        velocity = Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity);
     }
 
     private void OnDestroy()
