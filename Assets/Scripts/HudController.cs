@@ -8,6 +8,8 @@ public class HudController : MonoBehaviour
     public UnityEngine.UI.Text speedText;
     public UnityEngine.UI.Text throttleText;
     public UnityEngine.UI.Text turnText;
+    public UnityEngine.UI.Text lapText;
+
     private Rigidbody rigidBody;
 
     // Start is called before the first frame update
@@ -48,6 +50,26 @@ public class HudController : MonoBehaviour
         else
         {
             throttleText.text = "REV";
+        }
+
+        if (LapTimer.timers.ContainsKey(car.name))
+        {
+            var timer = LapTimer.timers[car.name];
+            if (timer.lastLapRecordedAt > Time.time - 5)
+            {
+                if (timer.bestTime < timer.lastTime)
+                {
+                    lapText.text = "LAP " + TimeWrapper.FormattedTime(timer.lastTime) + " (+" + TimeWrapper.FormattedDiff(timer.lastTime - timer.bestTime) + ")";
+                }
+                else
+                {
+                    lapText.text = "LAP " + TimeWrapper.FormattedTime(timer.lastTime);
+                }
+            }
+            else
+            {
+                lapText.text = "";
+            }
         }
     }
 
