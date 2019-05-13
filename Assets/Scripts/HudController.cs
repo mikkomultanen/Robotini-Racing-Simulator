@@ -41,18 +41,22 @@ public class HudController : MonoBehaviour
         }
         if (controller.brake > Mathf.Epsilon)
         {
+            throttleText.color = Color.red;
             throttleText.text = "BRK";
         }
         else if (Mathf.Abs(forward) < Mathf.Epsilon)
         {
+            throttleText.color = Color.blue;
             throttleText.text = "IDLE";
         }
         else if (forward > 0)
         {
+            throttleText.color = Color.green;
             throttleText.text =  "F " + f(forward);
         }
         else
         {
+            throttleText.color = Color.red;
             throttleText.text = "REV";
         }
 
