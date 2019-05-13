@@ -39,7 +39,11 @@ public class HudController : MonoBehaviour
         {
             turnText.text = "< " + f(-angle);
         }
-        if (Mathf.Abs(forward) < Mathf.Epsilon)
+        if (controller.brake > Mathf.Epsilon)
+        {
+            throttleText.text = "BRK";
+        }
+        else if (Mathf.Abs(forward) < Mathf.Epsilon)
         {
             throttleText.text = "IDLE";
         }

@@ -20,6 +20,7 @@ public class CarController : MonoBehaviour
     public Transform frontLeftT, frontRightT, rearLeftT, rearRightT;
     public float maxSteerAngle = 30;
     public float motorForce = 50;
+    public float brakeForce = 100;
     public float maxAngleChangePerSecond = 10;
     [HideInInspector]
     public float velocity;
@@ -27,15 +28,19 @@ public class CarController : MonoBehaviour
     public float angle;
     [HideInInspector]
     public float forward;
+    [HideInInspector]
+    public float brake;
     private float targetAngle = 0;
     private float lastBotCommandTime = 0;
     private Rigidbody rigidBody;
     private readonly ConcurrentQueue<JsonControlCommand> commandQueue = new ConcurrentQueue<JsonControlCommand>();
     private volatile Socket socket;
+    private WheelCollider[] allWheels;
 
     private void OnEnable()
     {
         rigidBody = GetComponent<Rigidbody>();
+        allWheels = new WheelCollider[] { frontLeftWC, frontRightWC, rearLeftWC, rearRightWC };
     }
 
     public void GetInput()
@@ -63,11 +68,24 @@ public class CarController : MonoBehaviour
 
     private void Accelerate()
     {
-        float motorTorgue = forward * motorForce;
-        frontLeftWC.motorTorque = motorTorgue;
-        frontRightWC.motorTorque = motorTorgue;
-        rearLeftWC.motorTorque = motorTorgue;
-        rearRightWC.motorTorque = motorTorgue;
+        if (brake == 0)
+        {
+            float motorTorque = forward * motorForce;
+            foreach (WheelCollider wheel in allWheels)
+            {
+                wheel.motorTorque = motorTorque;
+                wheel.brakeTorque = 0;
+            }
+        }
+        else
+        {
+            float brakeTorque = brake * brakeForce;
+            foreach (WheelCollider wheel in allWheels)
+            {
+                wheel.motorTorque = 0;
+                wheel.brakeTorque = brakeTorque;
+            }
+        }
     }
 
     private void UpdateWheelPoses()
@@ -154,10 +172,12 @@ public class CarController : MonoBehaviour
             //Debug.Log("Processing " + JsonUtility.ToJson(command));
             if (command.action == "forward")
             {
+                brake = 0;
                 forward = command.value;
             }
             else if (command.action == "reverse")
             {
+                brake = 0;
                 if (velocity <= 0.01)
                 {
                     forward = -command.value;
@@ -165,6 +185,11 @@ public class CarController : MonoBehaviour
                 {
                     forward = 0;
                 }
+            }
+            else if (command.action == "brake")
+            {
+                forward = 0;
+                brake = command.value;
             }
             else if (command.action == "turn")
             {
