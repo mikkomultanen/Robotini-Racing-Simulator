@@ -21,8 +21,8 @@ public class CarController : MonoBehaviour
     public float maxSteerAngle = 30;
     public float motorForce = 50;
     public float maxAngleChangePerSecond = 10;
+    [HideInInspector]
     public float velocity;
-
     [HideInInspector]
     public float angle;
     [HideInInspector]
