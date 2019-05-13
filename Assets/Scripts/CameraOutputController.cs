@@ -39,6 +39,7 @@ public class CameraOutputController : MonoBehaviour
         RenderTexture tempRT = new RenderTexture(width, height, 24);
         // the 24 can be 0,16,24, formats like
         // RenderTextureFormat.Default, ARGB32 etc.
+        tempRT.antiAliasing = 2;
 
         mCamera.targetTexture = tempRT;
         mCamera.Render();
