@@ -21,7 +21,8 @@ public class CarController : MonoBehaviour
     public float maxSteerAngle = 30;
     public float motorForce = 50;
     public float maxAngleChangePerSecond = 10;
-
+    [HideInInspector]
+    public float velocity;
     [HideInInspector]
     public float angle;
     [HideInInspector]
@@ -99,6 +100,7 @@ public class CarController : MonoBehaviour
     {
         UpdateWheelPoses();
         ProcessBotCommands();
+        velocity = Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity);
     }
 
     private void OnDestroy()
@@ -153,6 +155,16 @@ public class CarController : MonoBehaviour
             if (command.action == "forward")
             {
                 forward = command.value;
+            }
+            else if (command.action == "reverse")
+            {
+                if (velocity <= 0.01)
+                {
+                    forward = -command.value;
+                } else
+                {
+                    forward = 0;
+                }
             }
             else if (command.action == "turn")
             {
