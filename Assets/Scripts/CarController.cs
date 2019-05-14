@@ -50,6 +50,7 @@ public class CarController : MonoBehaviour
             // 300ms pause in bot commands -> return to manual control
             angle = Input.GetAxis("Horizontal");
             forward = Input.GetAxis("Vertical");
+            brake = Input.GetKey(KeyCode.Space) ? 1 : 0;
         }
         else
         {
