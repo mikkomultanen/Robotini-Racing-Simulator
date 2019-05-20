@@ -24,18 +24,47 @@ public class LapTimer : MonoBehaviour
                     GameObject row = Instantiate(lapTimeRowPrefab);
                     row.transform.Find("TeamName").GetComponent<TextMeshProUGUI>().text = carName;
                     timers[carName].timeListElement = row;
-                    row.transform.parent = lapTimeList.transform;
+                    row.transform.SetParent(lapTimeList.transform, false);
                     RectTransform rect = row.GetComponent<RectTransform>();
                     rect.localScale = Vector3.one;
                     rect.anchoredPosition = new Vector2(0, -25);
                 }
                 timers[carName].NewLapTime();
+                this.SortTimeList();
             }
             else
             {
                 Debug.Log("New car entering race: " + carName);
                 timers[carName] = new TimeWrapper();
             }
+        }
+    }
+
+    private void SortTimeList()
+    {
+        const float rowHeight = 50;
+        const float startHeight = -25;
+
+        List<TimeWrapper> times = new List<TimeWrapper>(timers.Values);
+        times.Sort(delegate (TimeWrapper t1, TimeWrapper t2) {
+            return t1.bestTime.CompareTo(t2.bestTime);
+        });
+
+        int i = 0;
+        foreach (TimeWrapper time in times) {
+            if (!time.timeListElement)
+            {
+                continue;
+            }
+            if (i > 7)
+            {
+                time.timeListElement.SetActive(false);
+                continue;
+            }
+            time.timeListElement.SetActive(true);
+
+            time.timeListElement.GetComponent<RectTransform>()
+            .anchoredPosition = new Vector2(0, startHeight - rowHeight * i++);
         }
     }
 
