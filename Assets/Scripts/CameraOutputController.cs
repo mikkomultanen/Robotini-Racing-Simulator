@@ -9,6 +9,7 @@ using UnityEngine;
 public class CameraOutputController : MonoBehaviour
 {
     private Camera mCamera;
+    private RenderTexture renderTexture;
     private Texture2D virtualPhoto;
     private float lastSaved = 0;
     private const int width = 128;
@@ -19,6 +20,8 @@ public class CameraOutputController : MonoBehaviour
     private void Start()
     {
         mCamera = GetComponent<Camera>();
+        renderTexture = new RenderTexture(width, height, 24);
+        renderTexture.antiAliasing = 2;
         virtualPhoto = new Texture2D(width, height, TextureFormat.RGB24, false);
     }
 
@@ -36,20 +39,21 @@ public class CameraOutputController : MonoBehaviour
         mCamera.aspect = 1.0f * width / height;
         // recall that the height is now the "actual" size from now on
 
-        RenderTexture tempRT = new RenderTexture(width, height, 24);
+        //RenderTexture tempRT = RenderTexture.GetTemporary(width, height, 24);
         // the 24 can be 0,16,24, formats like
         // RenderTextureFormat.Default, ARGB32 etc.
-        tempRT.antiAliasing = 2;
+        //tempRT.antiAliasing = 2;
 
-        mCamera.targetTexture = tempRT;
+        mCamera.targetTexture = renderTexture;
         mCamera.Render();
 
-        RenderTexture.active = tempRT;
+        RenderTexture.active = renderTexture;
         virtualPhoto.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        virtualPhoto.Apply();
 
         RenderTexture.active = null; //can help avoid errors 
         mCamera.targetTexture = null;
-        // consider ... Destroy(tempRT);
+        //RenderTexture.ReleaseTemporary(tempRT);
 
         sendQueue.Enqueue(virtualPhoto.EncodeToPNG());
     }
