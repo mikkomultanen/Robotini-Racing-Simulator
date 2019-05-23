@@ -35,7 +35,7 @@ public class RaceController : MonoBehaviour
         {
             Debug.Log("Client connected");
             var curveSample = track.GetSampleAtDistance(0.95f * track.Length);
-            var car = Instantiate(carPrefab, curveSample.location + Vector3.up, curveSample.Rotation);
+            var car = Instantiate(carPrefab, curveSample.location + 0.1f * Vector3.up, curveSample.Rotation);
             var carController = car.GetComponent<CarController>();
             carController.SetSocket(socket);
             carController.raceController = this;
@@ -46,6 +46,19 @@ public class RaceController : MonoBehaviour
         {
             motorsEnabled = !motorsEnabled;
             Debug.Log("Motors enabled: " + motorsEnabled);
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            var cars = FindObjectsOfType<CarController>();
+            int i = 0;
+            foreach (var car in cars)
+            {
+                var curveSample = track.GetSampleAtDistance(track.Length - (++i * 0.4f));
+                car.transform.position = curveSample.location + 0.1f * Vector3.up + curveSample.Rotation * Vector3.right * (i % 2 == 0 ? 1 : -1) * 0.1f;
+                car.transform.rotation = curveSample.Rotation;
+                car.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            }
         }
     }
 
