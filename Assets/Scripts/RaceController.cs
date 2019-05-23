@@ -8,6 +8,8 @@ using UnityEngine;
 public class RaceController : MonoBehaviour
 {
     public GameObject carPrefab;
+    [HideInInspector]
+    public bool motorsEnabled = true;
 
     private SplineMesh.Spline track;
     private readonly ManualResetEvent allDone = new ManualResetEvent(false);
@@ -34,8 +36,16 @@ public class RaceController : MonoBehaviour
             Debug.Log("Client connected");
             var curveSample = track.GetSampleAtDistance(0.95f * track.Length);
             var car = Instantiate(carPrefab, curveSample.location + Vector3.up, curveSample.Rotation);
-            car.GetComponent<CarController>().SetSocket(socket);
+            var carController = car.GetComponent<CarController>();
+            carController.SetSocket(socket);
+            carController.raceController = this;
             car.name = "Car" + (++index);
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            motorsEnabled = !motorsEnabled;
+            Debug.Log("Motors enabled: " + motorsEnabled);
         }
     }
 

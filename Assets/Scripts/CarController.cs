@@ -30,6 +30,8 @@ public class CarController : MonoBehaviour
     public float forward;
     [HideInInspector]
     public float brake;
+    [HideInInspector]
+    public RaceController raceController;
     private float targetAngle = 0;
     private float lastBotCommandTime = 0;
     private Rigidbody rigidBody;
@@ -69,7 +71,14 @@ public class CarController : MonoBehaviour
 
     private void Accelerate()
     {
-        if (brake == 0)
+        if (!raceController.motorsEnabled) {
+            foreach (WheelCollider wheel in allWheels)
+            {
+                wheel.motorTorque = 0;
+                wheel.brakeTorque = 0;
+            }
+        }
+        else if (brake == 0)
         {
             float motorTorque = forward * motorForce;
             foreach (WheelCollider wheel in allWheels)
