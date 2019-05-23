@@ -50,6 +50,7 @@ public class RaceController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
+            FindObjectOfType<LapTimer>().ResetTimers();
             var cars = FindObjectsOfType<CarController>();
             int i = 0;
             foreach (var car in cars)

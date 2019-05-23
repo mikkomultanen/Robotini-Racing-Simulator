@@ -76,6 +76,18 @@ public class LapTimer : MonoBehaviour
             timers[key].time += stepSize;
         }
     }
+
+    public void ResetTimers()
+    {
+        foreach (var timer in timers.Values)
+        { 
+            if (timer.timeListElement)
+            {
+                Destroy(timer.timeListElement);
+            }
+        }
+        timers.Clear();
+    }
 }
 
 public class TimeWrapper
