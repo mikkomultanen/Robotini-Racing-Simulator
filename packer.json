@@ -1,0 +1,56 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": ""
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "ami_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_size": 100
+        }
+      ],
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_size": 100
+        }
+      ],
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "eu-west-1",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": [
+          "099720109477"
+        ],
+        "most_recent": true
+      },
+      "instance_type": "g2.2xlarge",
+      "ssh_username": "ubuntu",
+      "ami_name": "robotini-runner-{{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "./robotini-runner.tar",
+      "destination": "/home/ubuntu/robotini-runner.tar"
+    },
+    {
+      "type": "shell",
+      "script": "provision.sh",
+      "pause_before": "5s",
+      "environment_vars": [
+        "LC_ALL=C.UTF-8",
+        "LANG=C.UTF-8"
+      ]
+    }
+  ]
+}

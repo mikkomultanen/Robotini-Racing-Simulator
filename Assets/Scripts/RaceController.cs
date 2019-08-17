@@ -70,7 +70,8 @@ public class RaceController : MonoBehaviour
         // The DNS name of the computer  
         // running the listener is "host.contoso.com".  
         IPAddress ipAddress = IPAddress.Any;
-        IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+        int port = 11000;
+        IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
 
         // Create a TCP/IP socket.  
         listener = new Socket(ipAddress.AddressFamily,
@@ -79,7 +80,7 @@ public class RaceController : MonoBehaviour
         listener.Bind(localEndPoint);
         listener.Listen(100);
 
-        Debug.Log("Starting thread");
+        Debug.Log("Starting thread, listening on" + port);
 
         new Thread(() =>
         {
