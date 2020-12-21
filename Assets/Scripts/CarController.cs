@@ -160,7 +160,10 @@ public class CarController : MonoBehaviour
                 {
                     var line = reader.ReadLine();
                     var command = JsonUtility.FromJson<JsonControlCommand>(line);
-                    commandQueue.Enqueue(command);
+                    if (command != null) {
+                        // Seems we get null commands sometimes, when socket closing or something
+                        commandQueue.Enqueue(command);
+                    }
                 }
                 catch (Exception e)
                 {
