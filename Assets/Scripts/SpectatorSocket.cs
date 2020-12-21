@@ -29,7 +29,15 @@ public class SpectatorSocket : MonoBehaviour
 
     private void OnEnable()
     {
-        StartListening();
+        if (ModeController.Mode != SimulatorMode.Playback)
+        {
+            Debug.Log("Initializing spectator socket");
+            StartListening();
+        }
+        else
+        {
+            Debug.Log("Skipping spectator socket");
+        }
     }
 
     private void OnDisable()

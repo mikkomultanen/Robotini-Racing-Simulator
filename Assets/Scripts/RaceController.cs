@@ -20,7 +20,15 @@ public class RaceController : MonoBehaviour
     private void OnEnable()
     {
         track = FindObjectOfType<SplineMesh.Spline>();
-        StartListening();
+        if (ModeController.Mode != SimulatorMode.Playback)
+        {
+            Debug.Log("Initializing car socket");
+            StartListening();
+        }
+        else
+        {
+            Debug.Log("Skipping car socket");
+        }
     }
 
     private void OnDisable()

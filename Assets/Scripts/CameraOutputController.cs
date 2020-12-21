@@ -23,6 +23,7 @@ public class CameraOutputController : MonoBehaviour
         renderTexture = new RenderTexture(width, height, 24);
         renderTexture.antiAliasing = 2;
         virtualPhoto = new Texture2D(width, height, TextureFormat.RGB24, false);
+        Debug.Log("CameraOutputController started");
     }
 
     // Update is called once per frame
