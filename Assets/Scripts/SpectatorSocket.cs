@@ -15,16 +15,13 @@ public class SpectatorSocket : MonoBehaviour
     private GameStatus latestGameStatus;
     private Socket listener = null;
     private readonly ManualResetEvent allDone = new ManualResetEvent(false);
+    private DateTime startTime = System.DateTime.Now;
 
     private void Update()
     {
         CarController[] cars = FindObjectsOfType<CarController>();
         CarStatus[] statuses = cars.Select(c => new CarStatus(c.rigidBody.position, c.rigidBody.velocity)).ToArray();
-
-        latestGameStatus = new GameStatus(statuses, System.DateTime.Now);
-        //string jsonString = JsonUtility.ToJson(latestGameStatus);
-        //Debug.Log(jsonString);
-
+        latestGameStatus = new GameStatus(statuses, (float)((System.DateTime.Now - startTime).TotalSeconds));
     }
 
     private void OnEnable()
@@ -96,7 +93,7 @@ public class SpectatorSocket : MonoBehaviour
             GameStatus myGameStatus = null;
             while (listener != null)
             {
-                if (myGameStatus == null || myGameStatus.timestamp != latestGameStatus.timestamp)
+                if (myGameStatus == null || (myGameStatus.timestamp != latestGameStatus.timestamp && ( myGameStatus.cars.Length > 0 || latestGameStatus.cars.Length > 0 ) ))
                 {
                     myGameStatus = latestGameStatus;
                     Debug.Log("Send update " + myGameStatus.timestamp);
@@ -147,11 +144,11 @@ public class CarStatus
 [Serializable]
 public class GameStatus
 {
-    public GameStatus(CarStatus[] cars, System.DateTime timestamp)
+    public GameStatus(CarStatus[] cars, float timestamp)
     {
         this.cars = cars;
         this.timestamp = timestamp;
     }
     public CarStatus[] cars;
-    public System.DateTime timestamp;
+    public float timestamp;
 }
