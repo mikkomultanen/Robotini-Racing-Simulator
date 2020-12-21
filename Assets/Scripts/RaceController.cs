@@ -33,7 +33,7 @@ public class RaceController : MonoBehaviour
         Socket socket;
         while (clientSocketQueue.TryDequeue(out socket))
         {
-            Debug.Log("Client connected");
+            Debug.Log("Client connected " + socket.RemoteEndPoint);
             var curveSample = track.GetSampleAtDistance(0.95f * track.Length);
             var car = Instantiate(carPrefab, curveSample.location + 0.1f * Vector3.up, curveSample.Rotation);
             var carController = car.GetComponent<CarController>();
@@ -66,9 +66,6 @@ public class RaceController : MonoBehaviour
     private void StartListening()
     {
         if (listener != null) return;
-        // Establish the local endpoint for the socket.  
-        // The DNS name of the computer  
-        // running the listener is "host.contoso.com".  
         IPAddress ipAddress = IPAddress.Any;
         int port = 11000;
         IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
@@ -80,7 +77,7 @@ public class RaceController : MonoBehaviour
         listener.Bind(localEndPoint);
         listener.Listen(100);
 
-        Debug.Log("Starting thread, listening on" + port);
+        Debug.Log("Starting car thread, listening on " + port);
 
         new Thread(() =>
         {
@@ -90,7 +87,7 @@ public class RaceController : MonoBehaviour
                 allDone.Reset();
 
                 // Start an asynchronous socket to listen for connections.  
-                Debug.Log("Waiting for a connection...");
+                Debug.Log("Waiting for car connection...");
                 listener.BeginAccept(
                     new AsyncCallback(AcceptCallback),
                     listener);

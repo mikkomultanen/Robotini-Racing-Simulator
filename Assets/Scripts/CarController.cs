@@ -34,7 +34,7 @@ public class CarController : MonoBehaviour
     public RaceController raceController;
     private float targetAngle = 0;
     private float lastBotCommandTime = 0;
-    private Rigidbody rigidBody;
+    public Rigidbody rigidBody;
     private readonly ConcurrentQueue<JsonControlCommand> commandQueue = new ConcurrentQueue<JsonControlCommand>();
     private volatile Socket socket;
     private WheelCollider[] allWheels;
