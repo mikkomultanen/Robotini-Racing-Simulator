@@ -20,7 +20,7 @@ public class SpectatorSocket : MonoBehaviour
     private void Update()
     {
         CarController[] cars = FindObjectsOfType<CarController>();
-        CarStatus[] statuses = cars.Select(c => new CarStatus(c.rigidBody.position, c.rigidBody.velocity)).ToArray();
+        CarStatus[] statuses = cars.Select(c => new CarStatus(c.rigidBody.position, c.rigidBody.velocity, c.rigidBody.rotation)).ToArray();
         latestGameStatus = new GameStatus(statuses, (float)((System.DateTime.Now - startTime).TotalSeconds));
     }
 
@@ -132,13 +132,15 @@ public class SpectatorSocket : MonoBehaviour
 [Serializable]
 public class CarStatus
 {
-    public CarStatus(Vector3 position, Vector3 velocity)
+    public CarStatus(Vector3 position, Vector3 velocity, Quaternion rotation)
     {
         this.position = position;
         this.velocity = velocity;
+        this.rotation = rotation;
     }
     public Vector3 position;
     public Vector3 velocity;
+    public Quaternion rotation;
 }
 
 [Serializable]
