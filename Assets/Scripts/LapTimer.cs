@@ -42,8 +42,8 @@ public class LapTimer : MonoBehaviour
 
     private void SortTimeList()
     {
-        const float rowHeight = 50;
-        const float startHeight = -25;
+        const float rowHeight = 20;
+        const float startHeight = -10;
 
         List<TimeWrapper> times = new List<TimeWrapper>(timers.Values);
         times.Sort(delegate (TimeWrapper t1, TimeWrapper t2) {
@@ -64,7 +64,7 @@ public class LapTimer : MonoBehaviour
             time.timeListElement.SetActive(true);
 
             time.timeListElement.GetComponent<RectTransform>()
-            .anchoredPosition = new Vector2(0, startHeight - rowHeight * i++);
+            .anchoredPosition = new Vector2(10, startHeight - rowHeight * i++);
         }
     }
 
