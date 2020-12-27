@@ -128,29 +128,3 @@ public class SpectatorSocket : MonoBehaviour
         }
     }
 }
-
-[Serializable]
-public class CarStatus
-{
-    public CarStatus(Vector3 position, Vector3 velocity, Quaternion rotation)
-    {
-        this.position = position;
-        this.velocity = velocity;
-        this.rotation = rotation;
-    }
-    public Vector3 position;
-    public Vector3 velocity;
-    public Quaternion rotation;
-}
-
-[Serializable]
-public class GameStatus
-{
-    public GameStatus(CarStatus[] cars, float timestamp)
-    {
-        this.cars = cars;
-        this.timestamp = timestamp;
-    }
-    public CarStatus[] cars;
-    public float timestamp;
-}

@@ -35,8 +35,8 @@ public class CarController : MonoBehaviour
     private float targetAngle = 0;
     private float lastBotCommandTime = 0;
     public Rigidbody rigidBody;
-    private readonly ConcurrentQueue<JsonControlCommand> commandQueue = new ConcurrentQueue<JsonControlCommand>();
-    private volatile Socket socket;
+    
+    private volatile SocketWrapper socket;
     private WheelCollider[] allWheels;
 
     private void OnEnable()
@@ -140,46 +140,16 @@ public class CarController : MonoBehaviour
         }
     }
 
-    public void SetSocket(Socket socket)
-    {
-        if (this.socket != null) return;
-
+    public void SetSocket(SocketWrapper socket) {
         this.socket = socket;
-
         var cameraOutput = GetComponentInChildren<CameraOutputController>();
-        cameraOutput.SetSocket(socket);
-
-        Boolean stopped = false;
-
-        new Thread(() => {
-            var stream = new NetworkStream(socket);
-            var reader = new StreamReader(stream);
-            while (this.socket != null && !stopped)
-            {
-                try
-                {
-                    var line = reader.ReadLine();
-                    var command = JsonUtility.FromJson<JsonControlCommand>(line);
-                    if (command != null) {
-                        // Seems we get null commands sometimes, when socket closing or something
-                        commandQueue.Enqueue(command);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.Log("Socket read failed:" + e.ToString());
-                    stopped = true;
-                }
-            }
-            commandQueue.Enqueue(new JsonControlCommand {
-                action = "disconnected"
-            });
-        }).Start();
+        cameraOutput.SetSocket(socket);        
     }
 
     private void ProcessBotCommands()
     {
-        foreach (var command in ReceiveCommands())
+        if (socket == null) return;
+        foreach (var command in socket.ReceiveCommands())
         {
             lastBotCommandTime = Time.time;
             //Debug.Log("Processing " + JsonUtility.ToJson(command));
@@ -215,14 +185,5 @@ public class CarController : MonoBehaviour
         }
     }
 
-    private IEnumerable<JsonControlCommand> ReceiveCommands()
-    {
-        var commands = new List<JsonControlCommand>();
-        JsonControlCommand command = null;
-        while (commandQueue.TryDequeue(out command))
-        {
-            commands.Add(command);
-        }
-        return commands;
-    }
+
 }

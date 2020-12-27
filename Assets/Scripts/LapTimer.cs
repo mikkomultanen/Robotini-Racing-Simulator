@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UniRx;
 
 public class LapTimer : MonoBehaviour
 {
@@ -16,7 +17,6 @@ public class LapTimer : MonoBehaviour
         if (carObject.GetComponent<CarController>())
         {
             string carName = carObject.name;
-
             if (timers.ContainsKey(carName))
             {
                 if (!timers[carName].timeListElement)
