@@ -12,7 +12,7 @@ public class CameraOutputController : MonoBehaviour
     private const int width = 128;
     private const int height = 80;
     
-    private volatile SocketWrapper socket;
+    private volatile CarSocket socket;
 
     private void Start()
     {
@@ -78,7 +78,7 @@ public class CameraOutputController : MonoBehaviour
         return encodedBytes;
     }
 
-    public void SetSocket(SocketWrapper socket)
+    public void SetSocket(CarSocket socket)
     {
         if (this.socket != null) return;
         this.socket = socket;

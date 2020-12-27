@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using UniRx;
+using System;
+using System.Collections.Concurrent;
 
 public class RaceController : MonoBehaviour
 {
     public GameObject carPrefab;
     [HideInInspector]
     public bool motorsEnabled = true;
-
+    private readonly ConcurrentQueue<CarSocket> incomingCars = new ConcurrentQueue<CarSocket>();
     private SplineMesh.Spline track;
 
     private void OnEnable()
@@ -33,23 +35,35 @@ public class RaceController : MonoBehaviour
         }).AddTo(this);
     }
 
-    public void AddCar(CarInfo info, SocketWrapper socket)
-    {        
-        var curveSample = track.GetSampleAtDistance(0.95f * track.Length);
-        var car = Instantiate(carPrefab, curveSample.location + 0.1f * Vector3.up, curveSample.Rotation);
-        var carController = car.GetComponent<CarController>();
-        carController.SetSocket(socket);
-        carController.raceController = this;
-        car.name = info.name;
+    public void AddCarSocket(CarSocket socket)
+    {
+        incomingCars.Enqueue(socket);       
     }
 
     private void Update()
     {
-        
+        CarSocket socket = null;
+        while (incomingCars.TryDequeue(out socket))
+        {
+            var curveSample = track.GetSampleAtDistance(0.95f * track.Length);
+            var car = Instantiate(carPrefab, curveSample.location + 0.1f * Vector3.up, curveSample.Rotation);
+            var carController = car.GetComponent<CarController>();
+            carController.SetSocket(socket);
+            carController.raceController = this;
+            car.name = socket.CarInfo().name;
+        }
     }
 }
 
+[Serializable]
+public class JsonControlCommand
+{
+    public string action;
+    public string move;
+    public float value;
+}
 
+[Serializable]
 public class CarInfo
 {
     public string teamId;

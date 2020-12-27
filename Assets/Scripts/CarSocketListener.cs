@@ -35,9 +35,7 @@ public class CarSocketListener : MonoBehaviour {
         while (clientSocketQueue.TryDequeue(out socket))
         {
             Debug.Log("Client connected " + socket.RemoteEndPoint);
-            var socketWrapper = new SocketWrapper(socket);
-            var carInfo = new CarInfo("TODOID", "Car" + (++index));
-            FindObjectOfType<RaceController>().AddCar(carInfo, socketWrapper);                        
+            new CarSocket(socket, FindObjectOfType<RaceController>());                       
         }
     }
 

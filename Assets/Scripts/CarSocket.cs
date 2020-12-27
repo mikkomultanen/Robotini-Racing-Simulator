@@ -6,48 +6,50 @@ using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
 
-public class SocketWrapper {
+public class CarSocket {
     private volatile Socket socket;
-    private readonly ConcurrentQueue<JsonControlCommand> commandQueue = new ConcurrentQueue<JsonControlCommand>();
+    private readonly ConcurrentQueue<JsonControlCommand> recvQueue = new ConcurrentQueue<JsonControlCommand>();
     private readonly ConcurrentQueue<byte[]> sendQueue = new ConcurrentQueue<byte[]>();
+    private CarInfo carInfo;
 
-    public SocketWrapper(Socket socket)
+    public CarSocket(Socket socket, RaceController raceController)
     {
         this.socket = socket;
-
-        Boolean stopped = false;
 
         // Receiver thread
         new Thread(() => {
             var stream = new NetworkStream(socket);
             var reader = new StreamReader(stream);
-            while (this.socket != null && !stopped)
+            try
             {
-                try
+                Debug.Log("Reading car info...");
+                var line = reader.ReadLine();
+                this.carInfo = JsonUtility.FromJson<CarInfo>(line);
+                Debug.Log("car info " + line);
+                if (carInfo.name == null || carInfo.name == "") throw new Exception("CarInfo.name missing");
+                if (carInfo.teamId == null || carInfo.teamId == "") throw new Exception("CarInfo.teamId missing");
+                raceController.AddCarSocket(this);
+
+                while (this.socket != null)
                 {
-                    var line = reader.ReadLine();
+                    line = reader.ReadLine();
                     var command = JsonUtility.FromJson<JsonControlCommand>(line);
-                    if (command != null) {
-                        // Seems we get null commands sometimes, when socket closing or something
-                        commandQueue.Enqueue(command);
-                    }
+                    recvQueue.Enqueue(command);
                 }
-                catch (Exception e)
-                {
-                    Debug.Log("Socket read failed:" + e.ToString());
-                    stopped = true;
-                }
+
             }
-            commandQueue.Enqueue(new JsonControlCommand {
-                action = "disconnected"
-            });
+            catch (Exception e)
+            {
+                Debug.Log("Socket read failed:" + e.ToString());
+                this.socket = null;
+            }
         }).Start();
 
 
         // Sender thread        
         new Thread(() =>
         {
-            while (this.socket != null && !stopped)
+            while (this.socket != null)
             {
                 byte[] data;
 
@@ -60,7 +62,7 @@ public class SocketWrapper {
                     catch (Exception e)
                     {
                         Debug.Log("Socket send failed:" + e.ToString());
-                        stopped = true;
+                        this.socket = null;
                     }
                 }
                 else
@@ -69,6 +71,16 @@ public class SocketWrapper {
                 }
             }
         }).Start();
+    }
+
+    public Boolean IsConnected()
+    {
+        return socket != null;
+    }
+
+    public CarInfo CarInfo()
+    {
+        return carInfo;
     }
 
     public void Send(byte[] data)
@@ -80,20 +92,27 @@ public class SocketWrapper {
     {
         return sendQueue.Count;
     }
-
+    
     public IEnumerable<JsonControlCommand> ReceiveCommands()
-    {
+    {        
         var commands = new List<JsonControlCommand>();
         JsonControlCommand command = null;
-        while (commandQueue.TryDequeue(out command))
+        while (recvQueue.TryDequeue(out command))
         {
-            commands.Add(command);
+            if (command != null)
+            {
+                // Seems we get null commands sometimes, when socket closing or something
+                commands.Add(command);
+            }            
         }
         return commands;
     }
 
     public void Dispose()
     {
-        this.socket.Dispose();
+        if (this.socket != null)
+        {
+            this.socket.Dispose();
+        }
     }
 }

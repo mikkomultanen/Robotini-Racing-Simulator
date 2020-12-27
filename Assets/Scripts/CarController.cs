@@ -6,14 +6,6 @@ using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
 
-[Serializable]
-public class JsonControlCommand
-{
-    public string action;
-    public string move;
-    public float value;
-}
-
 public class CarController : MonoBehaviour
 {
     public WheelCollider frontLeftWC, frontRightWC, rearLeftWC, rearRightWC;
@@ -36,7 +28,7 @@ public class CarController : MonoBehaviour
     private float lastBotCommandTime = 0;
     public Rigidbody rigidBody;
     
-    private volatile SocketWrapper socket;
+    private volatile CarSocket socket;
     private WheelCollider[] allWheels;
 
     private void OnEnable()
@@ -140,7 +132,7 @@ public class CarController : MonoBehaviour
         }
     }
 
-    public void SetSocket(SocketWrapper socket) {
+    public void SetSocket(CarSocket socket) {
         this.socket = socket;
         var cameraOutput = GetComponentInChildren<CameraOutputController>();
         cameraOutput.SetSocket(socket);        
@@ -149,6 +141,10 @@ public class CarController : MonoBehaviour
     private void ProcessBotCommands()
     {
         if (socket == null) return;
+        if (!socket.IsConnected())
+        {
+            Destroy(gameObject);
+        }
         foreach (var command in socket.ReceiveCommands())
         {
             lastBotCommandTime = Time.time;
@@ -177,10 +173,6 @@ public class CarController : MonoBehaviour
             else if (command.action == "turn")
             {
                 targetAngle = -command.value; // bot uses -1 right, +1 left
-            }
-            else if (command.action == "disconnected")
-            {
-                Destroy(gameObject);
             }
         }
     }
