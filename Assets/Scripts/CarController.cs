@@ -127,7 +127,6 @@ public class CarController : MonoBehaviour
     {
         if (this.socket != null) 
         {
-            this.socket.Dispose();
             this.socket = null;
         }
     }
@@ -136,6 +135,11 @@ public class CarController : MonoBehaviour
         this.socket = socket;
         var cameraOutput = GetComponentInChildren<CameraOutputController>();
         cameraOutput.SetSocket(socket);        
+    }
+
+    public CarInfo CarInfo()
+    {
+        return socket.CarInfo();
     }
 
     private void ProcessBotCommands()

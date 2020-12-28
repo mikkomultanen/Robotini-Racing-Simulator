@@ -11,11 +11,18 @@ public class HudController : MonoBehaviour
     public UnityEngine.UI.Text lapText;
 
     private Rigidbody rigidBody;
+    private LapCompleted lap;
 
     // Start is called before the first frame update
     void Start()
     {
         rigidBody = car.GetComponent<Rigidbody>();
+        EventBus.Subscribe<LapCompleted>(this, newLap => {
+            if (newLap.car.name == car.name)
+            {
+                lap = newLap;
+            }
+        });
     }
 
     // Update is called once per frame
@@ -60,24 +67,20 @@ public class HudController : MonoBehaviour
             throttleText.text = "REV";
         }
 
-        if (LapTimer.timers.ContainsKey(car.name))
+        if (lap != null)
         {
-            var timer = LapTimer.timers[car.name];
-            if (timer.lastLapRecordedAt > Time.time - 5)
+            if (lap.bestLap < lap.lastLap)
             {
-                if (timer.bestTime < timer.lastTime)
-                {
-                    lapText.text = "LAP " + TimeWrapper.FormattedTime(timer.lastTime) + " (+" + TimeWrapper.FormattedDiff(timer.lastTime - timer.bestTime) + ")";
-                }
-                else
-                {
-                    lapText.text = "LAP " + TimeWrapper.FormattedTime(timer.lastTime);
-                }
+                lapText.text = "LAP " + LapTimeDisplay.FormattedTime(lap.lastLap) + " (+" + LapTimeDisplay.FormattedDiff(lap.lastLap - lap.bestLap) + ")";
             }
             else
             {
-                lapText.text = "";
+                lapText.text = "LAP " + LapTimeDisplay.FormattedTime(lap.lastLap);
             }
+        }
+        else
+        {
+            lapText.text = "";
         }
     }
 

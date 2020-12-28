@@ -7,12 +7,12 @@ public class KeyboardController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            MessageBroker.Default.Publish(new MotorsToggle());
+            EventBus.Publish(new MotorsToggle());
         }
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            MessageBroker.Default.Publish(new ResetTimers());
+            EventBus.Publish(new ResetTimers());
         }
     }
 }

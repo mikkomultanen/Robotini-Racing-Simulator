@@ -28,7 +28,7 @@ public class CarSocket {
                 Debug.Log("car info " + line);
                 if (carInfo.name == null || carInfo.name == "") throw new Exception("CarInfo.name missing");
                 if (carInfo.teamId == null || carInfo.teamId == "") throw new Exception("CarInfo.teamId missing");
-                raceController.AddCarSocket(this);
+                EventBus.Publish(new CarConnected(carInfo, this));
 
                 while (this.socket != null)
                 {
@@ -41,7 +41,7 @@ public class CarSocket {
             catch (Exception e)
             {
                 Debug.Log("Socket read failed:" + e.ToString());
-                this.socket = null;
+                disconnected();
             }
         }).Start();
 
@@ -62,7 +62,7 @@ public class CarSocket {
                     catch (Exception e)
                     {
                         Debug.Log("Socket send failed:" + e.ToString());
-                        this.socket = null;
+                        disconnected();
                     }
                 }
                 else
@@ -71,6 +71,12 @@ public class CarSocket {
                 }
             }
         }).Start();
+    }
+
+    private void disconnected()
+    {
+        this.socket = null;
+        EventBus.Publish(new CarDisconnected(carInfo));
     }
 
     public Boolean IsConnected()
@@ -106,13 +112,5 @@ public class CarSocket {
             }            
         }
         return commands;
-    }
-
-    public void Dispose()
-    {
-        if (this.socket != null)
-        {
-            this.socket.Dispose();
-        }
     }
 }
