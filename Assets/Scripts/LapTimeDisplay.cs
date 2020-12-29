@@ -4,6 +4,10 @@ using TMPro;
 
 public class LapTimeDisplay : MonoBehaviour
 {
+    Dictionary<string, TimeWrapper> timers = new Dictionary<string, TimeWrapper>();
+    [SerializeField] private GameObject lapTimeList;
+    [SerializeField] private GameObject lapTimeRowPrefab;
+
     public static string FormattedTime(float inputTime)
     {
         int minutes = (int)(inputTime / 60);
@@ -19,19 +23,15 @@ public class LapTimeDisplay : MonoBehaviour
 
     public void OnEnable()
     {
+        EventBus.Subscribe<CarConnected>(this, e => {
+            addCar(e.car);
+            this.SortTimeList();
+        });
+
         EventBus.Subscribe<LapCompleted>(this, lap =>
         {
             string carName = lap.car.name;
-            if (!timers.ContainsKey(carName))
-            {
-                GameObject row = Instantiate(lapTimeRowPrefab);
-                row.transform.Find("TeamName").GetComponent<TextMeshProUGUI>().text = carName;
-                timers[carName] = new TimeWrapper(row);
-                row.transform.SetParent(lapTimeList.transform, false);
-                RectTransform rect = row.GetComponent<RectTransform>();
-                rect.localScale = Vector3.one;
-                rect.anchoredPosition = new Vector2(0, -25);
-            }
+            addCar(lap.car);
             timers[carName].LapCompleted(lap);
             this.SortTimeList();
         });
@@ -47,9 +47,20 @@ public class LapTimeDisplay : MonoBehaviour
         });
     }
 
-    Dictionary<string, TimeWrapper> timers = new Dictionary<string, TimeWrapper>();
-    [SerializeField] private GameObject lapTimeList;
-    [SerializeField] private GameObject lapTimeRowPrefab;
+    private void addCar(CarInfo car)
+    {
+        string carName = car.name;
+        if (!timers.ContainsKey(carName))
+        {
+            GameObject row = Instantiate(lapTimeRowPrefab);
+            row.transform.Find("TeamName").GetComponent<TextMeshProUGUI>().text = carName;
+            timers[carName] = new TimeWrapper(row);
+            row.transform.SetParent(lapTimeList.transform, false);
+            RectTransform rect = row.GetComponent<RectTransform>();
+            rect.localScale = Vector3.one;
+            rect.anchoredPosition = new Vector2(0, -25);
+        }
+    }
 
     public void ToggleLapTimeList() => lapTimeList?.SetActive(!lapTimeList.activeSelf);
 
@@ -89,6 +100,7 @@ public class LapTimeDisplay : MonoBehaviour
         public TimeWrapper(GameObject row)
         {
             this.timeListElement = row;
+            setTexts("", "", "");
         }
 
         internal void LapCompleted(LapCompleted lap)
@@ -96,10 +108,18 @@ public class LapTimeDisplay : MonoBehaviour
             this.lap = lap;
             if (timeListElement)
             {
-                timeListElement.transform.Find("LastLap").GetComponent<TextMeshProUGUI>().text = FormattedTime(lap.lastLap);
-                timeListElement.transform.Find("BestLap").GetComponent<TextMeshProUGUI>().text = FormattedTime(lap.bestLap);
-                timeListElement.transform.Find("LapCount").GetComponent<TextMeshProUGUI>().text = lap.lapCount.ToString();
+                setTexts(FormattedTime(lap.lastLap), FormattedTime(lap.bestLap), lap.lapCount.ToString());
             }
+        }
+        private void setTexts(string lastLap, string bestLap, string lapCount)
+        {
+            setText("LastLap", lastLap);
+            setText("BestLap", bestLap);
+            setText("LapCount", lapCount);
+        }
+        private void setText(string name, string text)
+        {
+            timeListElement.transform.Find(name).GetComponent<TextMeshProUGUI>().text = text;
         }
         public void OnRemove()
         {

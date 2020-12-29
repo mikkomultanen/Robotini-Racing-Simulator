@@ -91,6 +91,44 @@ public class LapCompleted: GameEvent
     }
 }
 
+public class RaceLobbyInit: GameEvent
+{
+
+}
+
+public class QualifyingStart: GameEvent
+{
+    public CarInfo[] cars;
+    public QualifyingStart(CarInfo[] cars)
+    {
+        this.cars = cars;
+    }
+}
+
+public class QualifyingResults : GameEvent
+{
+    public LapCompleted[] results;
+    public QualifyingResults(LapCompleted[] results)
+    {
+        this.results = results;
+    }
+}
+
+public class StartingGridInit : GameEvent
+{
+
+}
+
+public class RaceStart : GameEvent
+{
+
+}
+
+public class FreePracticeStart : GameEvent
+{
+
+}
+
 public class CarRemoved : GameEvent
 {
     public CarInfo car;
@@ -109,7 +147,7 @@ public class CarDisconnected : GameEvent
     }
 }
 
-public class CarConnected
+public class CarConnected // Deliberately not a GameEvent because contains a socket
 {
     public CarInfo car;
     public CarSocket socket;
@@ -124,6 +162,6 @@ public class MotorsToggle
 {
 }
 
-public class ResetTimers
+public class ProceedToNextPhase
 {
 }

@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UniRx;
 
 public class RaceController : MonoBehaviour
 {
     public GameObject carPrefab;
+    
     [HideInInspector]
     public bool motorsEnabled = true;
     private SplineMesh.Spline track;
@@ -13,15 +16,29 @@ public class RaceController : MonoBehaviour
 
     private void OnEnable()
     {
+        track = FindObjectOfType<SplineMesh.Spline>();
+
         if (ModeController.Mode == SimulatorMode.Playback)
         {
-            state = new Playback();
+            setState(new Playback(this));
+        }
+        else if (ModeController.Mode == SimulatorMode.Race)
+        {
+            setState(new RaceLobby(this));
         }
         else
         {
-            state = new Racing(this);
+            setState(new FreePractice(this));
+        }               
+    }
+
+    void setState(State state)
+    {
+        if (this.state != null)
+        {
+            this.state.OnDisable();
         }
-        
+        this.state = state;
         state.OnEnable();
     }
 
@@ -30,77 +47,171 @@ public class RaceController : MonoBehaviour
         state.CarHitTrigger(car);
     }
 
-    public abstract class State
-    {
-        public abstract void OnEnable();
-        public abstract void CarHitTrigger(GameObject car);
-    }
 
     public class Playback: State
     {
+        public Playback(RaceController c) : base(c)
+        {
+
+        }
         public override void OnEnable() { }
         public override void CarHitTrigger(GameObject car) { }
     }
 
-    public class Racing: State
+    public class RaceLobby: State
     {
-        public Racing(RaceController c) {
-            this.c = c;
+        private Dictionary<string, CarConnected> cars = new Dictionary<string, CarConnected>();
+
+        public RaceLobby(RaceController c): base(c)
+        {
+            
         }
-        RaceController c;
-        private Dictionary<string, CarStatus> cars = new Dictionary<string, CarStatus>();
+        
+        public override void OnEnable() {
+            EventBus.Publish(new RaceLobbyInit());
+            Subscribe<CarConnected>(e =>
+            {
+                cars[e.car.name] = e;
+            });
+            Subscribe<CarDisconnected>(e =>
+            {                
+                cars.Remove(e.car.name);
+                EventBus.Publish(new CarRemoved(e.car));
+            });
+            Subscribe<ProceedToNextPhase>(x => {
+                c.setState(new Qualifying(c, cars.Values.ToArray()));
+            });
+        }
+        public override void CarHitTrigger(GameObject car) {}
+    }
+
+    public class Qualifying : Racing
+    {
+        private CarConnected[] cars;
+        public Qualifying(RaceController c, CarConnected[] cars): base(c)
+        {
+            this.cars = cars;
+        }
+
+        public override void OnEnable()
+        {
+            base.OnEnable();
+            foreach (CarConnected car in cars)
+            {
+                c.addCarOnTrack(car);
+            }
+
+            EventBus.Publish(new QualifyingStart(cars.Select(c => c.car).ToArray()));
+
+            
+            Subscribe<ProceedToNextPhase>(x => {
+                Debug.Log("End of qualifying");
+                c.motorsEnabled = false;
+
+                var results = c.cars.Values.Select(v => v.LastLap).OrderBy(l => float.IsNaN(l.bestLap) ? float.MaxValue : l.bestLap).ToArray();
+                EventBus.Publish(new QualifyingResults(results));
+                var startingOrder = results.Select(l => l.car).ToArray();
+
+                c.setState(new StartingGrid(c, startingOrder));
+            });
+        }
+    }
+
+    public class StartingGrid : State
+    {
+        CarInfo[] startingGrid;
+
+        public StartingGrid(RaceController c, CarInfo[] startingGrid): base(c)
+        {
+            this.startingGrid = startingGrid;
+        }
+
+        public override void OnEnable()
+        {
+            EventBus.Publish(new StartingGridInit());
+            
+
+            // TODO: actual car positioning on the "grid" - this is just some copy-pasted position reset stuff
+            var cars = FindObjectsOfType<CarController>();
+            int i = 0;
+            foreach (var car in cars)
+            {
+                var curveSample = c.track.GetSampleAtDistance(c.track.Length - (++i * 0.4f));
+                car.transform.position = curveSample.location + 0.1f * Vector3.up + curveSample.Rotation * Vector3.right * (i % 2 == 0 ? 1 : -1) * 0.1f;
+                car.transform.rotation = curveSample.Rotation;
+                car.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            }
+
+            Subscribe<ProceedToNextPhase>(x => {
+                c.setState(new Race(c));
+            });
+        }
+
+        public override void CarHitTrigger(GameObject car)
+        {
+        }
+    }
+
+    public class Race : Racing
+    {
+        public Race(RaceController c): base(c)
+        {            
+            c.motorsEnabled = true;
+        }
+
+        public override void OnEnable()
+        {
+            base.OnEnable();
+            EventBus.Publish(new RaceStart());
+            
+            // TODO: race results based on lap count defined in RaceParameters (to be added)
+            // TODO: lap time display ordering by laps, not best lap time
+        }
+    }
+
+    public class FreePractice: Racing
+    {
+        public FreePractice(RaceController c): base(c) {
+        }
 
         override public void OnEnable()
         {
-            c.track = FindObjectOfType<SplineMesh.Spline>();
+            base.OnEnable();
+            EventBus.Publish(new FreePracticeStart());
+            
 
-            EventBus.Subscribe<MotorsToggle>(c, x => {
-                Debug.Log("Motors enabled: " + c.motorsEnabled);
-                c.motorsEnabled = !c.motorsEnabled;
-            });
-
-            EventBus.Subscribe<ResetTimers>(c, x => {
-                Debug.Log("Reset timers");
-                FindObjectOfType<LapTimeDisplay>().ResetTimers();
-                var cars = FindObjectsOfType<CarController>();
-                int i = 0;
-                foreach (var car in cars)
-                {
-                    var curveSample = c.track.GetSampleAtDistance(c.track.Length - (++i * 0.4f));
-                    car.transform.position = curveSample.location + 0.1f * Vector3.up + curveSample.Rotation * Vector3.right * (i % 2 == 0 ? 1 : -1) * 0.1f;
-                    car.transform.rotation = curveSample.Rotation;
-                    car.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                }
-            });
-
-            EventBus.Subscribe<CarConnected>(c, e =>
+            Subscribe<CarConnected>(e =>
             {
-                if (cars.ContainsKey(e.car.name))
-                {
-                    throw new Exception("TODO: duplicate car");
-                }
-
-                var curveSample = c.track.GetSampleAtDistance(0.95f * c.track.Length);
-                var car = Instantiate(c.carPrefab, curveSample.location + 0.1f * Vector3.up, curveSample.Rotation);
-                var carController = car.GetComponent<CarController>();
-                carController.SetSocket(e.socket);
-                carController.raceController = c;
-                car.name = e.car.name;
-                Debug.Log("Add Car '" + e.car.name + "'");
-                cars[e.car.name] = new CarStatus(e.car);
+                c.addCarOnTrack(e);
             });
 
-            EventBus.Subscribe<CarDisconnected>(c, e =>
+            Subscribe<CarDisconnected>(e =>
             {
                 EventBus.Publish(new CarRemoved(e.car));
                 // TODO keep it as a DNF car in race mode
 
             });
+        }
+    }
 
-            EventBus.Subscribe<CarRemoved>(c, e =>
+    public abstract class Racing : State
+    {
+        public Racing(RaceController c): base(c)
+        {
+        
+        }
+
+        override public void OnEnable()
+        {            
+            Subscribe<MotorsToggle>(x => {
+                Debug.Log("Motors enabled: " + c.motorsEnabled);
+                c.motorsEnabled = !c.motorsEnabled;
+            });
+
+            Subscribe<CarRemoved>(e =>
             {
                 Debug.Log("Remove Car " + e.car.name);
-                cars.Remove(e.car.name);
+                c.cars.Remove(e.car.name);
             });
         }
 
@@ -108,23 +219,71 @@ public class RaceController : MonoBehaviour
         {
             var name = car.name;
             Debug.Log("Lap Time for '" + name + "'");
-            cars[name].NewLapTime();
+            c.cars[name].NewLapTime();
         }
     }
 
 
+    public abstract class State
+    {
+        private List<IDisposable> disposables = new List<IDisposable>();
+        protected RaceController c;
+
+        public State(RaceController c)
+        {
+            this.c = c;
+        }
+
+
+        public abstract void OnEnable();
+        public abstract void CarHitTrigger(GameObject car);
+        public void Subscribe<T>(Action<T> action) where T : class
+        {
+            disposables.Add(EventBus.Receive<T>().Subscribe(action));
+        }
+        public void OnDisable()
+        {
+            foreach (var d in disposables)
+            {
+                d.Dispose();
+            }
+        }
+    }
+
+    void addCarOnTrack(CarConnected e)
+    {
+        if (cars.ContainsKey(e.car.name))
+        {
+            throw new Exception("TODO: duplicate car");
+        }
+
+        var curveSample = track.GetSampleAtDistance(0.95f * track.Length);
+        var car = Instantiate(carPrefab, curveSample.location + 0.1f * Vector3.up, curveSample.Rotation);
+        var carController = car.GetComponent<CarController>();
+        carController.SetSocket(e.socket);
+        carController.raceController = this;
+        car.name = e.car.name;
+        Debug.Log("Add Car '" + e.car.name + "'");
+        cars[e.car.name] = new CarStatus(e.car);
+    }
 
     class CarStatus
     {
-        internal float bestTime = float.MaxValue;
-        internal float lastTime = 0;
+        internal float bestTime = float.NaN;
+        internal float lastTime = float.NaN;
         internal float lastLapRecordedAt = Time.time;
         internal int lapCount = -1; // Not even started first lap yet, 0 would be running first lap.
         readonly CarInfo CarInfo;
+        internal LapCompleted lastLap;
+        public LapCompleted LastLap
+        {
+            get { return lastLap; }
+        }
 
         public CarStatus(CarInfo carInfo)
         {
             this.CarInfo = carInfo;
+            lastLap = new LapCompleted(CarInfo, 0, float.NaN, float.NaN);
         }
 
         internal void NewLapTime()
@@ -139,11 +298,16 @@ public class RaceController : MonoBehaviour
             }
             var lastTime = now - lastLapRecordedAt;
             lastLapRecordedAt = now;
-            if (lastTime < bestTime)
+            if (lastTime < bestTime || float.IsNaN(bestTime))
             {
+                Debug.Log("Set best");
                 bestTime = lastTime;
+            } else
+            {
+                Debug.Log("best: " + bestTime);
             }
-            EventBus.Publish(new LapCompleted(CarInfo, lapCount, lastTime, bestTime));
+            this.lastLap = new LapCompleted(CarInfo, lapCount, lastTime, bestTime);
+            EventBus.Publish(lastLap);
         }
 
     }

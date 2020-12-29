@@ -46,6 +46,7 @@ public class PlaybackController : MonoBehaviour
 
             foreach (GameEvent e in states)
             {
+                // TODO: need a better timing mechanism - current one is visibly laggy
                 if (previous != null && previous.cars.Length > 0)
                 {
                     float delay = Math.Min(e.timestamp - previous.timestamp, 1);

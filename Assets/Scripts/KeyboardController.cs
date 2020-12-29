@@ -10,9 +10,9 @@ public class KeyboardController : MonoBehaviour
             EventBus.Publish(new MotorsToggle());
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            EventBus.Publish(new ResetTimers());
+            EventBus.Publish(new ProceedToNextPhase());
         }
     }
 }
