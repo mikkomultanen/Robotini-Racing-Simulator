@@ -56,8 +56,15 @@ public class PlaybackController : MonoBehaviour
                     yield return new WaitForSeconds(delay);
                 }
 
-                previous = e as GameStatus;
-                cars = UpdateCars(cars, previous.cars);
+                if (e is GameStatus)
+                {
+                    previous = e as GameStatus;
+                    cars = UpdateCars(cars, previous.cars);
+                }
+                else
+                {
+                    EventBus.Publish(e);
+                }
             }
         }
     }

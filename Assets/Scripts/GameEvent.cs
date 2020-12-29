@@ -19,16 +19,16 @@ public enum GameEventType { lap, gameStatus }
 [Serializable]
 public class GameEvent
 {
+    static private DateTime startTime = System.DateTime.Now;
     [HideInInspector]
     public string type; // for deserialising as the correct type
 
-    public GameEvent(float timestamp)
+    public GameEvent()
     {
-        this.timestamp = timestamp;
         var type = this.GetType();
         this.type = type.FullName;
     }
-    public float timestamp;
+    public float timestamp = (float)((System.DateTime.Now - startTime).TotalSeconds);
 
     public static GameEvent FromJson(string json)
     {        
@@ -54,10 +54,9 @@ public class CarStatus
     public Quaternion rotation;
 }
 
-[Serializable]
 public class GameStatus: GameEvent
 {
-    public GameStatus(CarStatus[] cars, float timestamp): base(timestamp)
+    public GameStatus(CarStatus[] cars)
     {
         this.cars = cars;
     }
@@ -76,7 +75,7 @@ public class CarInfo
     }
 }
 
-public class LapCompleted
+public class LapCompleted: GameEvent
 {
     public CarInfo car;
     public int lapCount;
@@ -92,7 +91,7 @@ public class LapCompleted
     }
 }
 
-public class CarRemoved
+public class CarRemoved : GameEvent
 {
     public CarInfo car;
     public CarRemoved(CarInfo car)
@@ -101,7 +100,7 @@ public class CarRemoved
     }
 }
 
-public class CarDisconnected
+public class CarDisconnected : GameEvent
 {
     public CarInfo car;
     public CarDisconnected(CarInfo car)

@@ -3,17 +3,29 @@ using System;
 using UnityEngine;
 
 public class EventBus {
+    private static Subject<System.Object> subject = new Subject<System.Object>();
+
     public static void Publish<T>(T x)
     {
-        MessageBroker.Default.Publish(x);
+        subject.OnNext(x);        
     }
 
-    public static IObservable<T> Receive<T>()
+    public static IObservable<T> Receive<T>() where T : class
     {
-        return MessageBroker.Default.Receive<T>().ObserveOnMainThread();
+        return subject
+            .Where(x => x is T)
+            .Select(x => x as T)
+            .ObserveOnMainThread();
     }
 
-    public static void Subscribe<T>(MonoBehaviour b, Action<T> f)
+    public static IObservable<T> ReceiveAllAs<T>() where T : class
+    {
+        return subject
+            .Select(x => x as T)
+            .ObserveOnMainThread();
+    }
+
+    public static void Subscribe<T>(MonoBehaviour b, Action<T> f) where T : class
     {
         Receive<T>().Subscribe(f).AddTo(b);
     }

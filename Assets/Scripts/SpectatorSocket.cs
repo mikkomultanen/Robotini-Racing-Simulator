@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Linq;
 using UnityEngine;
-
+using UniRx;
 
 public class SpectatorSocket : MonoBehaviour
 {
@@ -21,7 +21,7 @@ public class SpectatorSocket : MonoBehaviour
     {
         CarController[] cars = FindObjectsOfType<CarController>();
         CarStatus[] statuses = cars.Select(c => new CarStatus(c.rigidBody.position, c.rigidBody.velocity, c.rigidBody.rotation)).ToArray();
-        latestGameStatus = new GameStatus(statuses, (float)((System.DateTime.Now - startTime).TotalSeconds));
+        latestGameStatus = new GameStatus(statuses);
     }
 
     private void OnEnable()
@@ -85,35 +85,53 @@ public class SpectatorSocket : MonoBehaviour
 
         Socket socket = listener.EndAccept(ar);
         socket.SendBufferSize = 20000;
-        socket.NoDelay = true;        
+        socket.NoDelay = true;
+
+        Debug.Log("Spectator connected.");
+
+        Action<GameEvent> send = (GameEvent e) => {
+            string jsonString = JsonUtility.ToJson(e);
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonString + "\n");
+            socket.Send(bytes);
+        };
 
         new Thread(() =>
         {
+            var eventQueue = new ConcurrentQueue<GameEvent>();
+            var subscription = EventBus.Receive<GameEvent>().Subscribe(e => {
+                eventQueue.Enqueue(e);
+            });
             GameStatus myGameStatus = null;
-            while (listener != null)
+            GameEvent gameEvent = null;
+
+            try
             {
-                if (myGameStatus == null || (myGameStatus.timestamp != latestGameStatus.timestamp && ( myGameStatus.cars.Length > 0 || latestGameStatus.cars.Length > 0 ) ))
+                while (listener != null)
                 {
-                    myGameStatus = latestGameStatus;
-                    Debug.Log("Send update " + myGameStatus.timestamp);
-                    try
+                    if (myGameStatus == null || (myGameStatus.timestamp != latestGameStatus.timestamp && (myGameStatus.cars.Length > 0 || latestGameStatus.cars.Length > 0)))
                     {
-                        string jsonString = JsonUtility.ToJson(latestGameStatus);
-                        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonString + "\n");
-                        socket.Send(bytes);
+                        myGameStatus = latestGameStatus;
+                        send(latestGameStatus);
                     }
-                    catch (Exception e)
+                    else if (eventQueue.TryDequeue(out gameEvent))
                     {
-                        Debug.Log("Spectator send failed:" + e.ToString() + " Closing socket");
-                        socket.Close();
-                        return;
+                        Debug.Log("Sending event " + gameEvent.type);
+                        send(gameEvent);
                     }
-                }
-                else
-                {
-                    Thread.Sleep(10);
+                    else
+                    {
+                        Thread.Sleep(10);
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                Debug.Log("Spectator send failed:" + e.ToString() + " Closing socket");
+                socket.Close();
+                subscription.Dispose();
+                return;
+            }
+
         }).Start();
 
     }
