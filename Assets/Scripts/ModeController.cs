@@ -22,8 +22,8 @@ public class ModeController : MonoBehaviour
         }
         else
         {
-            Debug.Log("Environment " + Application.platform + " detected. Using Development mode.");
-            Mode = SimulatorMode.Development;
+            Debug.Log("Environment " + Application.platform + " detected.");
+            Mode = SimulatorMode.Race;
         }
     }
 

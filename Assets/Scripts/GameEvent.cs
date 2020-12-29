@@ -116,7 +116,11 @@ public class QualifyingResults : GameEvent
 
 public class StartingGridInit : GameEvent
 {
+    public CarInfo[] cars;
 
+    public StartingGridInit(CarInfo[] cars) {
+        this.cars = cars;
+    }
 }
 
 public class RaceStart : GameEvent

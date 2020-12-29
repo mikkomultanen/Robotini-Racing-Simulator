@@ -128,9 +128,8 @@ public class RaceController : MonoBehaviour
 
         public override void OnEnable()
         {
-            EventBus.Publish(new StartingGridInit());
+            EventBus.Publish(new StartingGridInit(startingGrid));
             
-
             // TODO: actual car positioning on the "grid" - this is just some copy-pasted position reset stuff
             var cars = FindObjectsOfType<CarController>();
             int i = 0;
@@ -140,6 +139,10 @@ public class RaceController : MonoBehaviour
                 car.transform.position = curveSample.location + 0.1f * Vector3.up + curveSample.Rotation * Vector3.right * (i % 2 == 0 ? 1 : -1) * 0.1f;
                 car.transform.rotation = curveSample.Rotation;
                 car.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            }
+
+            foreach (var carState in c.cars.Values) {
+                carState.ResetLap();
             }
 
             Subscribe<ProceedToNextPhase>(x => {
@@ -268,11 +271,8 @@ public class RaceController : MonoBehaviour
     }
 
     class CarStatus
-    {
-        internal float bestTime = float.NaN;
-        internal float lastTime = float.NaN;
+    {        
         internal float lastLapRecordedAt = Time.time;
-        internal int lapCount = -1; // Not even started first lap yet, 0 would be running first lap.
         readonly CarInfo CarInfo;
         internal LapCompleted lastLap;
         public LapCompleted LastLap
@@ -283,29 +283,31 @@ public class RaceController : MonoBehaviour
         public CarStatus(CarInfo carInfo)
         {
             this.CarInfo = carInfo;
-            lastLap = new LapCompleted(CarInfo, 0, float.NaN, float.NaN);
+            ResetLap();
+        }
+
+        internal void ResetLap() {
+            lastLap = new LapCompleted(
+                CarInfo,
+                -1, // Not even started first lap yet, 0 would be running first lap.
+                float.NaN, float.NaN);
         }
 
         internal void NewLapTime()
         {
             var now = Time.time;
-            lapCount++;
+            var lapCount = lastLap.lapCount + 1;
             if (lapCount == 0)
             {
                 // crossed finish line, starting first lap.
                 lastLapRecordedAt = now;
+                lastLap = new LapCompleted(CarInfo, 0, float.NaN, float.NaN);
                 return;
             }
             var lastTime = now - lastLapRecordedAt;
             lastLapRecordedAt = now;
-            if (lastTime < bestTime || float.IsNaN(bestTime))
-            {
-                Debug.Log("Set best");
-                bestTime = lastTime;
-            } else
-            {
-                Debug.Log("best: " + bestTime);
-            }
+            var bestTime = (lastTime < lastLap.bestLap || float.IsNaN(lastLap.bestLap)) ? lastTime : lastLap.bestLap;
+            
             this.lastLap = new LapCompleted(CarInfo, lapCount, lastTime, bestTime);
             EventBus.Publish(lastLap);
         }
