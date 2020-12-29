@@ -85,6 +85,10 @@ public class RaceController : MonoBehaviour
         public override void CarHitTrigger(GameObject car) {}
     }
 
+
+    // TODO what to do with disconnected cars? Probably should remove from the track and include in results as DNF
+    // TODO: penalize crashes, reposition for re-entry after N seconds (remove support for reversing)
+
     public class Qualifying : Racing
     {
         private CarConnected[] cars;
@@ -191,8 +195,6 @@ public class RaceController : MonoBehaviour
             Subscribe<CarDisconnected>(e =>
             {
                 EventBus.Publish(new CarRemoved(e.car));
-                // TODO keep it as a DNF car in race mode
-
             });
         }
     }
