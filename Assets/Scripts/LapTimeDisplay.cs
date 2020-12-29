@@ -47,8 +47,7 @@ public class LapTimeDisplay : MonoBehaviour
         });
     }
 
-    static Dictionary<string, TimeWrapper> timers = new Dictionary<string, TimeWrapper>();
-
+    Dictionary<string, TimeWrapper> timers = new Dictionary<string, TimeWrapper>();
     [SerializeField] private GameObject lapTimeList;
     [SerializeField] private GameObject lapTimeRowPrefab;
 

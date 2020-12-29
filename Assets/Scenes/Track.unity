@@ -260,8 +260,7 @@ PrefabInstance:
         type: 3}
       propertyPath: collisionEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1554385155114746287, guid: 9d7829d6ee80c4a4a8c3a3624a92c8fd,
-        type: 3}
+      objectReference: {fileID: 1120998550}
     - target: {fileID: 5502672739528671983, guid: f36c1aa58d49149e8be80c3a982875a5,
         type: 3}
       propertyPath: collisionEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
@@ -310,6 +309,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f36c1aa58d49149e8be80c3a982875a5, type: 3}
+--- !u!114 &1120998550 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1554385155114746287, guid: 9d7829d6ee80c4a4a8c3a3624a92c8fd,
+    type: 3}
+  m_PrefabInstance: {fileID: 6802646687743222720}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69eeae41330ce4fb28b1f1d7602f0dcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1337212233
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,6 +431,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RaceGUI
       objectReference: {fileID: 0}
+    - target: {fileID: 1988696374, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1957722053, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}
       propertyPath: lapTimeRowPrefab
       value: 
@@ -518,10 +533,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1988696375, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1988696374, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}
-      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1749614904, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}

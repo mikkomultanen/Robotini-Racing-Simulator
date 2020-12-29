@@ -8,8 +8,7 @@ public class RaceController : MonoBehaviour
     [HideInInspector]
     public bool motorsEnabled = true;
     private SplineMesh.Spline track;
-    // TODO: why do these need to be static to work?
-    private static Dictionary<string, CarStatus> cars = new Dictionary<string, CarStatus>();
+    private Dictionary<string, CarStatus> cars = new Dictionary<string, CarStatus>();
 
     private void OnEnable()
     {
