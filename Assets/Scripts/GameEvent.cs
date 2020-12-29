@@ -9,7 +9,6 @@ using System.Threading;
 using System.Linq;
 using UnityEngine;
 
-
 public class GameEvents
 {
     
@@ -18,16 +17,27 @@ public class GameEvents
 public enum GameEventType { lap, gameStatus }
 
 [Serializable]
-public abstract class GameEvent
+public class GameEvent
 {
-    public GameEvent(GameEventType type, float timestamp)
+    [HideInInspector]
+    public string type; // for deserialising as the correct type
+
+    public GameEvent(float timestamp)
     {
         this.timestamp = timestamp;
-        this.type = type;
+        var type = this.GetType();
+        this.type = type.FullName;
     }
-
-    public GameEventType type;
     public float timestamp;
+
+    public static GameEvent FromJson(string json)
+    {        
+        var typeName = JsonUtility.FromJson<GameEvent>(json).type;
+        // deserialise first as plain GameEvent to get the instance Type
+        var type = System.Type.GetType(typeName);
+        // deserialise as the correct type
+        return (GameEvent)JsonUtility.FromJson(json, type);
+    }
 }
 
 [Serializable]
@@ -47,9 +57,74 @@ public class CarStatus
 [Serializable]
 public class GameStatus: GameEvent
 {
-    public GameStatus(CarStatus[] cars, float timestamp): base(GameEventType.gameStatus, timestamp)
+    public GameStatus(CarStatus[] cars, float timestamp): base(timestamp)
     {
         this.cars = cars;
     }
     public CarStatus[] cars;
+}
+
+[Serializable]
+public class CarInfo
+{
+    public string teamId;
+    public string name;
+    public CarInfo(string teamId, string name)
+    {
+        this.teamId = teamId;
+        this.name = name;
+    }
+}
+
+public class LapCompleted
+{
+    public CarInfo car;
+    public int lapCount;
+    public float lastLap;
+    public float bestLap;
+
+    public LapCompleted(CarInfo car, int lapCount, float lastLap, float bestLap)
+    {
+        this.car = car;
+        this.lapCount = lapCount;
+        this.lastLap = lastLap;
+        this.bestLap = bestLap;
+    }
+}
+
+public class CarRemoved
+{
+    public CarInfo car;
+    public CarRemoved(CarInfo car)
+    {
+        this.car = car;
+    }
+}
+
+public class CarDisconnected
+{
+    public CarInfo car;
+    public CarDisconnected(CarInfo car)
+    {
+        this.car = car;
+    }
+}
+
+public class CarConnected
+{
+    public CarInfo car;
+    public CarSocket socket;
+    public CarConnected(CarInfo car, CarSocket socket)
+    {
+        this.car = car;
+        this.socket = socket;
+    }
+}
+
+public class MotorsToggle
+{
+}
+
+public class ResetTimers
+{
 }

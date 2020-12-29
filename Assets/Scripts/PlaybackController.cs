@@ -35,27 +35,29 @@ public class PlaybackController : MonoBehaviour
             string text = www.downloadHandler.text;
 
             string[] lines = text.Split('\n');
-            GameStatus[] states = lines.Select(line => JsonUtility.FromJson<GameStatus>(line)).ToArray();
-            Debug.Log(JsonUtility.ToJson(states[0]));
+            GameEvent[] states = lines
+                .Where(line => line.Trim().Length > 0)
+                .Select(line => GameEvent.FromJson(line))
+                .ToArray();
 
             GameStatus previous = null;
 
             GameObject[] cars = { };         
 
-            foreach (GameStatus status in states)
+            foreach (GameEvent e in states)
             {
                 if (previous != null && previous.cars.Length > 0)
                 {
-                    float delay = status.timestamp - previous.timestamp;
-                    Debug.Log("Waiting " + delay);
+                    float delay = Math.Min(e.timestamp - previous.timestamp, 1);
+                    if (delay >= 1)
+                    {
+                        Debug.Log("Waiting " + delay);
+                    }
                     yield return new WaitForSeconds(delay);
                 }
 
-                previous = status;
-
-
-                cars = UpdateCars(cars, status.cars);
-
+                previous = e as GameStatus;
+                cars = UpdateCars(cars, previous.cars);
             }
         }
     }

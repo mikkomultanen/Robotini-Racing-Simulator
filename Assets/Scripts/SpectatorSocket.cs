@@ -15,7 +15,7 @@ public class SpectatorSocket : MonoBehaviour
     private GameStatus latestGameStatus;
     private Socket listener = null;
     private readonly ManualResetEvent allDone = new ManualResetEvent(false);
-    private DateTime startTime = System.DateTime.Now;
+    private DateTime startTime = System.DateTime.Now;    
 
     private void Update()
     {
@@ -85,8 +85,7 @@ public class SpectatorSocket : MonoBehaviour
 
         Socket socket = listener.EndAccept(ar);
         socket.SendBufferSize = 20000;
-        socket.NoDelay = true;
-
+        socket.NoDelay = true;        
 
         new Thread(() =>
         {
