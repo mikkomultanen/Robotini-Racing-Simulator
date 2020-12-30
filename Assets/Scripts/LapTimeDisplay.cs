@@ -33,7 +33,7 @@ public class LapTimeDisplay : MonoBehaviour
             string carName = lap.car.name;
             addCar(lap.car);
             timers[carName].LapCompleted(lap);
-            this.SortTimeList();
+            SortTimeList();
         });
 
         EventBus.Subscribe<StartingGridInit>(this, grid => {
@@ -45,6 +45,8 @@ public class LapTimeDisplay : MonoBehaviour
             foreach (var car in grid.cars) {
                 addCar(car);
             }
+
+            SortTimeList();
         });
 
         EventBus.Subscribe<CarRemoved>(this, e =>
@@ -75,15 +77,24 @@ public class LapTimeDisplay : MonoBehaviour
 
     public void ToggleLapTimeList() => lapTimeList?.SetActive(!lapTimeList.activeSelf);
 
+    private int compareTimes(TimeWrapper t1, TimeWrapper t2)
+    {
+        return getComparableTime(t1).CompareTo(getComparableTime(t2));
+    }
+
+    private float getComparableTime(TimeWrapper t)
+    {
+        if (t.lap != null && !float.IsNaN(t.lap.bestLap)) return t.lap.bestLap;
+        return float.MaxValue;
+    }
+
     private void SortTimeList()
     {
         const float rowHeight = 20;
         const float startHeight = -10;
 
         List<TimeWrapper> times = new List<TimeWrapper>(timers.Values);
-        times.Sort(delegate (TimeWrapper t1, TimeWrapper t2) {
-            return t1.lap.bestLap.CompareTo(t2.lap.bestLap);
-        });
+        times.Sort(compareTimes);
 
         int i = 0;
         foreach (TimeWrapper time in times)

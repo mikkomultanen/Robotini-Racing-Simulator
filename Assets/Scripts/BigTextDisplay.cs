@@ -11,15 +11,8 @@ public class BigTextDisplay : MonoBehaviour
         {
             if (e is RaceLobbyInit)
             {
-                return keepShowing("Race lobby, waiting for players...");
-            }
-            else if (e is CarConnected)
-            {
-                return showForAWhile("Connected: " + (e as CarConnected).car.name);
-            }
-            else if (e is CarDisconnected)
-            {
-                return showForAWhile("Disconnected: " + (e as CarDisconnected).car.name);
+                // Does not happen. Probably too early?
+                return keepShowing("Waiting for players. Press SPACE to start.");
             }
             else if (e is QualifyingStart)
             {
