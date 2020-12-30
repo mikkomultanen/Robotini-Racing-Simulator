@@ -151,7 +151,7 @@ public class CarDisconnected : GameEvent
     }
 }
 
-public class CarConnected // Deliberately not a GameEvent because contains a socket
+public class CarConnected : GameEvent // TODO: how does this serialize?
 {
     public CarInfo car;
     public CarSocket socket;
