@@ -151,10 +151,10 @@ public class CarDisconnected : GameEvent
     }
 }
 
-public class CarConnected : GameEvent // TODO: how does this serialize?
+public class CarConnected : GameEvent
 {
     public CarInfo car;
-    public CarSocket socket;
+    public CarSocket socket; // <- non serializable object, not included in JSON
     public CarConnected(CarInfo car, CarSocket socket)
     {
         this.car = car;
