@@ -139,6 +139,11 @@ public class RaceController : MonoBehaviour
                 c.setState(new StartingGrid(c, startingOrder));                
             });
         }
+
+        public override int compareLaps(LapCompleted a, LapCompleted b)
+        {
+            return Racing.compareByBestLap(a, b);
+        }
     }
 
     public class StartingGrid : State
@@ -190,6 +195,11 @@ public class RaceController : MonoBehaviour
             // TODO: race results based on lap count defined in RaceParameters (to be added)
             // TODO: lap time display ordering by laps, not best lap time
         }
+
+        public override int compareLaps(LapCompleted a, LapCompleted b)
+        {
+            return Racing.compareByCompletedLaps(a, b);
+        }
     }
 
     public class FreePractice: Racing
@@ -213,6 +223,11 @@ public class RaceController : MonoBehaviour
                 EventBus.Publish(new CarRemoved(e.car));
             });
         }
+
+        public override int compareLaps(LapCompleted a, LapCompleted b)
+        {
+            return Racing.compareByBestLap(a, b);
+        }
     }
 
     public abstract class Racing : State
@@ -221,6 +236,8 @@ public class RaceController : MonoBehaviour
         {
         
         }
+
+        public abstract int compareLaps(LapCompleted a, LapCompleted b);
 
         override public void OnEnable()
         {            
@@ -244,23 +261,40 @@ public class RaceController : MonoBehaviour
 
             var standings = c.cars.Values
                 .Select(c => c.lastLap)
-                .OrderBy(getComparableTime)
                 .ToArray();
+            Array.Sort(standings, compareLaps);            
 
             EventBus.Publish(new CurrentStandings(standings));
         }
-    }
 
-    static int compareTimes(LapCompleted t1, LapCompleted t2)
-    {
-        return getComparableTime(t1).CompareTo(getComparableTime(t2));
-    }
+        static float getComparableTime(LapCompleted t)
+        {
+            if (t != null && !float.IsNaN(t.bestLap)) return t.bestLap;
+            return float.MaxValue;
+        }
 
-    static float getComparableTime(LapCompleted t)
-    {
-        if (t != null && !float.IsNaN(t.bestLap)) return t.bestLap;
-        return float.MaxValue;
-    }
+        static int getComparableLapCount(LapCompleted t)
+        {
+            if (t != null) return t.lapCount;
+            return 0;
+        }
+
+        public static int compareByBestLap(LapCompleted a, LapCompleted b)
+        {
+            return getComparableTime(a).CompareTo(getComparableTime(b));
+        }
+
+        public static int compareByCompletedLaps(LapCompleted a, LapCompleted b)
+        {
+            int la = getComparableLapCount(a);
+            int lb = getComparableLapCount(b);
+            if (la == lb && la > 0)
+            {
+                return a.lastLapCompletedAt.CompareTo(b.lastLapCompletedAt);
+            }
+            return lb - la;
+        }
+    }    
 
     public abstract class State
     {

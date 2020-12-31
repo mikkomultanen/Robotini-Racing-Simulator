@@ -17,6 +17,10 @@ public enum GameEventType { lap, gameStatus }
 public class GameEvent
 {
     static private DateTime startTime = System.DateTime.Now;
+    public static float NewTimeStamp()
+    {
+        return (float)((System.DateTime.Now - startTime).TotalSeconds);
+    }
     [HideInInspector]
     public string type; // for deserialising as the correct type
 
@@ -25,7 +29,7 @@ public class GameEvent
         var type = this.GetType();
         this.type = type.FullName;
     }
-    public float timestamp = (float)((System.DateTime.Now - startTime).TotalSeconds);
+    public float timestamp = NewTimeStamp();
 
     public static GameEvent FromJson(string json)
     {        
@@ -78,6 +82,7 @@ public class LapCompleted: GameEvent
     public int lapCount;
     public float lastLap;
     public float bestLap;
+    public float lastLapCompletedAt;
 
     public LapCompleted(CarInfo car, int lapCount, float lastLap, float bestLap)
     {
@@ -85,6 +90,7 @@ public class LapCompleted: GameEvent
         this.lapCount = lapCount;
         this.lastLap = lastLap;
         this.bestLap = bestLap;
+        this.lastLapCompletedAt = GameEvent.NewTimeStamp();
     }
 }
 
