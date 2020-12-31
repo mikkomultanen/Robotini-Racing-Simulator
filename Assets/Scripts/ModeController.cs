@@ -23,7 +23,7 @@ public class ModeController : MonoBehaviour
         else
         {
             Debug.Log("Environment " + Application.platform + " detected.");
-            Mode = SimulatorMode.Development;
+            Mode = SimulatorMode.Race;
         }
     }
 

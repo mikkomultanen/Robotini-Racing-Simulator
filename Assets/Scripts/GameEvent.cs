@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using System.Linq;
 using UnityEngine;
 
-public class GameEvents
+[Serializable]
+public class RaceParameters
 {
-    
+    public int lapCount = 5;
+    public int autoStartQualifyingSeconds = 30;
+    public int qualifyingDurationSeconds = 30;
+    public int autoStartRaceSeconds = 10;
+    public int raceTimeoutSeconds = 300;
 }
 
 public enum GameEventType { lap, gameStatus }
@@ -93,7 +90,22 @@ public class LapCompleted: GameEvent
 
 public class RaceLobbyInit: GameEvent
 {
+    public RaceParameters raceParameters;
 
+    public RaceLobbyInit(RaceParameters raceParameters)
+    {
+        this.raceParameters = raceParameters;
+    }
+}
+
+public class SecondsRemaining : GameEvent
+{
+    public int secondsRemaining;
+
+    public SecondsRemaining(int secondsRemaining)
+    {
+        this.secondsRemaining = secondsRemaining;
+    }
 }
 
 public class QualifyingStart: GameEvent

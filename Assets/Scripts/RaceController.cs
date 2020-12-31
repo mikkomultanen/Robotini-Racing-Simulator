@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniRx;
+using System.IO;
 
 public class RaceController : MonoBehaviour
 {
@@ -12,11 +13,13 @@ public class RaceController : MonoBehaviour
     public bool motorsEnabled = true;
     private SplineMesh.Spline track;
     private Dictionary<string, CarStatus> cars = new Dictionary<string, CarStatus>();
+    private RaceParameters raceParameters;
     private State state;
 
     private void OnEnable()
     {
         track = FindObjectOfType<SplineMesh.Spline>();
+        raceParameters = readRaceParameters();
 
         if (ModeController.Mode == SimulatorMode.Playback)
         {
@@ -29,7 +32,21 @@ public class RaceController : MonoBehaviour
         else
         {
             setState(new FreePractice(this));
-        }               
+        }
+    }
+
+    private RaceParameters readRaceParameters()
+    {
+        try
+        {
+            var reader = new StreamReader("RaceParameters.json");
+            var raceParameters = JsonUtility.FromJson<RaceParameters>(reader.ReadToEnd());
+            return raceParameters;
+        }
+        catch (FileNotFoundException e)
+        {
+            return new RaceParameters();
+        }
     }
 
     void setState(State state)
@@ -68,7 +85,10 @@ public class RaceController : MonoBehaviour
         }
         
         public override void OnEnable() {
-            EventBus.Publish(new RaceLobbyInit());
+            
+            Debug.Log("RaceParameters:" + JsonUtility.ToJson(c.raceParameters));
+
+            EventBus.Publish(new RaceLobbyInit(c.raceParameters));
             Subscribe<CarConnected>(e =>
             {
                 cars[e.car.name] = e;
@@ -78,11 +98,12 @@ public class RaceController : MonoBehaviour
                 cars.Remove(e.car.name);
                 EventBus.Publish(new CarRemoved(e.car));
             });
-            Subscribe<ProceedToNextPhase>(x => {
+            
+            Countdown(c.raceParameters.autoStartQualifyingSeconds, () => {
                 c.setState(new Qualifying(c, cars.Values.ToArray()));
             });
-        }
-        public override void CarHitTrigger(GameObject car) {}
+
+        }        
     }
 
 
@@ -107,8 +128,7 @@ public class RaceController : MonoBehaviour
 
             EventBus.Publish(new QualifyingStart(cars.Select(c => c.car).ToArray()));
 
-            
-            Subscribe<ProceedToNextPhase>(x => {
+            Countdown(c.raceParameters.qualifyingDurationSeconds, () => {
                 Debug.Log("End of qualifying");
                 c.motorsEnabled = false;
 
@@ -116,7 +136,7 @@ public class RaceController : MonoBehaviour
                 EventBus.Publish(new QualifyingResults(results));
                 var startingOrder = results.Select(l => l.car).ToArray();
 
-                c.setState(new StartingGrid(c, startingOrder));
+                c.setState(new StartingGrid(c, startingOrder));                
             });
         }
     }
@@ -149,13 +169,9 @@ public class RaceController : MonoBehaviour
                 carState.ResetLap();
             }
 
-            Subscribe<ProceedToNextPhase>(x => {
+            Countdown(c.raceParameters.autoStartRaceSeconds, () => {
                 c.setState(new Race(c));
             });
-        }
-
-        public override void CarHitTrigger(GameObject car)
-        {
         }
     }
 
@@ -241,10 +257,20 @@ public class RaceController : MonoBehaviour
 
 
         public abstract void OnEnable();
-        public abstract void CarHitTrigger(GameObject car);
+        public virtual void CarHitTrigger(GameObject car) {
+            
+        }
         public void Subscribe<T>(Action<T> action) where T : class
         {
-            disposables.Add(EventBus.Receive<T>().Subscribe(action));
+            Subscribe(EventBus.Receive<T>(), action);
+        }
+        public void Subscribe<T>(IObservable<T> observable, Action<T> action)
+        {
+            disposables.Add(observable.Subscribe(action));
+        }
+        public void Subscribe<T>(IObservable<T> observable, Action action)
+        {
+            disposables.Add(observable.Subscribe(_ => action()));
         }
         public void OnDisable()
         {
@@ -252,6 +278,20 @@ public class RaceController : MonoBehaviour
             {
                 d.Dispose();
             }
+        }
+
+        public void Countdown(int seconds, Action action) {
+            var secondsRemaining = Observables.Countdown(seconds);
+
+            Subscribe(secondsRemaining, EventBus.Publish);
+
+            var timedOut = secondsRemaining.Where(s => s.secondsRemaining == 0).Select(s => new Unit());
+            var spaceBar = EventBus.Receive<ProceedToNextPhase>().Select(s => new Unit());
+
+            Subscribe(
+                timedOut.Merge(spaceBar),
+                action
+            );
         }
     }
 
