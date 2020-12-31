@@ -88,6 +88,14 @@ public class LapCompleted: GameEvent
     }
 }
 
+public class CurrentStandings: GameEvent {
+    public LapCompleted[] standings;
+
+    public CurrentStandings(LapCompleted[] standings) {
+        this.standings = standings;
+    }
+}
+
 public class RaceLobbyInit: GameEvent
 {
     public RaceParameters raceParameters;

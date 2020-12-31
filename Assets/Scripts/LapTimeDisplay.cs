@@ -36,6 +36,17 @@ public class LapTimeDisplay : MonoBehaviour
             SortTimeList();
         });
 
+        EventBus.Subscribe<CurrentStandings>(this, standings => {
+            var index = 0;
+            foreach (var s in standings.standings)
+            {
+                addCar(s.car);
+                timers[s.car.name].Standing = index;
+                index++;
+            }
+            SortTimeList();
+        });
+
         EventBus.Subscribe<StartingGridInit>(this, grid => {
             foreach (var timer in timers.Values) {
                 timer.OnRemove();
@@ -79,13 +90,7 @@ public class LapTimeDisplay : MonoBehaviour
 
     private int compareTimes(TimeWrapper t1, TimeWrapper t2)
     {
-        return getComparableTime(t1).CompareTo(getComparableTime(t2));
-    }
-
-    private float getComparableTime(TimeWrapper t)
-    {
-        if (t.lap != null && !float.IsNaN(t.lap.bestLap)) return t.lap.bestLap;
-        return float.MaxValue;
+        return t1.Standing - t2.Standing;
     }
 
     private void SortTimeList()
@@ -116,6 +121,7 @@ public class LapTimeDisplay : MonoBehaviour
 
     public class TimeWrapper
     {
+        public int Standing = 0;
         internal LapCompleted lap;
         internal GameObject timeListElement;
 

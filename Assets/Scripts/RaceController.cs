@@ -241,9 +241,26 @@ public class RaceController : MonoBehaviour
             var name = car.name;
             Debug.Log("Lap Time for '" + name + "'");
             c.cars[name].NewLapTime();
+
+            var standings = c.cars.Values
+                .Select(c => c.lastLap)
+                .OrderBy(getComparableTime)
+                .ToArray();
+
+            EventBus.Publish(new CurrentStandings(standings));
         }
     }
 
+    static int compareTimes(LapCompleted t1, LapCompleted t2)
+    {
+        return getComparableTime(t1).CompareTo(getComparableTime(t2));
+    }
+
+    static float getComparableTime(LapCompleted t)
+    {
+        if (t != null && !float.IsNaN(t.bestLap)) return t.bestLap;
+        return float.MaxValue;
+    }
 
     public abstract class State
     {
@@ -353,7 +370,6 @@ public class RaceController : MonoBehaviour
             this.lastLap = new LapCompleted(CarInfo, lapCount, lastTime, bestTime);
             EventBus.Publish(lastLap);
         }
-
     }
 }
 
