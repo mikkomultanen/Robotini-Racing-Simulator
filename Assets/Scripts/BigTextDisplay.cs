@@ -30,6 +30,14 @@ public class BigTextDisplay : MonoBehaviour
             {
                 return keepShowing("Free practice");
             }
+            else if (e is RaceWon)
+            {
+                return showForAWhile("Winner: " + (e as RaceWon).winner.name);
+            }
+            else if (e is RaceFinished)
+            {
+                return keepShowing("Race over. Winner: " + (e as RaceFinished).standings[0].car.name);
+            }
             return Observable.Never<string>();
         }).Switch();
         events.Subscribe(showBigText);

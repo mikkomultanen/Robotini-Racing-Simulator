@@ -94,6 +94,36 @@ public class LapCompleted: GameEvent
     }
 }
 
+public class CarFinished: GameEvent
+{
+    public CarInfo car;
+
+    public CarFinished(CarInfo car)
+    {
+        this.car = car;
+    }
+}
+
+public class RaceWon: GameEvent
+{
+    public CarInfo winner;
+
+    public RaceWon(CarInfo winner)
+    {
+        this.winner = winner;
+    }
+}
+
+public class RaceFinished: GameEvent
+{
+    public LapCompleted[] standings;
+
+    public RaceFinished(LapCompleted[] standings)
+    {
+        this.standings = standings;
+    }
+}
+
 public class CurrentStandings: GameEvent {
     public LapCompleted[] standings;
 

@@ -182,6 +182,8 @@ public class RaceController : MonoBehaviour
 
     public class Race : Racing
     {
+        List<LapCompleted> finishers = new List<LapCompleted>();
+
         public Race(RaceController c): base(c)
         {            
             c.motorsEnabled = true;
@@ -191,9 +193,23 @@ public class RaceController : MonoBehaviour
         {
             base.OnEnable();
             EventBus.Publish(new RaceStart());
-            
-            // TODO: race results based on lap count defined in RaceParameters (to be added)
-            // TODO: lap time display ordering by laps, not best lap time
+
+            // TODO: race timeout
+
+            Subscribe<LapCompleted>(l => {
+                if (l.lapCount >= c.raceParameters.lapCount || finishers.Count > 0)
+                {
+                    EventBus.Publish(new CarFinished(l.car));
+                    if (finishers.Count == 0)
+                    {
+                        EventBus.Publish(new RaceWon(l.car));
+                    }
+                    finishers.Add(l);
+                    if (finishers.Count == c.cars.Count) {
+                        EventBus.Publish(new RaceFinished(finishers.ToArray()));
+                    }
+                }
+            });                        
         }
 
         public override int compareLaps(LapCompleted a, LapCompleted b)

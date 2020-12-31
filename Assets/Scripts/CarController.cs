@@ -26,6 +26,7 @@ public class CarController : MonoBehaviour
     public RaceController raceController;
     private float targetAngle = 0;
     private float lastBotCommandTime = 0;
+    private bool finished = false;
     public Rigidbody rigidBody;
     
     private volatile CarSocket socket;
@@ -35,6 +36,12 @@ public class CarController : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody>();
         allWheels = new WheelCollider[] { frontLeftWC, frontRightWC, rearLeftWC, rearRightWC };
+        EventBus.Subscribe<CarFinished>(this, f => {
+            if (f.car.name == socket.CarInfo().name)
+            {
+                this.finished = true;
+            }
+        });
     }
 
     public void GetInput()
@@ -61,9 +68,14 @@ public class CarController : MonoBehaviour
         frontRightWC.steerAngle = steerAngle;
     }
 
+    private bool motorEnabled()
+    {
+        return raceController.motorsEnabled && !finished;
+    }
+
     private void Accelerate()
     {
-        if (!raceController.motorsEnabled) {
+        if (!motorEnabled()) {
             foreach (WheelCollider wheel in allWheels)
             {
                 wheel.motorTorque = 0;
