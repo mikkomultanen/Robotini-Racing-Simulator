@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
-using UniRx;
+using System;
 
 public enum SimulatorMode
 {        
@@ -23,7 +22,17 @@ public class ModeController : MonoBehaviour
         else
         {
             Debug.Log("Environment " + Application.platform + " detected.");
-            Mode = SimulatorMode.Race;
+            string mode = RaceParameters.readRaceParameters().mode;
+            switch (mode) {
+                case "development":
+                    Mode = SimulatorMode.Development; break;
+                case "race":
+                    Mode = SimulatorMode.Race; break;
+                case "playback":
+                    Mode = SimulatorMode.Playback; break;
+                default:
+                    throw new Exception("Illegal mode " + mode + ", expecting race or development");
+            }
         }
     }
 
