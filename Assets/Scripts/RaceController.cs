@@ -126,6 +126,19 @@ public class RaceController : MonoBehaviour
                 c.addCarOnTrack(car);
             }
 
+            var controllers = FindObjectsOfType<CarController>();
+            int i = 0;
+            float totalLength = 14;
+            float spacing = totalLength / (float)controllers.Count();
+            foreach (var car in controllers)
+            {
+                var curveSample = c.track.GetSampleAtDistance(c.track.Length - (++i * spacing));
+                car.transform.position = curveSample.location + 0.1f * Vector3.up;
+                car.transform.rotation = curveSample.Rotation;
+                car.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            }
+
+
             EventBus.Publish(new QualifyingStart(cars.Select(c => c.car).ToArray()));
 
             Countdown(c.raceParameters.qualifyingDurationSeconds, () => {
@@ -159,7 +172,6 @@ public class RaceController : MonoBehaviour
         {
             EventBus.Publish(new StartingGridInit(startingGrid));
             
-            // TODO: actual car positioning on the "grid" - this is just some copy-pasted position reset stuff
             var cars = FindObjectsOfType<CarController>();
             int i = 0;
             foreach (var car in cars)
