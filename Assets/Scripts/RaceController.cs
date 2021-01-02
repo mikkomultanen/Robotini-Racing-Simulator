@@ -114,8 +114,6 @@ public class RaceController : MonoBehaviour
         }
     }
 
-    // TODO: penalize crashes, reposition for re-entry after N seconds (remove support for reversing)
-
     public class Qualifying : Racing
     {
         private CarConnected[] cars;
