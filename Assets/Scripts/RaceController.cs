@@ -197,10 +197,15 @@ public class RaceController : MonoBehaviour
             EventBus.Publish(new StartingGridInit(startingGrid));
             EventBus.Publish(CurrentStandings());
             
-            var cars = FindObjectsOfType<CarController>();
+            
             int i = 0;
-            foreach (var car in cars)
+            foreach (var carInfo in startingGrid)
             {
+                var car = GameObject.Find(carInfo.name);
+                if (car == null) {
+                    Debug.Log("Car not found: " + carInfo.name);
+                    continue;
+                }
                 var curveSample = c.track.GetSampleAtDistance(c.track.Length - (++i * 0.4f));
                 car.transform.position = curveSample.location + 0.1f * Vector3.up + curveSample.Rotation * Vector3.right * (i % 2 == 0 ? 1 : -1) * 0.1f;
                 car.transform.rotation = curveSample.Rotation;
@@ -274,8 +279,7 @@ public class RaceController : MonoBehaviour
         override public void OnEnable()
         {
             base.OnEnable();
-            EventBus.Publish(new FreePracticeStart());
-            
+            EventBus.Publish(new FreePracticeStart());            
 
             Subscribe<CarConnected>(e =>
             {
