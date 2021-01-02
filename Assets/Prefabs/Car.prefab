@@ -91,7 +91,7 @@ GameObject:
   - component: {fileID: 4759284448989664005}
   m_Layer: 10
   m_Name: Car
-  m_TagString: Untagged
+  m_TagString: Car
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -172,10 +172,14 @@ MonoBehaviour:
   rearRightT: {fileID: 4759284449864841868}
   maxSteerAngle: 30
   motorForce: 1
+  brakeForce: 100
   maxAngleChangePerSecond: 10
   velocity: 0
   angle: 0
   forward: 0
+  brake: 0
+  raceController: {fileID: 0}
+  rigidBody: {fileID: 0}
 --- !u!1 &4759284449332738223
 GameObject:
   m_ObjectHideFlags: 0

@@ -220,6 +220,61 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &540544021
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 540544022}
+  - component: {fileID: 540544023}
+  m_Layer: 5
+  m_Name: CarLabels
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &540544022
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540544021}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 119644073}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &540544023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540544021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd664c01c2e0b4ba78e3d6886edc341f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  labelPrefab: {fileID: 8842847246339879472, guid: bc587ee7127704987b4dd72feae5be88,
+    type: 3}
+  offset: {x: 0, y: 1, z: 0}
+  clampToScreen: 0
+  clampBorderSize: 0.05
+  useMainCamera: 1
+  cameraToUse: {fileID: 0}
 --- !u!1 &690180528
 GameObject:
   m_ObjectHideFlags: 0
@@ -1141,6 +1196,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1749614904, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 1749614904, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1957722053, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}
       propertyPath: lapTimeRowPrefab
       value: 
@@ -1240,14 +1303,6 @@ PrefabInstance:
     - target: {fileID: 1988696375, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1749614904, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 300
-      objectReference: {fileID: 0}
-    - target: {fileID: 1749614904, guid: b3b2e4fd75a4c40908ab00099c5cd4db, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 76475121174181576, guid: b3b2e4fd75a4c40908ab00099c5cd4db,
         type: 3}
