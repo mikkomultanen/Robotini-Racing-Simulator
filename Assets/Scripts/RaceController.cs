@@ -195,7 +195,6 @@ public class RaceController : MonoBehaviour
             EventBus.Publish(new RaceStart());
 
             // TODO: race timeout
-            // TODO: include totalRaceTime in LapCompleted, instead of lastLapCompletedAt
 
             Subscribe<LapCompleted>(l => {
                 if (l.lapCount >= c.raceParameters.lapCount || finishers > 0)
@@ -248,6 +247,7 @@ public class RaceController : MonoBehaviour
 
     public abstract class Racing : State
     {
+        private DateTime sessionStartTime;
         public Racing(RaceController c): base(c)
         {
         
@@ -257,6 +257,7 @@ public class RaceController : MonoBehaviour
 
         override public void OnEnable()
         {            
+            sessionStartTime = System.DateTime.Now;
             Subscribe<MotorsToggle>(x => {
                 Debug.Log("Motors enabled: " + c.motorsEnabled);
                 c.motorsEnabled = !c.motorsEnabled;
@@ -273,7 +274,8 @@ public class RaceController : MonoBehaviour
         {
             var name = car.name;
             Debug.Log("Lap Time for '" + name + "'");
-            c.cars[name].NewLapTime();
+            var totalTime = GameEvent.TimeDiff(System.DateTime.Now, sessionStartTime);
+            c.cars[name].NewLapTime(totalTime);
             EventBus.Publish(CurrentStandings);
         }
 
@@ -309,7 +311,7 @@ public class RaceController : MonoBehaviour
             int lb = getComparableLapCount(b);
             if (la == lb && la > 0)
             {
-                return a.lastLapCompletedAt.CompareTo(b.lastLapCompletedAt);
+                return a.totalTime.CompareTo(b.totalTime);
             }
             return lb - la;
         }
@@ -402,10 +404,10 @@ public class RaceController : MonoBehaviour
             lastLap = new LapCompleted(
                 CarInfo,
                 -1, // Not even started first lap yet, 0 would be running first lap.
-                float.NaN, float.NaN);
+                float.NaN, float.NaN, 0);
         }
 
-        internal void NewLapTime()
+        internal void NewLapTime(float totalTime)
         {
             var now = Time.time;
             var lapCount = lastLap.lapCount + 1;
@@ -413,14 +415,14 @@ public class RaceController : MonoBehaviour
             {
                 // crossed finish line, starting first lap.
                 lastLapRecordedAt = now;
-                lastLap = new LapCompleted(CarInfo, 0, float.NaN, float.NaN);
+                lastLap = new LapCompleted(CarInfo, 0, float.NaN, float.NaN, totalTime);
                 return;
             }
             var lastTime = now - lastLapRecordedAt;
             lastLapRecordedAt = now;
             var bestTime = (lastTime < lastLap.bestLap || float.IsNaN(lastLap.bestLap)) ? lastTime : lastLap.bestLap;
             
-            this.lastLap = new LapCompleted(CarInfo, lapCount, lastTime, bestTime);
+            this.lastLap = new LapCompleted(CarInfo, lapCount, lastTime, bestTime, totalTime);
             EventBus.Publish(lastLap);
         }
     }

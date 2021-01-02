@@ -19,7 +19,10 @@ public class GameEvent
     static private DateTime startTime = System.DateTime.Now;
     public static float NewTimeStamp()
     {
-        return (float)((System.DateTime.Now - startTime).TotalSeconds);
+        return TimeDiff(System.DateTime.Now, startTime);
+    }
+    public static float TimeDiff(DateTime now, DateTime before) {
+        return (float)((now - before).TotalSeconds);
     }
     [HideInInspector]
     public string type; // for deserialising as the correct type
@@ -82,15 +85,15 @@ public class LapCompleted: GameEvent
     public int lapCount;
     public float lastLap;
     public float bestLap;
-    public float lastLapCompletedAt;
+    public float totalTime;
 
-    public LapCompleted(CarInfo car, int lapCount, float lastLap, float bestLap)
+    public LapCompleted(CarInfo car, int lapCount, float lastLap, float bestLap, float totalTime)
     {
         this.car = car;
         this.lapCount = lapCount;
         this.lastLap = lastLap;
         this.bestLap = bestLap;
-        this.lastLapCompletedAt = GameEvent.NewTimeStamp();
+        this.totalTime = totalTime;
     }
 }
 
