@@ -5,6 +5,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
+using UniRx;
 
 public class CarController : MonoBehaviour
 {
@@ -40,6 +41,7 @@ public class CarController : MonoBehaviour
             if (f.car.name == socket.CarInfo().name)
             {
                 this.finished = true;
+                Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => { Destroy(gameObject); });
             }
         });
     }
@@ -99,6 +101,9 @@ public class CarController : MonoBehaviour
                 wheel.motorTorque = 0;
                 wheel.brakeTorque = brakeTorque;
             }
+        }
+        if (finished) {
+            rigidBody.AddForce(new Vector3(0, 10, 0));
         }
     }
 
