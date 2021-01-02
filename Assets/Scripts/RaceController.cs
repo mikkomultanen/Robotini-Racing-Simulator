@@ -83,6 +83,12 @@ public class RaceController : MonoBehaviour
         }
         public override void OnEnable() { }
         public override void CarHitTrigger(GameObject car, int segment) { }
+        public override void OnSessionFinish() {
+            // Never gonna stop
+        }
+        override public CurrentStandings CurrentStandings() {
+            throw new NotImplementedException();
+        }
     }
 
     public class RaceLobby: State
@@ -109,11 +115,17 @@ public class RaceController : MonoBehaviour
                 EventBus.Publish(new CarRemoved(e.car));
             });
             
-            Countdown(c.raceParameters.autoStartQualifyingSeconds, () => {
-                c.setState(new Qualifying(c, cars.Values.ToArray()));
-            });
+            Countdown(c.raceParameters.autoStartQualifyingSeconds, OnSessionFinish);
 
-        }        
+        }
+
+        override public CurrentStandings CurrentStandings() {
+            return new CurrentStandings(cars.Values.Select(c => c.car.ToLap()).ToArray(), false);
+        }
+
+        public override void OnSessionFinish() {
+            c.setState(new Qualifying(c, cars.Values.ToArray()));
+        }
     }
 
     // TODO: penalize crashes, reposition for re-entry after N seconds (remove support for reversing)
@@ -148,17 +160,21 @@ public class RaceController : MonoBehaviour
 
 
             EventBus.Publish(new QualifyingStart(cars.Select(c => c.car).ToArray()));
+            EventBus.Publish(CurrentStandings());
 
-            Countdown(c.raceParameters.qualifyingDurationSeconds, () => {
-                Debug.Log("End of qualifying");
-                c.motorsEnabled = false;
+            Countdown(c.raceParameters.qualifyingDurationSeconds, OnSessionFinish);
+        }
 
-                var results = c.cars.Values.Select(v => v.LastLap).OrderBy(l => float.IsNaN(l.bestLap) ? float.MaxValue : l.bestLap).ToArray();
-                EventBus.Publish(new QualifyingResults(results));
-                var startingOrder = results.Select(l => l.car).ToArray();
+        public override void OnSessionFinish()
+        {
+            Debug.Log("End of qualifying");
+            c.motorsEnabled = false;
 
-                c.setState(new StartingGrid(c, startingOrder));                
-            });
+            var results = c.cars.Values.Select(v => v.LastLap).OrderBy(l => float.IsNaN(l.bestLap) ? float.MaxValue : l.bestLap).ToArray();
+            EventBus.Publish(new QualifyingResults(results));
+            var startingOrder = results.Select(l => l.car).ToArray();
+
+            c.setState(new StartingGrid(c, startingOrder));                
         }
 
         public override int compareLaps(LapCompleted a, LapCompleted b)
@@ -179,6 +195,7 @@ public class RaceController : MonoBehaviour
         public override void OnEnable()
         {
             EventBus.Publish(new StartingGridInit(startingGrid));
+            EventBus.Publish(CurrentStandings());
             
             var cars = FindObjectsOfType<CarController>();
             int i = 0;
@@ -194,9 +211,15 @@ public class RaceController : MonoBehaviour
                 carState.ResetLap();
             }
 
-            Countdown(c.raceParameters.autoStartRaceSeconds, () => {
-                c.setState(new Race(c));
-            });
+            Countdown(c.raceParameters.autoStartRaceSeconds, OnSessionFinish);
+        }
+
+        public override void OnSessionFinish() {
+            c.setState(new Race(c));
+        }
+
+        override public CurrentStandings CurrentStandings() {
+            return new CurrentStandings(startingGrid.Select(c => c.ToLap()).ToArray(), false);
         }
     }
 
@@ -214,21 +237,27 @@ public class RaceController : MonoBehaviour
         {
             base.OnEnable();
             EventBus.Publish(new RaceStart());
+            EventBus.Publish(CurrentStandings());
 
             // TODO: race timeout
             Subscribe<LapCompleted>(l => {
                 if (l.lapCount >= c.raceParameters.lapCount || finishers > 0)
                 {
-                    EventBus.Publish(new CarFinished(l.car));
+                    c.cars[l.car.name].Finished();                    
                     if (finishers++ == 0)
                     {
                         EventBus.Publish(new RaceWon(l.car));
                     }                    
-                    if (finishers == c.cars.Count) {
-                        EventBus.Publish(new RaceFinished(CurrentStandings.standings));
-                    }
+                    checkForFinish();
                 }
-            });                        
+            });
+
+            checkForFinish();
+        }
+
+        public override void OnSessionFinish()
+        {
+            EventBus.Publish(new RaceFinished(CurrentStandings().standings));
         }
 
         public override int compareLaps(LapCompleted a, LapCompleted b)
@@ -259,6 +288,10 @@ public class RaceController : MonoBehaviour
             });
         }
 
+        public override void OnSessionFinish() {
+            // Never gonna stop
+        }
+
         public override int compareLaps(LapCompleted a, LapCompleted b)
         {
             return Racing.compareByBestLap(a, b);
@@ -267,7 +300,6 @@ public class RaceController : MonoBehaviour
 
     public abstract class Racing : State
     {
-        private DateTime sessionStartTime;
         public bool qualifying = true;
         public Racing(RaceController c): base(c)
         {
@@ -276,45 +308,24 @@ public class RaceController : MonoBehaviour
 
         public abstract int compareLaps(LapCompleted a, LapCompleted b);
 
-        override public void OnEnable()
-        {            
-            sessionStartTime = System.DateTime.Now;
-            Subscribe<MotorsToggle>(x => {
-                Debug.Log("Motors enabled: " + c.motorsEnabled);
-                c.motorsEnabled = !c.motorsEnabled;
-            });
-
-            Subscribe<CarRemoved>(e =>
-            {
-                Debug.Log("Remove Car " + e.car.name);
-                c.cars.Remove(e.car.name);
-            });
-
-            Subscribe<CarDisconnected>(e =>
-            {
-                c.cars[e.car.name].Disconnected();
-                EventBus.Publish(CurrentStandings);
-            });
-        }
-
         override public void CarHitTrigger(GameObject car, int segment)
         {
             var totalTime = GameEvent.TimeDiff(System.DateTime.Now, sessionStartTime);
             bool updateStandings = c.cars[car.name].TrackSegmentStarted(segment, totalTime);
             if (updateStandings)
             {
-                EventBus.Publish(CurrentStandings);
+                EventBus.Publish(CurrentStandings());
             }
         }
 
-        public CurrentStandings CurrentStandings { get {
+        override public CurrentStandings CurrentStandings() {
             var standings = c.cars.Values
                 .Select(c => c.lastLap)
                 .ToArray();
             Array.Sort(standings, compareLaps);            
 
             return new CurrentStandings(standings, qualifying);
-        }}
+        }
 
         static float getComparableTime(LapCompleted t)
         {
@@ -347,6 +358,7 @@ public class RaceController : MonoBehaviour
 
     public abstract class State
     {
+        internal DateTime sessionStartTime;
         private List<IDisposable> disposables = new List<IDisposable>();
         protected RaceController c;
 
@@ -356,7 +368,30 @@ public class RaceController : MonoBehaviour
         }
 
 
-        public abstract void OnEnable();
+        public virtual void OnEnable()
+        {            
+            sessionStartTime = System.DateTime.Now;
+            Subscribe<MotorsToggle>(x => {
+                Debug.Log("Motors enabled: " + c.motorsEnabled);
+                c.motorsEnabled = !c.motorsEnabled;
+            });
+
+            Subscribe<CarRemoved>(e =>
+            {
+                Debug.Log("Remove Car " + e.car.name);
+                c.cars.Remove(e.car.name);
+            });
+
+            Subscribe<CarDisconnected>(e =>
+            {
+                c.cars[e.car.name].Disconnected();
+                EventBus.Publish(CurrentStandings());
+                checkForFinish();
+            });
+        }
+
+        public abstract CurrentStandings CurrentStandings();
+
         public virtual void CarHitTrigger(GameObject car, int segment) {
             
         }
@@ -393,6 +428,18 @@ public class RaceController : MonoBehaviour
                 action
             );
         }
+
+        public void checkForFinish()
+        {
+            foreach (CarStatus car in c.cars.Values) {
+                if (!car.disconnected && !car.finished) {
+                    return;
+                }
+            }
+            OnSessionFinish();    
+        }
+
+        public abstract void OnSessionFinish();
     }
 
     void addCarOnTrack(CarConnected e)
@@ -419,6 +466,8 @@ public class RaceController : MonoBehaviour
         internal LapCompleted lastLap;
         private int trackSegment;
         internal bool disconnected = false;
+        internal bool finished = false;
+
         public LapCompleted LastLap
         {
             get { return lastLap; }
@@ -443,6 +492,11 @@ public class RaceController : MonoBehaviour
             Debug.Log("Disconnected: " + CarInfo.name);
             this.disconnected = true;
             lastLap = new LapCompleted(CarInfo, lastLap.lapCount, lastLap.lastLap, lastLap.bestLap, lastLap.totalTime, true);
+        }
+
+        internal void Finished() {
+            finished = true;
+            EventBus.Publish(new CarFinished(CarInfo));
         }
 
         internal bool TrackSegmentStarted(int segment, float totalTime)

@@ -77,6 +77,10 @@ public class CarInfo
         this.teamId = teamId;
         this.name = name;
     }
+    public LapCompleted ToLap()
+    {
+        return new LapCompleted(this, 0, float.NaN, float.NaN, 0, false);
+    }
 }
 
 public class LapCompleted: GameEvent
