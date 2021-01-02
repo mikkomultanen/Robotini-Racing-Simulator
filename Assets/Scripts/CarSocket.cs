@@ -84,10 +84,9 @@ public class CarSocket {
         return socket != null;
     }
 
-    public CarInfo CarInfo()
-    {
+    public CarInfo CarInfo { get {
         return carInfo;
-    }
+    } }
 
     public void Send(byte[] data)
     {

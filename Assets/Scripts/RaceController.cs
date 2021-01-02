@@ -11,7 +11,7 @@ public class RaceController : MonoBehaviour
     
     [HideInInspector]
     public bool motorsEnabled = true;
-    private SplineMesh.Spline track;
+    public SplineMesh.Spline track;
     private Dictionary<string, CarStatus> cars = new Dictionary<string, CarStatus>();
     private RaceParameters raceParameters;
     private State state;
@@ -134,7 +134,7 @@ public class RaceController : MonoBehaviour
 
             var controllers = FindObjectsOfType<CarController>();
             int i = 0;
-            float totalLength = 14;
+            float totalLength = c.track.Length;
             float spacing = totalLength / (float)controllers.Count();
             foreach (var car in controllers)
             {

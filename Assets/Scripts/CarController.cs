@@ -32,13 +32,14 @@ public class CarController : MonoBehaviour
     
     private volatile CarSocket socket;
     private WheelCollider[] allWheels;
+    private DateTime collidingSince;
 
     private void OnEnable()
     {
         rigidBody = GetComponent<Rigidbody>();
         allWheels = new WheelCollider[] { frontLeftWC, frontRightWC, rearLeftWC, rearRightWC };
         EventBus.Subscribe<CarFinished>(this, f => {
-            if (f.car.name == socket.CarInfo().name)
+            if (f.car.name == CarInfo.name)
             {
                 this.finished = true;
                 Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => { Destroy(gameObject); });
@@ -126,6 +127,35 @@ public class CarController : MonoBehaviour
         wheelTransform.rotation = rot;
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.GetComponent<CarController>() != null) return; // ignore if colliding with other car
+        this.collidingSince = System.DateTime.Now;   
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.GetComponent<CarController>() != null) return; // ignore if colliding with other car
+        float collidingFor = GameEvent.TimeDiff(System.DateTime.Now, this.collidingSince);
+        if (collidingFor >= 2) {
+            Debug.Log("Returning car to track: " + CarInfo.name);
+            var track = FindObjectOfType<RaceController>().track;
+            SplineMesh.CurveSample closest = null;
+            float closestDistance = float.MaxValue;
+            for (float i = 0; i < track.Length; i += 0.05f) {
+                var curveSample = track.GetSampleAtDistance(i);
+                var distance = (gameObject.transform.position - curveSample.location).magnitude;
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closest = curveSample;
+                }
+            }
+
+            gameObject.transform.position = closest.location + 0.1f * Vector3.up;
+            gameObject.transform.rotation = closest.Rotation;
+        }
+    }    
+
     private void FixedUpdate()
     {
         GetInput();
@@ -154,9 +184,10 @@ public class CarController : MonoBehaviour
         cameraOutput.SetSocket(socket);        
     }
 
-    public CarInfo CarInfo()
-    {
-        return socket.CarInfo();
+    public CarInfo CarInfo { get
+        {
+            return socket.CarInfo;
+        }
     }
 
     private void ProcessBotCommands()
@@ -178,13 +209,7 @@ public class CarController : MonoBehaviour
             else if (command.action == "reverse")
             {
                 brake = 0;
-                if (velocity <= 0.01)
-                {
-                    forward = -command.value;
-                } else
-                {
-                    forward = 0;
-                }
+                forward = 0;
             }
             else if (command.action == "brake")
             {
