@@ -182,7 +182,7 @@ public class RaceController : MonoBehaviour
 
     public class Race : Racing
     {
-        List<LapCompleted> finishers = new List<LapCompleted>();
+        int finishers = 0;
 
         public Race(RaceController c): base(c)
         {            
@@ -195,18 +195,18 @@ public class RaceController : MonoBehaviour
             EventBus.Publish(new RaceStart());
 
             // TODO: race timeout
+            // TODO: include totalRaceTime in LapCompleted, instead of lastLapCompletedAt
 
             Subscribe<LapCompleted>(l => {
-                if (l.lapCount >= c.raceParameters.lapCount || finishers.Count > 0)
+                if (l.lapCount >= c.raceParameters.lapCount || finishers > 0)
                 {
                     EventBus.Publish(new CarFinished(l.car));
-                    if (finishers.Count == 0)
+                    if (finishers++ == 0)
                     {
                         EventBus.Publish(new RaceWon(l.car));
-                    }
-                    finishers.Add(l);
-                    if (finishers.Count == c.cars.Count) {
-                        EventBus.Publish(new RaceFinished(finishers.ToArray()));
+                    }                    
+                    if (finishers == c.cars.Count) {
+                        EventBus.Publish(new RaceFinished(CurrentStandings.standings));
                     }
                 }
             });                        
@@ -274,14 +274,17 @@ public class RaceController : MonoBehaviour
             var name = car.name;
             Debug.Log("Lap Time for '" + name + "'");
             c.cars[name].NewLapTime();
+            EventBus.Publish(CurrentStandings);
+        }
 
+        public CurrentStandings CurrentStandings { get {
             var standings = c.cars.Values
                 .Select(c => c.lastLap)
                 .ToArray();
             Array.Sort(standings, compareLaps);            
 
-            EventBus.Publish(new CurrentStandings(standings));
-        }
+            return new CurrentStandings(standings);
+        }}
 
         static float getComparableTime(LapCompleted t)
         {
