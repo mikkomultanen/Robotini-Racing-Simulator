@@ -30,6 +30,13 @@ public class SpectatorSocket : MonoBehaviour
         {
             Debug.Log("Initializing spectator socket");
             StartListening();
+            RaceParameters raceParams = RaceParameters.readRaceParameters();
+            if (raceParams.raceLogFile != null) {
+                Debug.Log("Writing race log to " + raceParams.raceLogFile);
+                var stream = new BinaryWriter(File.Open(raceParams.raceLogFile, FileMode.Create));
+                
+                Spectate(b => stream.Write(b), () => stream.Close());
+            }
         }
         else
         {
@@ -85,14 +92,30 @@ public class SpectatorSocket : MonoBehaviour
 
         Socket socket = listener.EndAccept(ar);
         socket.SendBufferSize = 20000;
-        socket.NoDelay = true;
+        socket.NoDelay = true;        
 
         Debug.Log("Spectator connected.");
 
+        Spectate(b => socket.Send(b), () => socket.Close());
+
+    }
+
+    private void EndListening()
+    {
+        if (listener != null)
+        {
+            listener.Dispose();
+            listener = null;
+        }
+    }
+
+    void Spectate(Action<byte[]> sendBytes, Action close)
+    {
         Action<GameEvent> send = (GameEvent e) => {
             string jsonString = JsonUtility.ToJson(e);
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonString + "\n");
-            socket.Send(bytes);
+            //Debug.Log("Writing " + jsonString + " as " + bytes.Length + " bytes");
+            sendBytes(bytes);
         };
 
         new Thread(() =>
@@ -107,13 +130,15 @@ public class SpectatorSocket : MonoBehaviour
             try
             {
                 while (listener != null)
-                {
-                    if (myGameStatus == null || (myGameStatus.timestamp != latestGameStatus.timestamp && (myGameStatus.cars.Length > 0 || latestGameStatus.cars.Length > 0)))
+                {                   
+                    if (latestGameStatus != null)
                     {
-                        myGameStatus = latestGameStatus;
-                        send(latestGameStatus);
+                        if (myGameStatus == null || (myGameStatus.timestamp != latestGameStatus.timestamp && (myGameStatus.cars.Length > 0 || latestGameStatus.cars.Length > 0))) {
+                            myGameStatus = latestGameStatus;
+                            send(latestGameStatus);
+                        }
                     }
-                    else if (eventQueue.TryDequeue(out gameEvent))
+                    if (eventQueue.TryDequeue(out gameEvent))
                     {
                         Debug.Log("Sending event " + gameEvent.type);
                         send(gameEvent);
@@ -127,21 +152,11 @@ public class SpectatorSocket : MonoBehaviour
             catch (Exception e)
             {
                 Debug.Log("Spectator send failed:" + e.ToString() + " Closing socket");
-                socket.Close();
+                close();
                 subscription.Dispose();
                 return;
             }
 
         }).Start();
-
-    }
-
-    private void EndListening()
-    {
-        if (listener != null)
-        {
-            listener.Dispose();
-            listener = null;
-        }
     }
 }

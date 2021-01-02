@@ -40,19 +40,6 @@ public class LapTimeDisplay : MonoBehaviour
             SortTimeList();
         });
 
-        EventBus.Subscribe<StartingGridInit>(this, grid => {
-            foreach (var timer in timers.Values) {
-                timer.OnRemove();
-            }
-            timers.Clear();
-
-            foreach (var car in grid.cars) {
-                addCar(car);
-            }
-
-            SortTimeList();
-        });
-
         EventBus.Subscribe<CarRemoved>(this, e =>
         {
             string key = e.car.name;

@@ -19,7 +19,7 @@ public class RaceController : MonoBehaviour
     private void OnEnable()
     {
         track = FindObjectOfType<SplineMesh.Spline>();
-        raceParameters = readRaceParameters();
+        raceParameters = RaceParameters.readRaceParameters();
 
         if (ModeController.Mode == SimulatorMode.Playback)
         {
@@ -32,20 +32,6 @@ public class RaceController : MonoBehaviour
         else
         {
             setState(new FreePractice(this));
-        }
-    }
-
-    private RaceParameters readRaceParameters()
-    {
-        try
-        {
-            var reader = new StreamReader("RaceParameters.json");
-            var raceParameters = JsonUtility.FromJson<RaceParameters>(reader.ReadToEnd());
-            return raceParameters;
-        }
-        catch (FileNotFoundException e)
-        {
-            return new RaceParameters();
         }
     }
 
