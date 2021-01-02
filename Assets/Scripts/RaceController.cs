@@ -505,9 +505,7 @@ public class RaceController : MonoBehaviour
 
         internal bool TrackSegmentStarted(int segment, float totalTime)
         {
-            Debug.Log("segment " + segment + " for " + CarInfo.name + " (currently " + this.trackSegment + ")");
             if (segment == (this.trackSegment + 1) % 3) {
-                Debug.Log("Is go!");
                 this.trackSegment = segment;
                 if (segment == 0)
                 {
