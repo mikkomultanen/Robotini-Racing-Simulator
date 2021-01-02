@@ -59,9 +59,19 @@ public class RaceController : MonoBehaviour
         state.OnEnable();
     }
 
-    public void CarHitTrigger(GameObject car)
+    public void FinishLineTrigger(GameObject car)
     {
-        state.CarHitTrigger(car);
+        state.CarHitTrigger(car, 0);
+    }
+
+    public void TrackSegmentTrigger1(GameObject car)
+    {
+        state.CarHitTrigger(car, 1);
+    }
+
+    public void TrackSegmentTrigger2(GameObject car)
+    {
+        state.CarHitTrigger(car, 2);
     }
 
 
@@ -72,7 +82,7 @@ public class RaceController : MonoBehaviour
 
         }
         public override void OnEnable() { }
-        public override void CarHitTrigger(GameObject car) { }
+        public override void CarHitTrigger(GameObject car, int segment) { }
     }
 
     public class RaceLobby: State
@@ -287,13 +297,14 @@ public class RaceController : MonoBehaviour
             });
         }
 
-        override public void CarHitTrigger(GameObject car)
+        override public void CarHitTrigger(GameObject car, int segment)
         {
-            var name = car.name;
-            Debug.Log("Lap Time for '" + name + "'");
             var totalTime = GameEvent.TimeDiff(System.DateTime.Now, sessionStartTime);
-            c.cars[name].NewLapTime(totalTime);
-            EventBus.Publish(CurrentStandings);
+            bool updateStandings = c.cars[car.name].TrackSegmentStarted(segment, totalTime);
+            if (updateStandings)
+            {
+                EventBus.Publish(CurrentStandings);
+            }
         }
 
         public CurrentStandings CurrentStandings { get {
@@ -346,7 +357,7 @@ public class RaceController : MonoBehaviour
 
 
         public abstract void OnEnable();
-        public virtual void CarHitTrigger(GameObject car) {
+        public virtual void CarHitTrigger(GameObject car, int segment) {
             
         }
         public void Subscribe<T>(Action<T> action) where T : class
@@ -406,6 +417,7 @@ public class RaceController : MonoBehaviour
         internal float lastLapRecordedAt = Time.time;
         readonly CarInfo CarInfo;
         internal LapCompleted lastLap;
+        private int trackSegment;
         internal bool disconnected = false;
         public LapCompleted LastLap
         {
@@ -419,6 +431,7 @@ public class RaceController : MonoBehaviour
         }
 
         internal void ResetLap() {
+            trackSegment = -1;
             lastLap = new LapCompleted(
                 CarInfo,
                 -1, // Not even started first lap yet, 0 would be running first lap.
@@ -430,6 +443,22 @@ public class RaceController : MonoBehaviour
             Debug.Log("Disconnected: " + CarInfo.name);
             this.disconnected = true;
             lastLap = new LapCompleted(CarInfo, lastLap.lapCount, lastLap.lastLap, lastLap.bestLap, lastLap.totalTime, true);
+        }
+
+        internal bool TrackSegmentStarted(int segment, float totalTime)
+        {
+            Debug.Log("segment " + segment + " for " + CarInfo.name + " (currently " + this.trackSegment + ")");
+            if (segment == (this.trackSegment + 1) % 3) {
+                Debug.Log("Is go!");
+                this.trackSegment = segment;
+                if (segment == 0)
+                {
+                    Debug.Log("Lap Time for '" + CarInfo.name + "'");
+                    NewLapTime(totalTime);
+                    return true;
+                }
+            }
+            return false;
         }
 
         internal void NewLapTime(float totalTime)
