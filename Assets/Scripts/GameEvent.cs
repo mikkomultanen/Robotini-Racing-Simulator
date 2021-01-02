@@ -86,14 +86,16 @@ public class LapCompleted: GameEvent
     public float lastLap;
     public float bestLap;
     public float totalTime;
+    public bool dnf;
 
-    public LapCompleted(CarInfo car, int lapCount, float lastLap, float bestLap, float totalTime)
+    public LapCompleted(CarInfo car, int lapCount, float lastLap, float bestLap, float totalTime, bool dnf)
     {
         this.car = car;
         this.lapCount = lapCount;
         this.lastLap = lastLap;
         this.bestLap = bestLap;
         this.totalTime = totalTime;
+        this.dnf = dnf;
     }
 }
 

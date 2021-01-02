@@ -129,40 +129,45 @@ public class LapTimeDisplay : MonoBehaviour
         {
             this.Standing = index;
             var lap = standings.standings[index];
-            if (lap.lapCount <= 0)
+            if (lap.dnf)
+            {
+                setTexts("", "", "", "DNF");
+            }
+            else if (lap.lapCount <= 0)
             {
                 setTexts("", "", "", "");
                 return;
             }
-
-            var totalTime = "";
-            if (!standings.qualifying)
+            else
             {
-                if (index == 0)
+                var totalTime = "";
+                if (!standings.qualifying)
                 {
-                    totalTime = FormattedTime(lap.totalTime);
-                }
-                else
-                {
-                    var leader = standings.standings[0];
-                    if (leader.totalTime > lap.totalTime)
+                    if (index == 0)
                     {
-                        // This lap's diff not determined yet
-                        totalTime = "";
-                    }
-                    else if (leader.lapCount == lap.lapCount)
-                    {
-                        totalTime = "+" + FormattedDiff(lap.totalTime - leader.totalTime);
+                        totalTime = FormattedTime(lap.totalTime);
                     }
                     else
                     {
-                        var lapDiff = leader.lapCount - lap.lapCount;
-                        totalTime = lapDiff + " lap" + (lapDiff > 1 ? "s" : "");
+                        var leader = standings.standings[0];
+                        if (leader.totalTime > lap.totalTime)
+                        {
+                            // This lap's diff not determined yet
+                            totalTime = "";
+                        }
+                        else if (leader.lapCount == lap.lapCount)
+                        {
+                            totalTime = "+" + FormattedDiff(lap.totalTime - leader.totalTime);
+                        }
+                        else
+                        {
+                            var lapDiff = leader.lapCount - lap.lapCount;
+                            totalTime = lapDiff + " lap" + (lapDiff > 1 ? "s" : "");
+                        }
                     }
                 }
-            }
-
-            setTexts(FormattedTime(lap.lastLap), FormattedTime(lap.bestLap), lap.lapCount.ToString(), totalTime);
+                setTexts(FormattedTime(lap.lastLap), FormattedTime(lap.bestLap), lap.lapCount.ToString(), totalTime);
+            }            
         }
         private void setTexts(string lastLap, string bestLap, string lapCount, string totalTime)
         {

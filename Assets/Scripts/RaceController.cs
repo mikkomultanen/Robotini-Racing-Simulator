@@ -106,8 +106,6 @@ public class RaceController : MonoBehaviour
         }        
     }
 
-
-    // TODO what to do with disconnected cars? Probably should remove from the track and include in results as DNF
     // TODO: penalize crashes, reposition for re-entry after N seconds (remove support for reversing)
 
     public class Qualifying : Racing
@@ -208,7 +206,6 @@ public class RaceController : MonoBehaviour
             EventBus.Publish(new RaceStart());
 
             // TODO: race timeout
-
             Subscribe<LapCompleted>(l => {
                 if (l.lapCount >= c.raceParameters.lapCount || finishers > 0)
                 {
@@ -281,6 +278,12 @@ public class RaceController : MonoBehaviour
             {
                 Debug.Log("Remove Car " + e.car.name);
                 c.cars.Remove(e.car.name);
+            });
+
+            Subscribe<CarDisconnected>(e =>
+            {
+                c.cars[e.car.name].Disconnected();
+                EventBus.Publish(CurrentStandings);
             });
         }
 
@@ -403,6 +406,7 @@ public class RaceController : MonoBehaviour
         internal float lastLapRecordedAt = Time.time;
         readonly CarInfo CarInfo;
         internal LapCompleted lastLap;
+        internal bool disconnected = false;
         public LapCompleted LastLap
         {
             get { return lastLap; }
@@ -418,7 +422,14 @@ public class RaceController : MonoBehaviour
             lastLap = new LapCompleted(
                 CarInfo,
                 -1, // Not even started first lap yet, 0 would be running first lap.
-                float.NaN, float.NaN, 0);
+                float.NaN, float.NaN, 0, disconnected);
+        }
+
+        internal void Disconnected()
+        {
+            Debug.Log("Disconnected: " + CarInfo.name);
+            this.disconnected = true;
+            lastLap = new LapCompleted(CarInfo, lastLap.lapCount, lastLap.lastLap, lastLap.bestLap, lastLap.totalTime, true);
         }
 
         internal void NewLapTime(float totalTime)
@@ -429,14 +440,14 @@ public class RaceController : MonoBehaviour
             {
                 // crossed finish line, starting first lap.
                 lastLapRecordedAt = now;
-                lastLap = new LapCompleted(CarInfo, 0, float.NaN, float.NaN, totalTime);
+                lastLap = new LapCompleted(CarInfo, 0, float.NaN, float.NaN, totalTime, false);
                 return;
             }
             var lastTime = now - lastLapRecordedAt;
             lastLapRecordedAt = now;
             var bestTime = (lastTime < lastLap.bestLap || float.IsNaN(lastLap.bestLap)) ? lastTime : lastLap.bestLap;
             
-            this.lastLap = new LapCompleted(CarInfo, lapCount, lastTime, bestTime, totalTime);
+            this.lastLap = new LapCompleted(CarInfo, lapCount, lastTime, bestTime, totalTime, false);
             EventBus.Publish(lastLap);
         }
     }
