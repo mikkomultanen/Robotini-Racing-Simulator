@@ -35,12 +35,14 @@ public class GameEvent
 [Serializable]
 public class CarStatus
 {
-    public CarStatus(Vector3 position, Vector3 velocity, Quaternion rotation)
+    public CarStatus(string name, Vector3 position, Vector3 velocity, Quaternion rotation)
     {
+        this.name = name;
         this.position = position;
         this.velocity = velocity;
         this.rotation = rotation;
     }
+    public string name;
     public Vector3 position;
     public Vector3 velocity;
     public Quaternion rotation;

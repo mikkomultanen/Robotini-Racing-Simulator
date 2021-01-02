@@ -72,7 +72,6 @@ public class PlaybackController : MonoBehaviour
 
     GameObject[] UpdateCars(GameObject[] cars, CarStatus[] newStatuses)
     {
-        // TODO: use some identifiers for cars instead of just indices
         // remove cars that no longer exist
         foreach (var car in cars.Skip(newStatuses.Length)) {
             Destroy(car); 
@@ -80,6 +79,7 @@ public class PlaybackController : MonoBehaviour
 
         cars = cars
             .Zip(newStatuses, (car, newStatus) => {
+                car.name = newStatus.name;
                 car.transform.position = newStatus.position;
                 car.transform.rotation = newStatus.rotation;
                 return car;
@@ -89,11 +89,10 @@ public class PlaybackController : MonoBehaviour
                 .Select((newCarStatus, index) => {
                     var carPrefab = FindObjectOfType<RaceController>().carPrefab;
                     var car = Instantiate(carPrefab, newCarStatus.position, newCarStatus.rotation);
-                    // remove the unnecessary componens that actually fails without a RaceController
+                    // remove the unnecessary components that actually fails without a RaceController
                     foreach (var c in car.GetComponentsInChildren<CarController>()) { Destroy(c); }
                     foreach (var c in car.GetComponentsInChildren<HudController>()) { Destroy(c); }
-
-                    car.name = "Car" + (index + cars.Length);
+                    car.name = newCarStatus.name;
                     return car;
                 })
             ).ToArray();

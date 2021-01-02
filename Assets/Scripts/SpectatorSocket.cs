@@ -20,7 +20,7 @@ public class SpectatorSocket : MonoBehaviour
     private void Update()
     {
         CarController[] cars = FindObjectsOfType<CarController>();
-        CarStatus[] statuses = cars.Select(c => new CarStatus(c.rigidBody.position, c.rigidBody.velocity, c.rigidBody.rotation)).ToArray();
+        CarStatus[] statuses = cars.Select(c => new CarStatus(c.name, c.rigidBody.position, c.rigidBody.velocity, c.rigidBody.rotation)).ToArray();
         latestGameStatus = new GameStatus(statuses);
     }
 
