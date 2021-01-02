@@ -32,7 +32,9 @@ public class CarController : MonoBehaviour
     
     private volatile CarSocket socket;
     private WheelCollider[] allWheels;
-    private DateTime collidingSince;
+    private DateTime collidingSince = DateTime.MaxValue;
+    private DateTime stationarySince = DateTime.MaxValue;
+    private bool started = false;
 
     private void OnEnable()
     {
@@ -79,6 +81,7 @@ public class CarController : MonoBehaviour
     private void Accelerate()
     {
         if (!motorEnabled()) {
+            started = false;
             foreach (WheelCollider wheel in allWheels)
             {
                 wheel.motorTorque = 0;
@@ -130,7 +133,7 @@ public class CarController : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.GetComponent<CarController>() != null) return; // ignore if colliding with other car
-        this.collidingSince = System.DateTime.Now;   
+        this.collidingSince = DateTime.Now;   
     }
 
     private void OnCollisionStay(Collision collision)
@@ -138,23 +141,27 @@ public class CarController : MonoBehaviour
         if (collision.gameObject.GetComponent<CarController>() != null) return; // ignore if colliding with other car
         float collidingFor = GameEvent.TimeDiff(System.DateTime.Now, this.collidingSince);
         if (collidingFor >= 2) {
-            Debug.Log("Returning car to track: " + CarInfo.name);
-            var track = FindObjectOfType<RaceController>().track;
-            SplineMesh.CurveSample closest = null;
-            float closestDistance = float.MaxValue;
-            for (float i = 0; i < track.Length; i += 0.05f) {
-                var curveSample = track.GetSampleAtDistance(i);
-                var distance = (gameObject.transform.position - curveSample.location).magnitude;
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closest = curveSample;
-                }
-            }
-
-            gameObject.transform.position = closest.location + 0.1f * Vector3.up;
-            gameObject.transform.rotation = closest.Rotation;
+            returnToTrack(true);
         }
-    }    
+    }
+
+    private void returnToTrack(bool force) {
+        Debug.Log("Returning car to track: " + CarInfo.name);
+        var track = FindObjectOfType<RaceController>().track;
+        SplineMesh.CurveSample closest = null;
+        float closestDistance = float.MaxValue;
+        for (float i = 0; i < track.Length; i += 0.05f) {
+            var curveSample = track.GetSampleAtDistance(i);
+            var distance = (gameObject.transform.position - curveSample.location).magnitude;
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closest = curveSample;
+            }
+        }
+
+        gameObject.transform.position = closest.location + 0.1f * Vector3.up;
+        gameObject.transform.rotation = closest.Rotation;
+    }
 
     private void FixedUpdate()
     {
@@ -168,6 +175,23 @@ public class CarController : MonoBehaviour
         UpdateWheelPoses();
         ProcessBotCommands();
         velocity = Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity);
+        if (velocity < 0.01f) {
+            if (started) {
+                if (stationarySince == DateTime.MaxValue) {
+                    // Not moving, mark as colliding
+                    stationarySince = DateTime.Now;
+                } else if (GameEvent.TimeDiff(DateTime.Now, stationarySince) >= 2) {
+                    stationarySince = DateTime.MaxValue;
+                    started = false;
+                    returnToTrack(false);
+                }
+            }
+        } else {
+            started = true;
+            if (stationarySince != DateTime.MaxValue) {
+                stationarySince = DateTime.MaxValue;
+            }
+        }
     }
 
     private void OnDestroy()
