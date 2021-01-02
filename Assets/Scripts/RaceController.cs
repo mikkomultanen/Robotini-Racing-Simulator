@@ -187,6 +187,7 @@ public class RaceController : MonoBehaviour
         public Race(RaceController c): base(c)
         {            
             c.motorsEnabled = true;
+            qualifying = false;
         }
 
         public override void OnEnable()
@@ -248,6 +249,7 @@ public class RaceController : MonoBehaviour
     public abstract class Racing : State
     {
         private DateTime sessionStartTime;
+        public bool qualifying = true;
         public Racing(RaceController c): base(c)
         {
         
@@ -285,7 +287,7 @@ public class RaceController : MonoBehaviour
                 .ToArray();
             Array.Sort(standings, compareLaps);            
 
-            return new CurrentStandings(standings);
+            return new CurrentStandings(standings, qualifying);
         }}
 
         static float getComparableTime(LapCompleted t)

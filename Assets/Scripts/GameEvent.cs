@@ -129,9 +129,11 @@ public class RaceFinished: GameEvent
 
 public class CurrentStandings: GameEvent {
     public LapCompleted[] standings;
+    public bool qualifying;
 
-    public CurrentStandings(LapCompleted[] standings) {
+    public CurrentStandings(LapCompleted[] standings, bool qualifying) {
         this.standings = standings;
+        this.qualifying = qualifying;
     }
 }
 
