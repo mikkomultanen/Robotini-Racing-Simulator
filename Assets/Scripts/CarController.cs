@@ -132,7 +132,13 @@ public class CarController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.GetComponent<CarController>() != null) return; // ignore if colliding with other car
+        var otherCar = collision.gameObject.GetComponent<CarController>();
+        if (otherCar != null) {
+            // Collision with other car
+            EventBus.Publish(new CarBumped(CarInfo, otherCar.CarInfo));
+            return;
+        }
+        EventBus.Publish(new CarCrashed(CarInfo));
         this.collidingSince = DateTime.Now;   
     }
 
@@ -161,6 +167,7 @@ public class CarController : MonoBehaviour
 
         gameObject.transform.position = closest.location + 0.1f * Vector3.up;
         gameObject.transform.rotation = closest.Rotation;
+        EventBus.Publish(new CarReturnedToTrack(CarInfo));
     }
 
     private void FixedUpdate()

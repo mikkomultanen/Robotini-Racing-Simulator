@@ -60,6 +60,15 @@ public class PlaybackController : MonoBehaviour
     IEnumerator GetRaceLog()
     {
 
+        // TODO: extract parameters and use raceId parameter to load /api/v1/race/:raceId 
+/*
+        var uri = new Uri(Application.absoluteURL);
+        var ps = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        string root = Application.absoluteURL.Replace(uri.PathAndQuery, ""); // TODO: fails if there's no pathandquery :)
+        Debug.Log("Root: " + root);
+         Debug.Log("Params: " + ps.Keys.ToString());
+         */
+
         UnityWebRequest www = UnityWebRequest.Get("http://localhost:8000/race-capture.json");
         yield return www.SendWebRequest();
 

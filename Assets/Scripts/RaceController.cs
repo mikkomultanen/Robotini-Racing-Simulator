@@ -19,6 +19,11 @@ public class RaceController : MonoBehaviour
     private void OnEnable()
     {
         track = FindObjectOfType<SplineMesh.Spline>();
+        
+    }
+
+    private void Start()
+    {
         raceParameters = RaceParameters.readRaceParameters();
 
         if (ModeController.Mode == SimulatorMode.Playback)

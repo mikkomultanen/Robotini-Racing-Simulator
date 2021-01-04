@@ -32,7 +32,7 @@ public class BigTextDisplay : MonoBehaviour
             }
             else if (e is RaceWon)
             {
-                return showForAWhile("Winner: " + (e as RaceWon).winner.name);
+                return showForAWhile("Winner: " + (e as RaceWon).car.name);
             }
             else if (e is RaceFinished)
             {

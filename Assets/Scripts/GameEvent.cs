@@ -73,17 +73,25 @@ public class CarInfo
     }
 }
 
-[Serializable]
-public class LapCompleted: GameEvent
-{
+public abstract class CarEvent: GameEvent {
     public CarInfo car;
+
+    public CarEvent(CarInfo car)
+    {
+        this.car = car;
+    }
+}
+
+[Serializable]
+public class LapCompleted: CarEvent
+{
     public int lapCount;
     public float lastLap;
     public float bestLap;
     public float totalTime;
     public bool dnf;
 
-    public LapCompleted(CarInfo car, int lapCount, float lastLap, float bestLap, float totalTime, bool dnf)
+    public LapCompleted(CarInfo car, int lapCount, float lastLap, float bestLap, float totalTime, bool dnf): base(car)
     {
         this.car = car;
         this.lapCount = lapCount;
@@ -94,24 +102,14 @@ public class LapCompleted: GameEvent
     }
 }
 
-public class CarFinished: GameEvent
+public class CarFinished: CarEvent
 {
-    public CarInfo car;
-
-    public CarFinished(CarInfo car)
-    {
-        this.car = car;
-    }
+    public CarFinished(CarInfo car): base(car) { }    
 }
 
-public class RaceWon: GameEvent
+public class RaceWon: CarEvent
 {
-    public CarInfo winner;
-
-    public RaceWon(CarInfo winner)
-    {
-        this.winner = winner;
-    }
+    public RaceWon(CarInfo car): base(car) { }  
 }
 
 public class RaceFinished: GameEvent
@@ -122,6 +120,24 @@ public class RaceFinished: GameEvent
     {
         this.standings = standings;
     }
+}
+
+public class CarCrashed: CarEvent
+{
+    public CarCrashed(CarInfo car): base(car) { }
+}
+
+public class CarBumped: CarEvent
+{
+    public CarInfo other;
+    public CarBumped(CarInfo car, CarInfo other): base(car)
+    {
+        this.other = other;
+    }
+}
+
+public class CarReturnedToTrack: CarEvent {
+    public CarReturnedToTrack(CarInfo car): base(car) { }
 }
 
 public class CurrentStandings: GameEvent {
@@ -191,31 +207,21 @@ public class FreePracticeStart : GameEvent
 
 }
 
-public class CarRemoved : GameEvent
+public class CarRemoved : CarEvent
 {
-    public CarInfo car;
-    public CarRemoved(CarInfo car)
-    {
-        this.car = car;
-    }
+    public CarRemoved(CarInfo car): base(car) {}
 }
 
-public class CarDisconnected : GameEvent
+public class CarDisconnected : CarEvent
 {
-    public CarInfo car;
-    public CarDisconnected(CarInfo car)
-    {
-        this.car = car;
-    }
+    public CarDisconnected(CarInfo car): base(car) {}
 }
 
-public class CarConnected : GameEvent
+public class CarConnected : CarEvent
 {
-    public CarInfo car;
     public CarSocket socket; // <- non serializable object, not included in JSON
-    public CarConnected(CarInfo car, CarSocket socket)
+    public CarConnected(CarInfo car, CarSocket socket): base(car)
     {
-        this.car = car;
         this.socket = socket;
     }
 }

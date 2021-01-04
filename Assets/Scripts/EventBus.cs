@@ -29,6 +29,11 @@ public class EventBus {
     {
         Receive<T>().Subscribe(f).AddTo(b);
     }
+
+    public static void Subscribe<T>(MonoBehaviour b, Action f) where T : class
+    {
+        Subscribe<T>(b, _ => f());
+    }
 }
 
 public class Observables

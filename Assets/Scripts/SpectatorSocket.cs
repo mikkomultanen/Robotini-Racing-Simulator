@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System;
 using System.IO;
 using System.Net;
@@ -21,7 +19,14 @@ public class SpectatorSocket : MonoBehaviour
     {
         CarController[] cars = FindObjectsOfType<CarController>();
         CarStatus[] statuses = cars.Select(c => new CarStatus(c.name, c.rigidBody.position, c.rigidBody.velocity, c.rigidBody.rotation)).ToArray();
-        latestGameStatus = new GameStatus(statuses);
+
+        var newGameStatus = new GameStatus(statuses);
+
+
+        if (latestGameStatus == null || (latestGameStatus.timestamp != newGameStatus.timestamp && (latestGameStatus.cars.Length > 0 || newGameStatus.cars.Length > 0))) {
+            latestGameStatus = newGameStatus;
+            EventBus.Publish(latestGameStatus);
+        }
     }
 
     private void OnEnable()
@@ -130,17 +135,10 @@ public class SpectatorSocket : MonoBehaviour
             try
             {
                 while (listener != null)
-                {                   
-                    if (latestGameStatus != null)
-                    {
-                        if (myGameStatus == null || (myGameStatus.timestamp != latestGameStatus.timestamp && (myGameStatus.cars.Length > 0 || latestGameStatus.cars.Length > 0))) {
-                            myGameStatus = latestGameStatus;
-                            send(latestGameStatus);
-                        }
-                    }
+                {                                       
                     if (eventQueue.TryDequeue(out gameEvent))
                     {
-                        Debug.Log("Sending event " + gameEvent.type);
+                        //Debug.Log("Sending event " + gameEvent.type);
                         send(gameEvent);
                     }
                     else
