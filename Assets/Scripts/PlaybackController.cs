@@ -10,12 +10,50 @@ using UnityEngine.Networking;
 
 public class PlaybackController : MonoBehaviour
 {
+    private float position = 0;
+    private int index = 0;
+    private GameEvent[] events;
+    private GameObject[] cars = { };
+
+    static float maxWait = 1; // 1 sec
+
     private void OnEnable()
     {
         if (ModeController.Mode == SimulatorMode.Playback)
         {
             Debug.Log("Initializing playback");
             StartCoroutine(GetRaceLog());
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (events == null) return;
+        if (index >= events.Length) return;
+        while (pollForNext()); // Apply all events due
+        position += Time.deltaTime;
+    }
+
+    private bool pollForNext() {
+        if (index >= events.Length) return false;
+        GameEvent nextEvent = events[index];
+        position = Math.Max(position, nextEvent.timestamp - maxWait);
+        var diff = nextEvent.timestamp - position;
+        if (diff > 0) return false;
+        index++;
+        applyEvent(nextEvent);
+        return true;
+    }
+
+    private void applyEvent(GameEvent e)
+    {
+        if (e is GameStatus)
+        {
+            cars = UpdateCars(cars, (e as GameStatus).cars);
+        }
+        else
+        {
+            EventBus.Publish(e);
         }
     }
 
@@ -35,38 +73,10 @@ public class PlaybackController : MonoBehaviour
             string text = www.downloadHandler.text;
 
             string[] lines = text.Split('\n');
-            GameEvent[] states = lines
+            this.events = lines
                 .Where(line => line.Trim().Length > 0)
                 .Select(line => GameEvent.FromJson(line))
-                .ToArray();
-
-            GameStatus previous = null;
-
-            GameObject[] cars = { };         
-
-            foreach (GameEvent e in states)
-            {
-                // TODO: need a better timing mechanism - current one is visibly laggy
-                if (previous != null && previous.cars.Length > 0)
-                {
-                    float delay = Math.Min(e.timestamp - previous.timestamp, 1);
-                    if (delay >= 1)
-                    {
-                        Debug.Log("Waiting " + delay);
-                    }
-                    yield return new WaitForSeconds(delay);
-                }
-
-                if (e is GameStatus)
-                {
-                    previous = e as GameStatus;
-                    cars = UpdateCars(cars, previous.cars);
-                }
-                else
-                {
-                    EventBus.Publish(e);
-                }
-            }
+                .ToArray();           
         }
     }
 

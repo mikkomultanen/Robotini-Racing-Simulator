@@ -7,6 +7,7 @@ public class CountdownUI : MonoBehaviour
     void Start()
     {
         EventBus.Subscribe<ProceedToNextPhase>(this, s => {
+            // TODO: this doesn't work for playback!
             gameObject.GetComponent<TextMeshProUGUI>().text = "";
         });
         EventBus.Subscribe<SecondsRemaining>(this, s => {
