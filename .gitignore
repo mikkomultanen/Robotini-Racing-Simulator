@@ -1,3 +1,7 @@
+*.mov
+race-capture.json
+robotini-web-player
+.DS_Store
 robotini-linux.x86_64
 robotini-linux_Data
 robotini-runner.tar
@@ -38,3 +42,6 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+.vscode
+race.log
+

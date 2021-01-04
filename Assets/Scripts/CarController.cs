@@ -5,14 +5,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
-
-[Serializable]
-public class JsonControlCommand
-{
-    public string action;
-    public string move;
-    public float value;
-}
+using UniRx;
 
 public class CarController : MonoBehaviour
 {
@@ -34,15 +27,26 @@ public class CarController : MonoBehaviour
     public RaceController raceController;
     private float targetAngle = 0;
     private float lastBotCommandTime = 0;
-    private Rigidbody rigidBody;
-    private readonly ConcurrentQueue<JsonControlCommand> commandQueue = new ConcurrentQueue<JsonControlCommand>();
-    private volatile Socket socket;
+    private bool finished = false;
+    public Rigidbody rigidBody;
+    
+    private volatile CarSocket socket;
     private WheelCollider[] allWheels;
+    private DateTime collidingSince = DateTime.MaxValue;
+    private DateTime stationarySince = DateTime.MaxValue;
+    private bool started = false;
 
     private void OnEnable()
     {
         rigidBody = GetComponent<Rigidbody>();
         allWheels = new WheelCollider[] { frontLeftWC, frontRightWC, rearLeftWC, rearRightWC };
+        EventBus.Subscribe<CarFinished>(this, f => {
+            if (f.car.name == CarInfo.name)
+            {
+                this.finished = true;
+                Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => { Destroy(gameObject); });
+            }
+        });
     }
 
     public void GetInput()
@@ -69,9 +73,15 @@ public class CarController : MonoBehaviour
         frontRightWC.steerAngle = steerAngle;
     }
 
+    private bool motorEnabled()
+    {
+        return raceController.motorsEnabled && !finished;
+    }
+
     private void Accelerate()
     {
-        if (!raceController.motorsEnabled) {
+        if (!motorEnabled()) {
+            started = false;
             foreach (WheelCollider wheel in allWheels)
             {
                 wheel.motorTorque = 0;
@@ -96,6 +106,9 @@ public class CarController : MonoBehaviour
                 wheel.brakeTorque = brakeTorque;
             }
         }
+        if (finished) {
+            rigidBody.AddForce(new Vector3(0, 10, 0));
+        }
     }
 
     private void UpdateWheelPoses()
@@ -117,6 +130,39 @@ public class CarController : MonoBehaviour
         wheelTransform.rotation = rot;
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.GetComponent<CarController>() != null) return; // ignore if colliding with other car
+        this.collidingSince = DateTime.Now;   
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.GetComponent<CarController>() != null) return; // ignore if colliding with other car
+        float collidingFor = GameEvent.TimeDiff(System.DateTime.Now, this.collidingSince);
+        if (collidingFor >= 2) {
+            returnToTrack(true);
+        }
+    }
+
+    private void returnToTrack(bool force) {
+        Debug.Log("Returning car to track: " + CarInfo.name);
+        var track = FindObjectOfType<RaceController>().track;
+        SplineMesh.CurveSample closest = null;
+        float closestDistance = float.MaxValue;
+        for (float i = 0; i < track.Length; i += 0.05f) {
+            var curveSample = track.GetSampleAtDistance(i);
+            var distance = (gameObject.transform.position - curveSample.location).magnitude;
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closest = curveSample;
+            }
+        }
+
+        gameObject.transform.position = closest.location + 0.1f * Vector3.up;
+        gameObject.transform.rotation = closest.Rotation;
+    }
+
     private void FixedUpdate()
     {
         GetInput();
@@ -129,54 +175,53 @@ public class CarController : MonoBehaviour
         UpdateWheelPoses();
         ProcessBotCommands();
         velocity = Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity);
+        if (velocity < 0.01f) {
+            if (started) {
+                if (stationarySince == DateTime.MaxValue) {
+                    // Not moving, mark as colliding
+                    stationarySince = DateTime.Now;
+                } else if (GameEvent.TimeDiff(DateTime.Now, stationarySince) >= 2) {
+                    stationarySince = DateTime.MaxValue;
+                    started = false;
+                    returnToTrack(false);
+                }
+            }
+        } else {
+            started = true;
+            if (stationarySince != DateTime.MaxValue) {
+                stationarySince = DateTime.MaxValue;
+            }
+        }
     }
 
     private void OnDestroy()
     {
         if (this.socket != null) 
         {
-            this.socket.Dispose();
             this.socket = null;
         }
     }
 
-    public void SetSocket(Socket socket)
-    {
-        if (this.socket != null) return;
-
+    public void SetSocket(CarSocket socket) {
         this.socket = socket;
-
         var cameraOutput = GetComponentInChildren<CameraOutputController>();
-        cameraOutput.SetSocket(socket);
+        cameraOutput.SetSocket(socket);        
+    }
 
-        Boolean stopped = false;
-
-        new Thread(() => {
-            var stream = new NetworkStream(socket);
-            var reader = new StreamReader(stream);
-            while (this.socket != null && !stopped)
-            {
-                try
-                {
-                    var line = reader.ReadLine();
-                    var command = JsonUtility.FromJson<JsonControlCommand>(line);
-                    commandQueue.Enqueue(command);
-                }
-                catch (Exception e)
-                {
-                    Debug.Log("Socket read failed:" + e.ToString());
-                    stopped = true;
-                }
-            }
-            commandQueue.Enqueue(new JsonControlCommand {
-                action = "disconnected"
-            });
-        }).Start();
+    public CarInfo CarInfo { get
+        {
+            return socket.CarInfo;
+        }
     }
 
     private void ProcessBotCommands()
     {
-        foreach (var command in ReceiveCommands())
+        if (socket == null) return;
+        if (!socket.IsConnected())
+        {
+            Destroy(gameObject);
+        }
+        foreach (var command in socket.ReceiveCommands())
         {
             lastBotCommandTime = Time.time;
             //Debug.Log("Processing " + JsonUtility.ToJson(command));
@@ -188,13 +233,7 @@ public class CarController : MonoBehaviour
             else if (command.action == "reverse")
             {
                 brake = 0;
-                if (velocity <= 0.01)
-                {
-                    forward = -command.value;
-                } else
-                {
-                    forward = 0;
-                }
+                forward = 0;
             }
             else if (command.action == "brake")
             {
@@ -205,21 +244,8 @@ public class CarController : MonoBehaviour
             {
                 targetAngle = -command.value; // bot uses -1 right, +1 left
             }
-            else if (command.action == "disconnected")
-            {
-                Destroy(gameObject);
-            }
         }
     }
 
-    private IEnumerable<JsonControlCommand> ReceiveCommands()
-    {
-        var commands = new List<JsonControlCommand>();
-        JsonControlCommand command = null;
-        while (commandQueue.TryDequeue(out command))
-        {
-            commands.Add(command);
-        }
-        return commands;
-    }
+
 }

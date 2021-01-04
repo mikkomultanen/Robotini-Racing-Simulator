@@ -1,8 +1,5 @@
-﻿using System.Collections.Concurrent;
-using System;
+﻿using System;
 using System.Linq;
-using System.Net.Sockets;
-using System.Threading;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
@@ -14,8 +11,8 @@ public class CameraOutputController : MonoBehaviour
     private float lastSaved = 0;
     private const int width = 128;
     private const int height = 80;
-    private readonly ConcurrentQueue<byte[]> sendQueue = new ConcurrentQueue<byte[]>();
-    private volatile Socket socket;
+    
+    private volatile CarSocket socket;
 
     private void Start()
     {
@@ -23,12 +20,14 @@ public class CameraOutputController : MonoBehaviour
         renderTexture = new RenderTexture(width, height, 24);
         renderTexture.antiAliasing = 2;
         virtualPhoto = new Texture2D(width, height, TextureFormat.RGB24, false);
+        Debug.Log("CameraOutputController started");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Time.time < lastSaved + 0.03 || sendQueue.Count > 5 || socket == null)
+        if (socket == null) return;
+        if (Time.time < lastSaved + 0.03 || socket.SendQueueSize() > 5 || socket == null)
         {
             return;
         }
@@ -55,7 +54,7 @@ public class CameraOutputController : MonoBehaviour
         mCamera.targetTexture = null;
         //RenderTexture.ReleaseTemporary(tempRT);
 
-        sendQueue.Enqueue(virtualPhoto.EncodeToPNG());
+        socket.Send(encodeFrame(virtualPhoto));
     }
 
     private void OnDestroy()
@@ -66,41 +65,22 @@ public class CameraOutputController : MonoBehaviour
         }
     }
 
-    public void SetSocket(Socket socket)
+    private byte[] encodeFrame(Texture2D virtualPhoto)
+    {
+        byte[] data = virtualPhoto.EncodeToPNG();
+
+        if (data.Length > 65535) throw new Exception("Max image size exceeded");
+        byte lowerByte = (byte)(data.Length & 0xff);
+        byte higherByte = (byte)((data.Length & 0xff00) >> 8);
+        //Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
+        byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
+        byte[] encodedBytes = lengthAsBytes.Concat(data).ToArray();
+        return encodedBytes;
+    }
+
+    public void SetSocket(CarSocket socket)
     {
         if (this.socket != null) return;
-
         this.socket = socket;
-
-        Boolean stopped = false;
-        new Thread(() =>
-        {
-            while (this.socket != null && !stopped)
-            {
-                byte[] data;
-
-                if (sendQueue.TryDequeue(out data))
-                {
-                    if (data.Length > 65535) throw new Exception("Max image size exceeded");
-                    byte lowerByte = (byte)(data.Length & 0xff);
-                    byte higherByte = (byte)((data.Length & 0xff00) >> 8);
-                    //Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
-                    byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
-                    try
-                    {
-                        socket.Send(lengthAsBytes.Concat(data).ToArray());
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.Log("Socket send failed:" + e.ToString());
-                        stopped = true;
-                    }
-                }
-                else
-                {
-                    Thread.Sleep(10);
-                }
-            }
-        }).Start();
     }
 }
