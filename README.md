@@ -4,7 +4,7 @@ Simulator for training machine vision racing AIs, created with Unity.
 
 Clone this repo and open it in Unity. Run and enjoy!
 
-At start, you can control the car with arrow keys. But this is not the point.
+## The bot connection
 
 The point is to connect your AI to localhost:11000. The simulator will
 feed you PNG images from the car's front camera. Like this
@@ -18,16 +18,25 @@ The simulator accepts control commands as a JSON string terminated with \n from 
 - `{ "action": "forward", "value": 0.5}\n` where value is the throttle value between 0 and 1.
 - `{ "action": "turn", "value": -0.1}\n` where value is the direction for the front wheels. 1.0 is full left and -1.0 is full right. 
 
-Enjoy!
+## RaceParameters
 
-# Spectator socket
+The RaceParameters.json file can be used to control the operating mode of the Simulator. First of all, `mode` can be one of `development`, `race` or `playback` for different modes.
 
-The simulator serves JSON car positions on port 11001.
+In `development` mode the simulator accepts bot connections and places cars immediately on the track for free practice with lap timing
+
+In `race` mode the simulator accepts bot connections while in the "race lobby" phase. Then it starts Qualifying and finally the Race. You can move tho the next phase using SPACEBAR. 
+It also moves automatically forward based on RaceParameters, see self-documenting code in [RaceParameters.cs](Assets/Scripts/RaceParameters.cs).
+
+In `playback` mode the simulators plays back a recorded race log. When running in WebGL, the playback mode is always assumed. See below.
 
 # Playback mode and WebGL
 
-WIP!
+You can build a WebGL build with Unity. It results into an index.html file containing the player. You need to server it over HTTP though - file protocol is not supported.
 
-You can build a WebGL build with Unity. It results into an index.html file containing the player. You need to server it over HTTP though - file protocol not supported.
+At the moment it always looks for race data at http://localhost:8000/race-capture.json and this should be parameterized soon.
 
-When running in WebGL, the simulator goes to playback mode. The idea is to be able to play back earlier races in a Web UI. Currently it doesn't have any playback capabilities, just initial testing that we can launch it in WebGL, detect the WebGL environment and skip opening any TCP server sockets. Next step would be to download a recorded race and play it.
+When running a race, the simulator saves race data to `race.log`. If you serve the resulting file over HTTP to the player, you should see a race.
+
+## Spectator socket
+
+The simulator serves a full capture of race events on port 11001 as a newline-separated JSON stream. This could be used for watching the race live.
