@@ -51,10 +51,7 @@ public class PlaybackController : MonoBehaviour
         {
             cars = UpdateCars(cars, (e as GameStatus).cars);
         }
-        else
-        {
-            EventBus.Publish(e);
-        }
+        EventBus.Publish(e);
     }
 
     IEnumerator GetRaceLog()
