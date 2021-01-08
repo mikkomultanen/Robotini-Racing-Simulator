@@ -25,19 +25,20 @@ public class RaceController : MonoBehaviour
     private void Start()
     {
         raceParameters = RaceParameters.readRaceParameters();
-
-        if (ModeController.Mode == SimulatorMode.Playback)
-        {
-            setState(new Playback(this));
-        }
-        else if (ModeController.Mode == SimulatorMode.Race)
-        {
-            setState(new RaceLobby(this));
-        }
-        else
-        {
-            setState(new FreePractice(this));
-        }
+        Observables.Delay(TimeSpan.FromMilliseconds(0)).Subscribe(_ => {
+            if (ModeController.Mode == SimulatorMode.Playback)
+            {
+                setState(new Playback(this));
+            }
+            else if (ModeController.Mode == SimulatorMode.Race)
+            {
+                setState(new RaceLobby(this));
+            }
+            else
+            {
+                setState(new FreePractice(this));
+            }
+        });        
     }
 
     void setState(State state)

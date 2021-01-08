@@ -102,6 +102,8 @@ public class LapCompleted: CarEvent
     }
 }
 
+public interface PhaseChange { }
+
 public class CarFinished: CarEvent
 {
     public CarFinished(CarInfo car): base(car) { }    
@@ -112,7 +114,7 @@ public class RaceWon: CarEvent
     public RaceWon(CarInfo car): base(car) { }  
 }
 
-public class RaceFinished: GameEvent
+public class RaceFinished: GameEvent, PhaseChange
 {
     public LapCompleted[] standings;
 
@@ -150,7 +152,7 @@ public class CurrentStandings: GameEvent {
     }
 }
 
-public class RaceLobbyInit: GameEvent
+public class RaceLobbyInit: GameEvent, PhaseChange
 {
     public RaceParameters raceParameters;
 
@@ -170,7 +172,7 @@ public class SecondsRemaining : GameEvent
     }
 }
 
-public class QualifyingStart: GameEvent
+public class QualifyingStart: GameEvent, PhaseChange
 {
     public CarInfo[] cars;
     public QualifyingStart(CarInfo[] cars)
@@ -188,7 +190,7 @@ public class QualifyingResults : GameEvent
     }
 }
 
-public class StartingGridInit : GameEvent
+public class StartingGridInit : GameEvent, PhaseChange
 {
     public CarInfo[] cars;
 
@@ -197,12 +199,12 @@ public class StartingGridInit : GameEvent
     }
 }
 
-public class RaceStart : GameEvent
+public class RaceStart : GameEvent, PhaseChange
 {
 
 }
 
-public class FreePracticeStart : GameEvent
+public class FreePracticeStart : GameEvent, PhaseChange
 {
 
 }

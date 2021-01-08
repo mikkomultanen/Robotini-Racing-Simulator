@@ -3,16 +3,17 @@ using TMPro;
 
 public class CountdownUI : MonoBehaviour
 {
-    // Use this for initialization
     void Start()
     {
-        EventBus.Subscribe<ProceedToNextPhase>(this, s => {
-            // TODO: this doesn't work for playback!
-            gameObject.GetComponent<TextMeshProUGUI>().text = "";
-        });
+        EventBus.Subscribe<PhaseChange>(this, clearText);
         EventBus.Subscribe<SecondsRemaining>(this, s => {
             var txt = s.secondsRemaining > 0 ? "" + s.secondsRemaining : "";
             gameObject.GetComponent<TextMeshProUGUI>().text = txt;
         });
+    }
+
+    void clearText()
+    {
+        gameObject.GetComponent<TextMeshProUGUI>().text = "";
     }
 }
