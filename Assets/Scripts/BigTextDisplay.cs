@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using TMPro;
 using System;
+using System.Linq;
 using UniRx;
 
 public class BigTextDisplay : MonoBehaviour
 {
-    void Update()
+    private void Start()
     {
         var events = EventBus.Receive<GameEvent>().Select(e =>
         {
@@ -36,7 +37,7 @@ public class BigTextDisplay : MonoBehaviour
             }
             else if (e is RaceFinished)
             {
-                return keepShowing("Race over. Winner: " + (e as RaceFinished).standings[0].car.name);
+                return keepShowing("Race over. Winner: " + (e as RaceFinished).standings.FirstOrDefault()?.car?.name);
             }
             return Observable.Never<string>();
         }).Switch();
