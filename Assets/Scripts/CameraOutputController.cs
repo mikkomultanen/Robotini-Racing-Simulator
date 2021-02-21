@@ -27,7 +27,10 @@ public class CameraOutputController : MonoBehaviour
         outputArray = new NativeArray<uint>(width * height, Allocator.Persistent);
         virtualPhoto = new Texture2D(width, height, TextureFormat.ARGB32, false);
         Debug.Log("CameraOutputController started");
-        Debug.Log("supportsAsyncGPUReadback " + SystemInfo.supportsAsyncGPUReadback);
+        mCamera.rect = new Rect(0, 0, 1, 1);
+        mCamera.aspect = 1.0f * width / height;
+        mCamera.targetTexture = renderTexture;
+        mCamera.enabled = true;
     }
 
     // Update is called once per frame
@@ -39,53 +42,15 @@ public class CameraOutputController : MonoBehaviour
             return;
         }
 
-        if (hasRequest && !request.done) {
-            Debug.Log("SKIPPED FRAME");
-            return;
-        }
-
-        if (hasRequest) {
-            hasRequest = false;
-            //request.WaitForCompletion();
-            if (request.hasError)
-            {
-                Debug.LogError("ERROR reading pixels");
-            }
-            else
-            {
-                Debug.Log("DONE reading pixels");
-                virtualPhoto.LoadRawTextureData(outputArray);
-                virtualPhoto.Apply();
-                socket.Send(encodeFrame(virtualPhoto));
-            }
+        if (hasRequest)
+        {
+            request.WaitForCompletion();
         }
 
         lastSaved = Time.time;
 
-        mCamera.rect = new Rect(0, 0, 1, 1);
-        mCamera.aspect = 1.0f * width / height;
-        // recall that the height is now the "actual" size from now on
-
-        //RenderTexture tempRT = RenderTexture.GetTemporary(width, height, 24);
-        // the 24 can be 0,16,24, formats like
-        // RenderTextureFormat.Default, ARGB32 etc.
-        //tempRT.antiAliasing = 2;
-
-        mCamera.targetTexture = renderTexture;
-        //mCamera.Render();
-        mCamera.enabled = true;
-        request = AsyncGPUReadback.RequestIntoNativeArray(ref outputArray, renderTexture, 0, TextureFormat.ARGB32);
+        request = AsyncGPUReadback.RequestIntoNativeArray(ref outputArray, renderTexture, 0, TextureFormat.ARGB32, OnCompleteReadback);
         hasRequest = true;
-        
-        //RenderTexture.active = renderTexture;
-        //virtualPhoto.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-        //virtualPhoto.Apply();
-
-        //RenderTexture.active = null; //can help avoid errors 
-        //mCamera.targetTexture = null;
-        //RenderTexture.ReleaseTemporary(tempRT);
-
-        //socket.Send(encodeFrame(virtualPhoto));
     }
 
     void OnCompleteReadback(AsyncGPUReadbackRequest request)
@@ -96,21 +61,25 @@ public class CameraOutputController : MonoBehaviour
             Debug.Log("GPU readback error detected.");
             return;
         }
-        if (virtualPhoto == null) {
+        if (virtualPhoto == null || socket == null) {
             return;
         }
-        virtualPhoto.LoadRawTextureData(request.GetData<uint>());
+        virtualPhoto.LoadRawTextureData(outputArray);
         virtualPhoto.Apply();
         socket.Send(encodeFrame(virtualPhoto));
     }
 
     private void OnDestroy()
     {
-        //outputArray.Dispose();
         if (this.socket != null)
         {
             this.socket = null;
         }
+        if (hasRequest)
+        {
+            request.WaitForCompletion();
+        }
+        outputArray.Dispose();
     }
 
     private byte[] encodeFrame(Texture2D virtualPhoto)
