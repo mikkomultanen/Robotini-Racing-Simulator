@@ -9,7 +9,6 @@ public class CarSocketListener : MonoBehaviour {
     private readonly ManualResetEvent allDone = new ManualResetEvent(false);
     private readonly ConcurrentQueue<Socket> clientSocketQueue = new ConcurrentQueue<Socket>();
     private Socket listener = null;
-    private int index = 0;
 
     private void OnEnable()
     {

@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Unity.Collections;
 
 [RequireComponent(typeof(Camera))]
 public class CameraOutputController : MonoBehaviour
 {
     private Camera mCamera;
-    private RenderTexture renderTexture;
+    public RenderTexture renderTexture;
+    private NativeArray<uint> outputArray;
+    private AsyncGPUReadbackRequest request;
+    private bool hasRequest = false;
     private Texture2D virtualPhoto;
     private float lastSaved = 0;
     private const int width = 128;
@@ -17,10 +22,12 @@ public class CameraOutputController : MonoBehaviour
     private void Start()
     {
         mCamera = GetComponent<Camera>();
-        renderTexture = new RenderTexture(width, height, 24);
+        renderTexture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
         renderTexture.antiAliasing = 2;
-        virtualPhoto = new Texture2D(width, height, TextureFormat.RGB24, false);
+        outputArray = new NativeArray<uint>(width * height, Allocator.Persistent);
+        virtualPhoto = new Texture2D(width, height, TextureFormat.ARGB32, false);
         Debug.Log("CameraOutputController started");
+        Debug.Log("supportsAsyncGPUReadback " + SystemInfo.supportsAsyncGPUReadback);
     }
 
     // Update is called once per frame
@@ -30,6 +37,27 @@ public class CameraOutputController : MonoBehaviour
         if (Time.time < lastSaved + 0.03 || socket.SendQueueSize() > 5 || socket == null)
         {
             return;
+        }
+
+        if (hasRequest && !request.done) {
+            Debug.Log("SKIPPED FRAME");
+            return;
+        }
+
+        if (hasRequest) {
+            hasRequest = false;
+            //request.WaitForCompletion();
+            if (request.hasError)
+            {
+                Debug.LogError("ERROR reading pixels");
+            }
+            else
+            {
+                Debug.Log("DONE reading pixels");
+                virtualPhoto.LoadRawTextureData(outputArray);
+                virtualPhoto.Apply();
+                socket.Send(encodeFrame(virtualPhoto));
+            }
         }
 
         lastSaved = Time.time;
@@ -44,21 +72,41 @@ public class CameraOutputController : MonoBehaviour
         //tempRT.antiAliasing = 2;
 
         mCamera.targetTexture = renderTexture;
-        mCamera.Render();
+        //mCamera.Render();
+        mCamera.enabled = true;
+        request = AsyncGPUReadback.RequestIntoNativeArray(ref outputArray, renderTexture, 0, TextureFormat.ARGB32);
+        hasRequest = true;
+        
+        //RenderTexture.active = renderTexture;
+        //virtualPhoto.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        //virtualPhoto.Apply();
 
-        RenderTexture.active = renderTexture;
-        virtualPhoto.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-        virtualPhoto.Apply();
-
-        RenderTexture.active = null; //can help avoid errors 
-        mCamera.targetTexture = null;
+        //RenderTexture.active = null; //can help avoid errors 
+        //mCamera.targetTexture = null;
         //RenderTexture.ReleaseTemporary(tempRT);
 
+        //socket.Send(encodeFrame(virtualPhoto));
+    }
+
+    void OnCompleteReadback(AsyncGPUReadbackRequest request)
+    {
+        hasRequest = false;
+        if (request.hasError)
+        {
+            Debug.Log("GPU readback error detected.");
+            return;
+        }
+        if (virtualPhoto == null) {
+            return;
+        }
+        virtualPhoto.LoadRawTextureData(request.GetData<uint>());
+        virtualPhoto.Apply();
         socket.Send(encodeFrame(virtualPhoto));
     }
 
     private void OnDestroy()
     {
+        //outputArray.Dispose();
         if (this.socket != null)
         {
             this.socket = null;
