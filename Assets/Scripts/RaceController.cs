@@ -21,6 +21,9 @@ public class RaceController : MonoBehaviour
         track = FindObjectOfType<SplineMesh.Spline>();
         raceParameters = RaceParameters.readRaceParameters();
 
+        Application.runInBackground = true;
+        Application.targetFrameRate = 60;
+
         if (ModeController.Mode == SimulatorMode.Playback)
         {
             setState(new Playback(this));
