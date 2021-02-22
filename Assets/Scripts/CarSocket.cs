@@ -75,8 +75,13 @@ public class CarSocket {
 
     private void disconnected()
     {
+        if (this.carInfo != null) {
+            Debug.Log("Car disconnected: " + carInfo.name);
+            EventBus.Publish(new CarDisconnected(carInfo));
+        } else {
+            Debug.Log("Car disconnected: " + socket.RemoteEndPoint);
+        }
         this.socket = null;
-        EventBus.Publish(new CarDisconnected(carInfo));
     }
 
     public Boolean IsConnected()
