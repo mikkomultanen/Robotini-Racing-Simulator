@@ -47,7 +47,7 @@ public class Observables
     {
         return Observable
             .Interval(TimeSpan.FromSeconds(1))
-            .Merge(Observable.Return(0l))
+            .Merge(Observable.Return(0L))
             .Scan(seconds, (acc, _) => acc - 1)
             .TakeWhile(v => v >= 0)
             .Select(s => new SecondsRemaining(s))

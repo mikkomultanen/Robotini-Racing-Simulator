@@ -749,20 +749,6 @@ MonoBehaviour:
       m_Height: 7
     m_Scale: 1
     m_AtlasIndex: 0
-  - m_Index: 57
-    m_Metrics:
-      m_Width: 57
-      m_Height: 59
-      m_HorizontalBearingX: 0
-      m_HorizontalBearingY: 59
-      m_HorizontalAdvance: 57
-    m_GlyphRect:
-      m_X: 420
-      m_Y: 326
-      m_Width: 57
-      m_Height: 59
-    m_Scale: 1
-    m_AtlasIndex: 0
   - m_Index: 14
     m_Metrics:
       m_Width: 42
@@ -775,6 +761,20 @@ MonoBehaviour:
       m_Y: 90
       m_Width: 42
       m_Height: 43
+    m_Scale: 1
+    m_AtlasIndex: 0
+  - m_Index: 57
+    m_Metrics:
+      m_Width: 57
+      m_Height: 59
+      m_HorizontalBearingX: 0
+      m_HorizontalBearingY: 59
+      m_HorizontalAdvance: 57
+    m_GlyphRect:
+      m_X: 420
+      m_Y: 326
+      m_Width: 57
+      m_Height: 59
     m_Scale: 1
     m_AtlasIndex: 0
   m_CharacterTable:
@@ -939,12 +939,12 @@ MonoBehaviour:
     m_GlyphIndex: 16
     m_Scale: 1
   - m_ElementType: 1
-    m_Unicode: 86
-    m_GlyphIndex: 57
-    m_Scale: 1
-  - m_ElementType: 1
     m_Unicode: 43
     m_GlyphIndex: 14
+    m_Scale: 1
+  - m_ElementType: 1
+    m_Unicode: 86
+    m_GlyphIndex: 57
     m_Scale: 1
   m_AtlasTextures:
   - {fileID: 28268798066460806}
@@ -1106,14 +1106,14 @@ MonoBehaviour:
     m_Y: 341
     m_Width: 42
     m_Height: 26
-  - m_X: 410
-    m_Y: 316
-    m_Width: 76
-    m_Height: 78
   - m_X: 284
     m_Y: 80
     m_Width: 61
     m_Height: 62
+  - m_X: 410
+    m_Y: 316
+    m_Width: 76
+    m_Height: 78
   m_FreeGlyphRects:
   - m_X: 57
     m_Y: 25
@@ -1243,6 +1243,14 @@ MonoBehaviour:
     m_Y: 341
     m_Width: 9
     m_Height: 170
+  - m_X: 284
+    m_Y: 142
+    m_Width: 63
+    m_Height: 14
+  - m_X: 345
+    m_Y: 80
+    m_Width: 2
+    m_Height: 76
   - m_X: 341
     m_Y: 392
     m_Width: 69
@@ -1255,14 +1263,6 @@ MonoBehaviour:
     m_Y: 314
     m_Width: 20
     m_Height: 2
-  - m_X: 284
-    m_Y: 142
-    m_Width: 63
-    m_Height: 14
-  - m_X: 345
-    m_Y: 80
-    m_Width: 2
-    m_Height: 76
   m_fontInfo:
     Name: Liberation Sans
     PointSize: 86

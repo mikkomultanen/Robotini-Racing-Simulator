@@ -75,7 +75,7 @@ public class CarController : MonoBehaviour
 
     private bool motorEnabled()
     {
-        return raceController.motorsEnabled && !finished;
+        return (raceController == null || raceController.motorsEnabled) && !finished;
     }
 
     private void Accelerate()
@@ -152,8 +152,8 @@ public class CarController : MonoBehaviour
     }
 
     private void returnToTrack(bool force) {
-        Debug.Log("Returning car to track: " + CarInfo.name);
-        var track = FindObjectOfType<RaceController>().track;
+        Debug.Log("Returning car to track: " + CarInfo?.name);
+        var track = FindObjectOfType<SplineMesh.Spline>();
         SplineMesh.CurveSample closest = null;
         float closestDistance = float.MaxValue;
         for (float i = 0; i < track.Length; i += 0.05f) {
@@ -217,7 +217,7 @@ public class CarController : MonoBehaviour
 
     public CarInfo CarInfo { get
         {
-            return socket.CarInfo;
+            return socket?.CarInfo;
         }
     }
 

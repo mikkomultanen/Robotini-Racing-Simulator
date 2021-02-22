@@ -22,7 +22,7 @@ public class RaceParameters
             var p = JsonUtility.FromJson<RaceParameters>(reader.ReadToEnd());            
             return p;
         }
-        catch (FileNotFoundException e)
+        catch (FileNotFoundException)
         {
             return new RaceParameters();
         }

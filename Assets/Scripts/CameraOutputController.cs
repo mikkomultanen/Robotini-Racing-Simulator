@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Unity.Collections;
 
 [RequireComponent(typeof(Camera))]
 public class CameraOutputController : MonoBehaviour
 {
     private Camera mCamera;
-    private RenderTexture renderTexture;
+    public RenderTexture renderTexture;
+    private NativeArray<uint> outputArray;
+    private AsyncGPUReadbackRequest request;
+    private bool hasRequest = false;
     private Texture2D virtualPhoto;
     private float lastSaved = 0;
     private const int width = 128;
@@ -17,10 +22,15 @@ public class CameraOutputController : MonoBehaviour
     private void Start()
     {
         mCamera = GetComponent<Camera>();
-        renderTexture = new RenderTexture(width, height, 24);
+        renderTexture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
         renderTexture.antiAliasing = 2;
-        virtualPhoto = new Texture2D(width, height, TextureFormat.RGB24, false);
+        outputArray = new NativeArray<uint>(width * height, Allocator.Persistent);
+        virtualPhoto = new Texture2D(width, height, TextureFormat.ARGB32, false);
         Debug.Log("CameraOutputController started");
+        mCamera.rect = new Rect(0, 0, 1, 1);
+        mCamera.aspect = 1.0f * width / height;
+        mCamera.targetTexture = renderTexture;
+        mCamera.enabled = true;
     }
 
     // Update is called once per frame
@@ -32,28 +42,30 @@ public class CameraOutputController : MonoBehaviour
             return;
         }
 
+        if (hasRequest)
+        {
+            request.WaitForCompletion();
+        }
+
         lastSaved = Time.time;
 
-        mCamera.rect = new Rect(0, 0, 1, 1);
-        mCamera.aspect = 1.0f * width / height;
-        // recall that the height is now the "actual" size from now on
+        request = AsyncGPUReadback.RequestIntoNativeArray(ref outputArray, renderTexture, 0, TextureFormat.ARGB32, OnCompleteReadback);
+        hasRequest = true;
+    }
 
-        //RenderTexture tempRT = RenderTexture.GetTemporary(width, height, 24);
-        // the 24 can be 0,16,24, formats like
-        // RenderTextureFormat.Default, ARGB32 etc.
-        //tempRT.antiAliasing = 2;
-
-        mCamera.targetTexture = renderTexture;
-        mCamera.Render();
-
-        RenderTexture.active = renderTexture;
-        virtualPhoto.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+    void OnCompleteReadback(AsyncGPUReadbackRequest request)
+    {
+        hasRequest = false;
+        if (request.hasError)
+        {
+            Debug.Log("GPU readback error detected.");
+            return;
+        }
+        if (virtualPhoto == null || socket == null) {
+            return;
+        }
+        virtualPhoto.LoadRawTextureData(outputArray);
         virtualPhoto.Apply();
-
-        RenderTexture.active = null; //can help avoid errors 
-        mCamera.targetTexture = null;
-        //RenderTexture.ReleaseTemporary(tempRT);
-
         socket.Send(encodeFrame(virtualPhoto));
     }
 
@@ -63,6 +75,11 @@ public class CameraOutputController : MonoBehaviour
         {
             this.socket = null;
         }
+        if (hasRequest)
+        {
+            request.WaitForCompletion();
+        }
+        outputArray.Dispose();
     }
 
     private byte[] encodeFrame(Texture2D virtualPhoto)
