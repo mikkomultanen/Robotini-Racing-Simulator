@@ -12,6 +12,7 @@ public class CameraOutputController : MonoBehaviour
     private NativeArray<uint> outputArray;
     private AsyncGPUReadbackRequest request;
     private bool hasRequest = false;
+    private bool outputReady = false;
     private Texture2D virtualPhoto;
     private float lastSaved = 0;
     private const int width = 128;
@@ -31,13 +32,13 @@ public class CameraOutputController : MonoBehaviour
         mCamera.aspect = 1.0f * width / height;
         mCamera.targetTexture = renderTexture;
         mCamera.enabled = true;
+        RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnEndFrameRendering(ScriptableRenderContext context, Camera[] cameras)
     {
         if (socket == null) return;
-        if (Time.time < lastSaved + 0.03 || socket.SendQueueSize() > 5 || socket == null)
+        if (Time.time < lastSaved + 0.03)
         {
             return;
         }
@@ -45,6 +46,15 @@ public class CameraOutputController : MonoBehaviour
         if (hasRequest)
         {
             request.WaitForCompletion();
+        }
+        if (outputReady)
+        {
+            outputReady = false;
+            socket.Send(encodeFrame(virtualPhoto));
+        }
+
+        if (socket.SendQueueSize() > 1) {
+            return;
         }
 
         lastSaved = Time.time;
@@ -66,7 +76,7 @@ public class CameraOutputController : MonoBehaviour
         }
         virtualPhoto.LoadRawTextureData(outputArray);
         virtualPhoto.Apply();
-        socket.Send(encodeFrame(virtualPhoto));
+        outputReady = true;
     }
 
     private void OnDestroy()
