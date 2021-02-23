@@ -40,3 +40,7 @@ When running a race, the simulator saves race data to `race.log`. If you serve t
 ## Spectator socket
 
 The simulator serves a full capture of race events on port 11001 as a newline-separated JSON stream. This could be used for watching the race live.
+
+You can also send UICommands through the socket, such as:
+
+    {"type":"ProceedToNextPhase"}

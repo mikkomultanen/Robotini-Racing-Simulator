@@ -228,10 +228,13 @@ public class CarConnected : CarEvent
     }
 }
 
-public class MotorsToggle
+public abstract class UICommand: GameEvent {
+}
+
+public class MotorsToggle: UICommand
 {
 }
 
-public class ProceedToNextPhase
+public class ProceedToNextPhase: UICommand
 {
 }

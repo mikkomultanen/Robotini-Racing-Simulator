@@ -40,7 +40,7 @@ public class CarSocket {
             }
             catch (Exception e)
             {
-                Debug.Log("Socket read failed:" + e.ToString());
+                Debug.Log("Car socket read failed:" + e.ToString());
                 disconnected();
             }
         }).Start();

@@ -101,7 +101,33 @@ public class SpectatorSocket : MonoBehaviour
 
         Debug.Log("Spectator connected.");
 
-        Spectate(b => socket.Send(b), () => socket.Close());
+        Action close = () => socket.Close();
+
+        // Receiver thread
+        new Thread(() => {
+            var stream = new NetworkStream(socket);
+            var reader = new StreamReader(stream);
+            try
+            {                
+                while (true)
+                {
+                    var line = reader.ReadLine();
+                    var command = GameEvent.FromJson(line);
+                    if (!(command is UICommand)) {
+                        throw new Exception("Received unexpected command from Spectator: " + command);
+                    }
+                    EventBus.Publish(command);
+                }
+
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Spectator socket read failed:" + e.ToString());
+                close();
+            }
+        }).Start();
+
+        Spectate(b => socket.Send(b), close);
 
     }
 
