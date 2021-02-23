@@ -7,23 +7,22 @@ using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.IO;
 
-public class PlaybackController : MonoBehaviour
+public class PlaybackController : RemoteEventPlayer
 {
     private float position = 0;
     private int index = 0;
     private GameEvent[] events;
-    private GameObject[] cars = { };
 
     static float maxWait = 1; // 1 sec
 
     private void OnEnable()
     {
         if (ModeController.Mode == SimulatorMode.Playback)
-        {
-            Debug.Log("Initializing playback");
+        {            
             StartCoroutine(GetRaceLog());
-        }
+        }        
     }
 
     private void FixedUpdate()
@@ -41,21 +40,15 @@ public class PlaybackController : MonoBehaviour
         var diff = nextEvent.timestamp - position;
         if (diff > 0) return false;
         index++;
-        applyEvent(nextEvent);
+        ApplyEvent(nextEvent);
         return true;
     }
 
-    private void applyEvent(GameEvent e)
-    {
-        if (e is GameStatus)
-        {
-            cars = UpdateCars(cars, (e as GameStatus).cars);
-        }
-        EventBus.Publish(e);
-    }
+    
 
     IEnumerator GetRaceLog()
     {
+        Debug.Log("Initializing playback");
 
         // TODO: extract parameters and use raceId parameter to load /api/v1/race/:raceId 
 /*
@@ -84,6 +77,19 @@ public class PlaybackController : MonoBehaviour
                 .Select(line => GameEvent.FromJson(line))
                 .ToArray();           
         }
+    }
+}
+
+public class RemoteEventPlayer : MonoBehaviour {
+    private GameObject[] cars = { };
+
+    public void ApplyEvent(GameEvent e)
+    {
+        if (e is GameStatus)
+        {
+            cars = UpdateCars(cars, (e as GameStatus).cars);
+        }
+        EventBus.Publish(e);
     }
 
     GameObject[] UpdateCars(GameObject[] cars, CarStatus[] newStatuses)

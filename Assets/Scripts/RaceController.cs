@@ -27,7 +27,7 @@ public class RaceController : MonoBehaviour
         Application.targetFrameRate = 60;
         raceParameters = RaceParameters.readRaceParameters();
         Observables.Delay(TimeSpan.FromMilliseconds(0)).Subscribe(_ => {
-            if (ModeController.Mode == SimulatorMode.Playback)
+            if (ModeController.Mode == SimulatorMode.Playback || ModeController.Mode == SimulatorMode.RemoteControl)
             {
                 setState(new Playback(this));
             }

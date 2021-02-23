@@ -5,7 +5,8 @@ public enum SimulatorMode
 {        
     Development,
     Race,
-    Playback
+    Playback,
+    RemoteControl
 }
 
 public class ModeController : MonoBehaviour
@@ -30,6 +31,8 @@ public class ModeController : MonoBehaviour
                     Mode = SimulatorMode.Race; break;
                 case "playback":
                     Mode = SimulatorMode.Playback; break;
+                case "remote":
+                    Mode = SimulatorMode.RemoteControl; break;
                 default:
                     throw new Exception("Illegal mode " + mode + ", expecting race or development");
             }

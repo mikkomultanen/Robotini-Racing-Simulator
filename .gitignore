@@ -45,3 +45,5 @@ sysinfo.txt
 .vscode
 race.log
 Logs
+/*.so
+/*.debug

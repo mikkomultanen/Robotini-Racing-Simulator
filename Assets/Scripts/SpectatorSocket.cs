@@ -31,21 +31,21 @@ public class SpectatorSocket : MonoBehaviour
 
     private void OnEnable()
     {
-        if (ModeController.Mode != SimulatorMode.Playback)
-        {
-            Debug.Log("Initializing spectator socket");
-            StartListening();
-            RaceParameters raceParams = RaceParameters.readRaceParameters();
-            if (raceParams.raceLogFile != null) {
-                Debug.Log("Writing race log to " + raceParams.raceLogFile);
-                var stream = new BinaryWriter(File.Open(raceParams.raceLogFile, FileMode.Create));
+        switch (ModeController.Mode) {
+            case SimulatorMode.Playback:
+            case SimulatorMode.RemoteControl:
+                break;
+            default:
+                Debug.Log("Initializing spectator socket");
+                StartListening();
+                RaceParameters raceParams = RaceParameters.readRaceParameters();
+                if (raceParams.raceLogFile != null) {
+                    Debug.Log("Writing race log to " + raceParams.raceLogFile);
+                    var stream = new BinaryWriter(File.Open(raceParams.raceLogFile, FileMode.Create));
                 
-                Spectate(b => stream.Write(b), () => stream.Close());
-            }
-        }
-        else
-        {
-            Debug.Log("Skipping spectator socket");
+                    Spectate(b => stream.Write(b), () => stream.Close());
+                }
+                break;
         }
     }
 

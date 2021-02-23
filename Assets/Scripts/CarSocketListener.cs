@@ -12,15 +12,11 @@ public class CarSocketListener : MonoBehaviour {
 
     private void OnEnable()
     {
-        if (ModeController.Mode != SimulatorMode.Playback)
+        if (ModeController.Mode != SimulatorMode.Playback && ModeController.Mode != SimulatorMode.RemoteControl)
         {
             Debug.Log("Initializing car socket");
             StartListening();
-        }
-        else
-        {
-            Debug.Log("Skipping car socket");
-        }
+        }        
     }
 
     private void OnDisable()
