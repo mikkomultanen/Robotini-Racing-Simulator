@@ -165,7 +165,9 @@ public class SpectatorSocket : MonoBehaviour
                     if (eventQueue.TryDequeue(out gameEvent))
                     {
                         //Debug.Log("Sending event " + gameEvent.type);
-                        send(gameEvent);
+                        if (!(gameEvent is UICommand)) {
+                            send(gameEvent);
+                        }                        
                     }
                     else
                     {

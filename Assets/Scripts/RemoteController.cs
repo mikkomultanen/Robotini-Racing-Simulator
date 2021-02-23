@@ -1,19 +1,9 @@
 ﻿using UnityEngine;
-using System.Linq;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using UnityEngine;
-using UnityEngine.Networking;
 using System.IO;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System;
-using System.IO;
-using System.Net.Sockets;
-using System.Threading;
-using UnityEngine;
 
 public class RemoteController : RemoteEventPlayer
 {
@@ -47,6 +37,13 @@ public class RemoteController : RemoteEventPlayer
                     client = null;
                 }
             }).Start();
+
+            EventBus.Subscribe<UICommand>(this, cmd => {
+                Debug.Log("Sending " + cmd.type);
+                string jsonString = JsonUtility.ToJson(cmd);
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonString + "\n");
+                client.GetStream().Write(bytes, 0, bytes.Length);
+            });
         }
     }
     
