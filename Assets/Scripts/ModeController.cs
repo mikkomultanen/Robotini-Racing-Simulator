@@ -39,6 +39,7 @@ public class ModeController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Debug.Log("Setting Application.runInBackground to true");
         Application.runInBackground = true;
     }
 
@@ -47,7 +48,7 @@ public class ModeController : MonoBehaviour
     {
         if (!Application.runInBackground) {
              Application.runInBackground = true;
-             Debug.Log("Re-Setting Application.runInBackground to TRUE at: " + Time.time);
+             Debug.Log("Re-Setting Application.runInBackground to true");
         }
     }
 }
