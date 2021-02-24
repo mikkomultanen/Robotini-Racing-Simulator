@@ -104,6 +104,15 @@ public class CameraOutputController : MonoBehaviour
             return;
         }
 
+        if (Application.platform == RuntimePlatform.LinuxPlayer) {
+            SendSync();
+        } else {
+            SendAsync();
+        } 
+    }
+
+    void SendAsync() 
+    {
         lastSaved = Time.time;
 
         readers[NEXT].Read(renderTexture);
@@ -114,6 +123,31 @@ public class CameraOutputController : MonoBehaviour
         }
 
         Roll(readers);
+    }
+
+    void SendSync()
+    {
+        mCamera.rect = new Rect(0, 0, 1, 1);
+        mCamera.aspect = 1.0f * width / height;
+        // recall that the height is now the "actual" size from now on
+
+        //RenderTexture tempRT = RenderTexture.GetTemporary(width, height, 24);
+        // the 24 can be 0,16,24, formats like
+        // RenderTextureFormat.Default, ARGB32 etc.
+        //tempRT.antiAliasing = 2;
+
+        mCamera.targetTexture = renderTexture;
+        mCamera.Render();
+
+        RenderTexture.active = renderTexture;
+        virtualPhoto.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        virtualPhoto.Apply();
+
+        RenderTexture.active = null; //can help avoid errors 
+        mCamera.targetTexture = null;
+        //RenderTexture.ReleaseTemporary(tempRT);
+
+        socket.Send(encodeFrame(virtualPhoto));
     }
 
     private void OnDestroy()
