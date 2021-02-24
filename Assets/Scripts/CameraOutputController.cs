@@ -103,6 +103,7 @@ public class CameraOutputController : MonoBehaviour
         {
             return;
         }
+        lastSaved = Time.time;
 
         if (Application.platform == RuntimePlatform.LinuxPlayer) {
             SendSync();
@@ -113,8 +114,6 @@ public class CameraOutputController : MonoBehaviour
 
     void SendAsync() 
     {
-        lastSaved = Time.time;
-
         readers[NEXT].Read(renderTexture);
 
         if (readers[CURRENT].WriteTo(virtualPhoto))
