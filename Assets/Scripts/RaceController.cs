@@ -499,8 +499,7 @@ public class RaceController : MonoBehaviour
             if (segment == (this.trackSegment + 1) % 3) {
                 this.trackSegment = segment;
                 if (segment == 0)
-                {
-                    Debug.Log("Lap Time for '" + CarInfo.name + "'");
+                {                    
                     NewLapTime(totalTime);
                     return true;
                 }
@@ -520,6 +519,7 @@ public class RaceController : MonoBehaviour
                 return;
             }
             var lastTime = now - lastLapRecordedAt;
+            Debug.Log("Lap Time for '" + CarInfo.name + "': " + lastTime);
             lastLapRecordedAt = now;
             var bestTime = (lastTime < lastLap.bestLap || float.IsNaN(lastLap.bestLap)) ? lastTime : lastLap.bestLap;
             
