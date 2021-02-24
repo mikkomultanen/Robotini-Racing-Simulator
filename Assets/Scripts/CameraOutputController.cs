@@ -63,18 +63,16 @@ public class CameraOutputController : MonoBehaviour
         }
     }
 
-    private const int READERS_LENGTH = 2;
+    private const int READERS_LENGTH = 3;
     private const int CURRENT = 0;
     private const int NEXT = READERS_LENGTH - 1;
 
     private Camera mCamera;
     public RenderTexture renderTexture;
     private GPUReader[] readers = new GPUReader[READERS_LENGTH];
-    private Texture2D virtualPhoto;
-    private float lastSaved = 0;
+    private Texture2D virtualPhoto;    
     private const int width = 128;
     private const int height = 80;
-
 
     private volatile CarSocket socket;
 
@@ -99,18 +97,24 @@ public class CameraOutputController : MonoBehaviour
     void OnEndFrameRendering(ScriptableRenderContext context, Camera[] cameras)
     {
         if (socket == null) return;
-        if (Time.time < lastSaved + 0.03 || socket.SendQueueSize() > 1)
-        {
-            return;
-        }
-        lastSaved = Time.time;
 
         if (Application.platform == RuntimePlatform.LinuxPlayer) {
             SendSync();
         } else {
             SendAsync();
-        } 
+        }
+
     }
+
+    void MaybeSend(Texture2D virtualPhoto)
+    {
+        if (socket.FrameRequested)
+        {
+            socket.Send(encodeFrame(virtualPhoto));
+            socket.FrameRequested = false;
+        }        
+    }
+
 
     void SendAsync() 
     {
@@ -118,7 +122,7 @@ public class CameraOutputController : MonoBehaviour
 
         if (readers[CURRENT].WriteTo(virtualPhoto))
         {
-            socket.Send(encodeFrame(virtualPhoto));
+            MaybeSend(virtualPhoto);
         }
 
         Roll(readers);
@@ -146,7 +150,7 @@ public class CameraOutputController : MonoBehaviour
         mCamera.targetTexture = null;
         //RenderTexture.ReleaseTemporary(tempRT);
 
-        socket.Send(encodeFrame(virtualPhoto));
+        MaybeSend(virtualPhoto);
     }
 
     private void OnDestroy()

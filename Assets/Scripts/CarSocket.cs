@@ -11,6 +11,7 @@ public class CarSocket {
     private readonly ConcurrentQueue<JsonControlCommand> recvQueue = new ConcurrentQueue<JsonControlCommand>();
     private readonly ConcurrentQueue<byte[]> sendQueue = new ConcurrentQueue<byte[]>();
     private CarInfo carInfo;
+    public Boolean FrameRequested = false;
 
     public CarSocket(Socket socket, RaceController raceController)
     {
@@ -29,6 +30,8 @@ public class CarSocket {
                 if (carInfo.name == null || carInfo.name == "") throw new Exception("CarInfo.name missing");
                 if (carInfo.teamId == null || carInfo.teamId == "") throw new Exception("CarInfo.teamId missing");
                 EventBus.Publish(new CarConnected(carInfo, this));
+
+                FrameRequested = true;
 
                 while (this.socket != null)
                 {
@@ -113,6 +116,7 @@ public class CarSocket {
             {
                 // Seems we get null commands sometimes, when socket closing or something
                 commands.Add(command);
+                FrameRequested = true;
             }            
         }
         return commands;
