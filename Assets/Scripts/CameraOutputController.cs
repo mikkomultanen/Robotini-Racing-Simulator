@@ -109,7 +109,7 @@ public class CameraOutputController : MonoBehaviour
     {
         if (socket == null) return;
 
-        if (false && SystemInfo.supportsAsyncGPUReadback)
+        if (SystemInfo.supportsAsyncGPUReadback)
         {
             ReadAsync();
         }
