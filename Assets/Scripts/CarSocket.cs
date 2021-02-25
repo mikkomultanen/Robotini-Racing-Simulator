@@ -11,7 +11,7 @@ public class CarSocket {
     private readonly ConcurrentQueue<JsonControlCommand> recvQueue = new ConcurrentQueue<JsonControlCommand>();
     private readonly ConcurrentQueue<byte[]> sendQueue = new ConcurrentQueue<byte[]>();
     private CarInfo carInfo;
-    public Boolean FrameRequested = false;
+    public volatile bool FrameRequested = false;
 
     public CarSocket(Socket socket, RaceController raceController)
     {
@@ -38,6 +38,7 @@ public class CarSocket {
                     line = reader.ReadLine();
                     var command = JsonUtility.FromJson<JsonControlCommand>(line);
                     recvQueue.Enqueue(command);
+                    FrameRequested = true;
                 }
 
             }
@@ -116,7 +117,6 @@ public class CarSocket {
             {
                 // Seems we get null commands sometimes, when socket closing or something
                 commands.Add(command);
-                FrameRequested = true;
             }            
         }
         return commands;

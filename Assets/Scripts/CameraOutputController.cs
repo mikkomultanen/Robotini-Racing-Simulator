@@ -70,7 +70,8 @@ public class CameraOutputController : MonoBehaviour
     private Camera mCamera;
     public RenderTexture renderTexture;
     private GPUReader[] readers = new GPUReader[READERS_LENGTH];
-    private Texture2D virtualPhoto;    
+    private Texture2D virtualPhoto;
+    private byte[] latestCameraData = null;
     private const int width = 128;
     private const int height = 80;
 
@@ -94,63 +95,51 @@ public class CameraOutputController : MonoBehaviour
         RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
     }
 
+    void Update()
+    {
+        if (socket.FrameRequested && latestCameraData != null)
+        {
+            socket.Send(encodeFrame(latestCameraData));
+            latestCameraData = null;
+            socket.FrameRequested = false;
+        }
+    }
+
     void OnEndFrameRendering(ScriptableRenderContext context, Camera[] cameras)
     {
         if (socket == null) return;
 
-        if (Application.platform == RuntimePlatform.LinuxPlayer) {
-            SendSync();
-        } else {
-            SendAsync();
+        if (false && SystemInfo.supportsAsyncGPUReadback)
+        {
+            ReadAsync();
+        }
+        else
+        {
+            ReadSync();
         }
 
     }
 
-    void MaybeSend(Texture2D virtualPhoto)
-    {
-        if (socket.FrameRequested)
-        {
-            socket.Send(encodeFrame(virtualPhoto));
-            socket.FrameRequested = false;
-        }        
-    }
-
-
-    void SendAsync() 
+    void ReadAsync() 
     {
         readers[NEXT].Read(renderTexture);
 
         if (readers[CURRENT].WriteTo(virtualPhoto))
         {
-            MaybeSend(virtualPhoto);
+            latestCameraData = virtualPhoto.EncodeToPNG();
         }
 
         Roll(readers);
     }
 
-    void SendSync()
+    void ReadSync()
     {
-        mCamera.rect = new Rect(0, 0, 1, 1);
-        mCamera.aspect = 1.0f * width / height;
-        // recall that the height is now the "actual" size from now on
-
-        //RenderTexture tempRT = RenderTexture.GetTemporary(width, height, 24);
-        // the 24 can be 0,16,24, formats like
-        // RenderTextureFormat.Default, ARGB32 etc.
-        //tempRT.antiAliasing = 2;
-
-        mCamera.targetTexture = renderTexture;
-        mCamera.Render();
-
         RenderTexture.active = renderTexture;
         virtualPhoto.ReadPixels(new Rect(0, 0, width, height), 0, 0);
         virtualPhoto.Apply();
-
         RenderTexture.active = null; //can help avoid errors 
-        mCamera.targetTexture = null;
-        //RenderTexture.ReleaseTemporary(tempRT);
 
-        MaybeSend(virtualPhoto);
+        latestCameraData = virtualPhoto.EncodeToPNG();
     }
 
     private void OnDestroy()
@@ -169,10 +158,8 @@ public class CameraOutputController : MonoBehaviour
         }
     }
 
-    private byte[] encodeFrame(Texture2D virtualPhoto)
+    private byte[] encodeFrame(byte[] data)
     {
-        byte[] data = virtualPhoto.EncodeToPNG();
-
         if (data.Length > 65535) throw new Exception("Max image size exceeded");
         byte lowerByte = (byte)(data.Length & 0xff);
         byte higherByte = (byte)((data.Length & 0xff00) >> 8);
