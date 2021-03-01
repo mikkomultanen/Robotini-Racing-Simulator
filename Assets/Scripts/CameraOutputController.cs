@@ -74,7 +74,7 @@ public class CameraOutputController : MonoBehaviour
     private byte[] latestCameraData = null;
     private const int width = 128;
     private const int height = 80;
-
+    private Boolean async;
     private volatile CarSocket socket;
 
     private void Start()
@@ -93,6 +93,9 @@ public class CameraOutputController : MonoBehaviour
         mCamera.targetTexture = renderTexture;
         mCamera.enabled = true;
         RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
+        this.async = SystemInfo.supportsAsyncGPUReadback;
+        Debug.Log("Async GPU Readback supported: " + this.async);
+
     }
 
     void Update()
@@ -109,7 +112,7 @@ public class CameraOutputController : MonoBehaviour
     {
         if (socket == null) return;
 
-        if (SystemInfo.supportsAsyncGPUReadback)
+        if (async)
         {
             ReadAsync();
         }
