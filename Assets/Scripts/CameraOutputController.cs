@@ -76,6 +76,7 @@ public class CameraOutputController : MonoBehaviour
     private const int height = 80;
     private Boolean async;
     private volatile CarSocket socket;
+    FPSLogger logger;
 
     private void Start()
     {
@@ -95,7 +96,7 @@ public class CameraOutputController : MonoBehaviour
         RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
         this.async = SystemInfo.supportsAsyncGPUReadback;
         Debug.Log("Async GPU Readback supported: " + this.async);
-
+        logger = FindObjectOfType<FPSLogger>();
     }
 
     void Update()
@@ -105,6 +106,7 @@ public class CameraOutputController : MonoBehaviour
             socket.Send(encodeFrame(latestCameraData));
             latestCameraData = null;
             socket.FrameRequested = false;
+            logger.LogFrameSent(socket.CarInfo);
         }
     }
 
@@ -120,7 +122,6 @@ public class CameraOutputController : MonoBehaviour
         {
             ReadSync();
         }
-
     }
 
     void ReadAsync() 
