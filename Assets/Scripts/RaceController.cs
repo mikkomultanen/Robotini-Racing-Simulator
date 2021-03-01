@@ -265,6 +265,8 @@ public class RaceController : MonoBehaviour
 
     public class FreePractice: Racing
     {
+        int i = 0;
+
         public FreePractice(RaceController c): base(c) {
         }
 
@@ -275,7 +277,19 @@ public class RaceController : MonoBehaviour
 
             Subscribe<CarConnected>(e =>
             {
-                c.addCarOnTrack(e);
+                var car = c.addCarOnTrack(e);
+
+                var controllers = FindObjectsOfType<CarController>();
+                float totalLength = c.track.Length;
+                float spacing = totalLength / (float)10; // always 10 segments
+                
+                
+                var curveSample = c.track.GetSampleAtDistance(c.track.Length - (i * spacing));
+                car.transform.position = curveSample.location + 0.1f * Vector3.up;
+                car.transform.rotation = curveSample.Rotation;
+                car.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                i++;
+
             });
 
             Subscribe<CarDisconnected>(e =>
@@ -438,7 +452,7 @@ public class RaceController : MonoBehaviour
         public abstract void OnSessionFinish();
     }
 
-    void addCarOnTrack(CarConnected e)
+    CarController addCarOnTrack(CarConnected e)
     {
         if (cars.ContainsKey(e.car.name))
         {
@@ -453,6 +467,7 @@ public class RaceController : MonoBehaviour
         car.name = e.car.name;
         Debug.Log("Add Car '" + e.car.name + "'");
         cars[e.car.name] = new CarStatus(e.car);
+        return carController;
     }
 
     class CarStatus
