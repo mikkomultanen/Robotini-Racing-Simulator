@@ -25,10 +25,10 @@ public class FPSLogger : MonoBehaviour
     }
 
     Stat frameRender = new Stat("FPS");
-    private Dictionary<string, Stat> carFrameSent = new Dictionary<string, Stat>();    
+    private Dictionary<string, Stat> carFrameSent = new Dictionary<string, Stat>();
     public float valuesInterval = 1;
     public float previousValues;
-    public float headersInterval = 1;
+    public float headersInterval = 10;
     public float previousHeaders;
 
     void Start() {
