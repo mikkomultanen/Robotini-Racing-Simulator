@@ -278,6 +278,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1d40861dd7284a2582a01331c1dd902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  valuesInterval: 1
+  previousValues: 0
+  headersInterval: 10
+  previousHeaders: 0
 --- !u!850595691 &213375763
 LightingSettings:
   m_ObjectHideFlags: 0
