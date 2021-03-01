@@ -101,7 +101,7 @@ public class CameraOutputController : MonoBehaviour
 
     void Update()
     {
-        if (socket.FrameRequested && latestCameraData != null)
+        if (socket != null && socket.FrameRequested && latestCameraData != null)
         {
             socket.Send(encodeFrame(latestCameraData));
             latestCameraData = null;
