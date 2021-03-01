@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using System.Linq;
 using UnityEngine;
 
 public class CarSocket {
@@ -22,13 +23,23 @@ public class CarSocket {
             var stream = new NetworkStream(socket);
             var reader = new StreamReader(stream);
             try
-            {
+            {                
                 Debug.Log("Reading car info...");
                 var line = reader.ReadLine();
                 this.carInfo = JsonUtility.FromJson<CarInfo>(line);
                 Debug.Log("car info " + line);
+                // TODO: respond with error msgs
                 if (carInfo.name == null || carInfo.name == "") throw new Exception("CarInfo.name missing");
                 if (carInfo.teamId == null || carInfo.teamId == "") throw new Exception("CarInfo.teamId missing");
+
+                var cars = RaceParameters.readRaceParameters().cars;
+                if (cars != null) {
+                    var found = cars.First(c => c.teamId == carInfo.teamId);
+                    if (found == null) {
+                        throw new Exception("Team not found: " + carInfo.teamId);
+                    }
+                    carInfo.name = found.name;
+                }
                 EventBus.Publish(new CarConnected(carInfo, this));
 
                 FrameRequested = true;

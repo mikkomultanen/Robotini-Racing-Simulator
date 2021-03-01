@@ -10,6 +10,8 @@ public class RaceParameters
     public int qualifyingDurationSeconds = 30;
     public int autoStartRaceSeconds = 10;
     public int raceTimeoutSeconds = 300;
+    public CarInfo[] cars;
+
     public string mode = "development";
 
     public string raceLogFile = "race.log";
@@ -19,7 +21,7 @@ public class RaceParameters
         try
         {
             var reader = new StreamReader("RaceParameters.json");
-            var p = JsonUtility.FromJson<RaceParameters>(reader.ReadToEnd());            
+            var p = JsonUtility.FromJson<RaceParameters>(reader.ReadToEnd());
             return p;
         }
         catch (FileNotFoundException)

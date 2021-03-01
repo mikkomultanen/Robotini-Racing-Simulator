@@ -62,6 +62,7 @@ public class CarInfo
 {
     public string teamId;
     public string name;
+
     public CarInfo(string teamId, string name)
     {
         this.teamId = teamId;
