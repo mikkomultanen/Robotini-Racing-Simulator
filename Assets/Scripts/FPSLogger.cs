@@ -39,7 +39,8 @@ public class FPSLogger : MonoBehaviour
     {
         LogFrameRendered();
         var now = Time.time;
-        if (now > previousValues + valuesInterval) {
+        var elapsed = now - previousValues;
+        if (elapsed > valuesInterval) {
             var allStats = (new[] { frameRender }).Concat(carFrameSent.Values);
             var colWidth = 12;
 
@@ -48,7 +49,7 @@ public class FPSLogger : MonoBehaviour
                 Debug.Log(headers);
                 previousHeaders = now;
             }
-            var values = String.Join(" ", allStats.Select(stat => { return stat.pop().ToString().PadRight(colWidth); }));
+            var values = String.Join(" ", allStats.Select(stat => { return Math.Round(stat.pop() / elapsed).ToString().PadRight(colWidth); }));
             Debug.Log(values);
             previousValues = now;
         }
