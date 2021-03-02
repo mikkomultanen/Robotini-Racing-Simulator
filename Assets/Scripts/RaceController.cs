@@ -26,6 +26,7 @@ public class RaceController : MonoBehaviour
     {
         QualitySettings.vSyncCount = 0;  // VSync must be disabled
         Application.targetFrameRate = 60;
+        Time.captureFramerate = 60;
         raceParameters = RaceParameters.readRaceParameters();
         Observables.Delay(TimeSpan.FromMilliseconds(0)).Subscribe(_ => {
             if (ModeController.Mode == SimulatorMode.Playback || ModeController.Mode == SimulatorMode.RemoteControl)
