@@ -72,7 +72,7 @@ public class CarSocket {
                 {
                     try
                     {
-                        socket.Send(data);
+                        socket.Send(encodeFrame(data));
                     }
                     catch (Exception e)
                     {
@@ -86,6 +86,17 @@ public class CarSocket {
                 }
             }
         }).Start();
+    }
+
+    private byte[] encodeFrame(byte[] data)
+    {
+        if (data.Length > 65535) throw new Exception("Max image size exceeded");
+        byte lowerByte = (byte)(data.Length & 0xff);
+        byte higherByte = (byte)((data.Length & 0xff00) >> 8);
+        //Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
+        byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
+        byte[] encodedBytes = lengthAsBytes.Concat(data).ToArray();
+        return encodedBytes;
     }
 
     private void disconnected()

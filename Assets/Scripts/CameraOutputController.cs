@@ -104,7 +104,7 @@ public class CameraOutputController : MonoBehaviour
     {
         if (socket != null && socket.FrameRequested && latestCameraData != null)
         {
-            socket.Send(encodeFrame(latestCameraData));
+            socket.Send(latestCameraData);
             latestCameraData = null;
             socket.FrameRequested = false;
             logger.LogFrameSent(socket.CarInfo);
@@ -169,17 +169,6 @@ public class CameraOutputController : MonoBehaviour
             }
             readers[i] = null;
         }
-    }
-
-    private byte[] encodeFrame(byte[] data)
-    {
-        if (data.Length > 65535) throw new Exception("Max image size exceeded");
-        byte lowerByte = (byte)(data.Length & 0xff);
-        byte higherByte = (byte)((data.Length & 0xff00) >> 8);
-        //Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
-        byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
-        byte[] encodedBytes = lengthAsBytes.Concat(data).ToArray();
-        return encodedBytes;
     }
 
     public void SetSocket(CarSocket socket)
