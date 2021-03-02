@@ -21,6 +21,10 @@ The simulator accepts control commands as a JSON string terminated with `\n` fro
 - `{ "action": "forward", "value": 0.5}\n` where value is the throttle value between 0 and 1.
 - `{ "action": "turn", "value": -0.1}\n` where value is the direction for the front wheels. 1.0 is full left and -1.0 is full right. 
 
+Prepare to process 60 frames per second using a single thread.
+
+Remember to use the TCP_NODELAY option in your bot TCP socket to ensure that the commands are sent without delay.
+
 ## RaceParameters
 
 The RaceParameters.json file can be used to control the operating mode of the Simulator. First of all, `mode` can be one of `development`, `race` or `playback` for different modes.
