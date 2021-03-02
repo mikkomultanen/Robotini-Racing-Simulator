@@ -38,7 +38,7 @@ public class FPSLogger : MonoBehaviour
     private void Update()
     {
         LogFrameRendered();
-        var now = Time.time;
+        var now = Time.realtimeSinceStartup;
         var elapsed = now - previousValues;
         if (elapsed > valuesInterval) {
             var allStats = (new[] { frameRender }).Concat(carFrameSent.Values);
