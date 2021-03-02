@@ -6,14 +6,19 @@ Clone this repo and open it in Unity. Run and enjoy!
 
 ## The bot connection
 
-The point is to connect your AI to localhost:11000. The simulator will
-feed you PNG images from the car's front camera. Like this
+The point is to connect your AI to localhost:11000. The simulator will feed you PNG images from the car's front camera.
 
-1. two bytes indicating the size of the next image (higher byte first)
-2. PNG image data
-3. goto 1
+Your bot should do the following:
 
-The simulator accepts control commands as a JSON string terminated with \n from the AI:
+1. Connect to simulator:11000
+2. Send a "login" JSON message: `{"name":"your bot name", "teamId": "your team ID"}` followed by `\n`.
+3. Read a frame
+3.1. Read two bytes indicating the size of the next image (higher byte first)
+3.2. Read PNG image data
+4. Respond with 1 or more commands (see below)
+5. goto 3
+
+The simulator accepts control commands as a JSON string terminated with `\n` from the bot:
 
 - `{ "action": "forward", "value": 0.5}\n` where value is the throttle value between 0 and 1.
 - `{ "action": "turn", "value": -0.1}\n` where value is the direction for the front wheels. 1.0 is full left and -1.0 is full right. 
