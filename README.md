@@ -12,9 +12,7 @@ Your bot should do the following:
 
 1. Connect to simulator:11000
 2. Send a "login" JSON message: `{"name":"your bot name", "teamId": "your team ID"}` followed by `\n`.
-3. Read a frame
-3.1. Read two bytes indicating the size of the next image (higher byte first)
-3.2. Read PNG image data
+3. Read a frame: 2 bytes indicating the size of image, followed by PNG image data
 4. Respond with 1 or more commands (see below)
 5. goto 3
 
