@@ -6,11 +6,14 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 public class CarSocket {
+    public static uint IMAGE_WIDTH = 128;
+    public static uint IMAGE_HEIGHT = 80;
     private volatile Socket socket;
     private readonly ConcurrentQueue<JsonControlCommand> recvQueue = new ConcurrentQueue<JsonControlCommand>();
-    private readonly ConcurrentQueue<byte[]> sendQueue = new ConcurrentQueue<byte[]>();
+    private readonly ConcurrentQueue<uint[]> sendQueue = new ConcurrentQueue<uint[]>();
     private CarInfo carInfo;
     public volatile bool FrameRequested = false;
 
@@ -66,7 +69,7 @@ public class CarSocket {
         {
             while (this.socket != null)
             {
-                byte[] data;
+                uint[] data;
 
                 if (sendQueue.TryDequeue(out data))
                 {
@@ -88,8 +91,9 @@ public class CarSocket {
         }).Start();
     }
 
-    private byte[] encodeFrame(byte[] data)
+    private byte[] encodeFrame(uint[] rawData)
     {
+        var data = ImageConversion.EncodeArrayToPNG(rawData, GraphicsFormat.R8G8B8_UNorm, IMAGE_WIDTH, IMAGE_HEIGHT);
         if (data.Length > 65535) throw new Exception("Max image size exceeded");
         byte lowerByte = (byte)(data.Length & 0xff);
         byte higherByte = (byte)((data.Length & 0xff00) >> 8);
@@ -119,7 +123,7 @@ public class CarSocket {
         return carInfo;
     } }
 
-    public void Send(byte[] data)
+    public void Send(uint[] data)
     {
         sendQueue.Enqueue(data);
     }

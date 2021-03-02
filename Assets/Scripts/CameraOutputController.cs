@@ -21,12 +21,12 @@ public class CameraOutputController : MonoBehaviour
 
         public void Read(RenderTexture renderTexture)
         {
-            request = AsyncGPUReadback.RequestIntoNativeArray(ref outputArray, renderTexture, 0, TextureFormat.ARGB32, OnCompleteReadback);
+            request = AsyncGPUReadback.RequestIntoNativeArray(ref outputArray, renderTexture, 0, TextureFormat.RGB24, OnCompleteReadback);
             hasRequest = true;
         }
 
 
-        public bool WriteTo(Texture2D texture)
+        public bool WriteTo(out uint[] data)
         {
             if (hasRequest)
             {
@@ -35,10 +35,10 @@ public class CameraOutputController : MonoBehaviour
             if (outputReady)
             {
                 outputReady = false;
-                texture.LoadRawTextureData(outputArray);
-                texture.Apply();
+                data = outputArray.ToArray();
                 return true;
             }
+            data = null;
             return false;
         }
 
@@ -71,9 +71,7 @@ public class CameraOutputController : MonoBehaviour
     public RenderTexture renderTexture;
     private GPUReader[] readers = new GPUReader[READERS_LENGTH];
     private Texture2D virtualPhoto;
-    private byte[] latestCameraData = null;
-    private const int width = 128;
-    private const int height = 80;
+    private uint[] latestCameraData = null;
     private bool read = false;
     private bool async;
     private volatile CarSocket socket;
@@ -82,16 +80,16 @@ public class CameraOutputController : MonoBehaviour
     private void Start()
     {
         mCamera = GetComponent<Camera>();
-        renderTexture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
+        renderTexture = new RenderTexture((int)CarSocket.IMAGE_WIDTH, (int)CarSocket.IMAGE_HEIGHT, 24, RenderTextureFormat.ARGB32);
         renderTexture.antiAliasing = 2;
         for (int i = 0; i < readers.Length; ++i)
         {
-            readers[i] = new GPUReader(width * height);
+            readers[i] = new GPUReader((int)CarSocket.IMAGE_WIDTH * (int)CarSocket.IMAGE_HEIGHT);
         }
-        virtualPhoto = new Texture2D(width, height, TextureFormat.ARGB32, false);
+        virtualPhoto = new Texture2D((int)CarSocket.IMAGE_WIDTH, (int)CarSocket.IMAGE_HEIGHT, TextureFormat.RGB24, false);
         Debug.Log("CameraOutputController started");
         mCamera.rect = new Rect(0, 0, 1, 1);
-        mCamera.aspect = 1.0f * width / height;
+        mCamera.aspect = 1.0f * CarSocket.IMAGE_WIDTH / CarSocket.IMAGE_HEIGHT;
         mCamera.targetTexture = renderTexture;
         mCamera.enabled = true;
         RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
@@ -137,9 +135,10 @@ public class CameraOutputController : MonoBehaviour
     {
         readers[NEXT].Read(renderTexture);
 
-        if (readers[CURRENT].WriteTo(virtualPhoto))
+        uint[] data;
+        if (readers[CURRENT].WriteTo(out data))
         {
-            latestCameraData = virtualPhoto.EncodeToPNG();
+            latestCameraData = data;
         }
 
         Roll(readers);
@@ -148,11 +147,11 @@ public class CameraOutputController : MonoBehaviour
     void ReadSync()
     {
         RenderTexture.active = renderTexture;
-        virtualPhoto.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        virtualPhoto.ReadPixels(new Rect(0, 0, CarSocket.IMAGE_WIDTH, CarSocket.IMAGE_HEIGHT), 0, 0);
         virtualPhoto.Apply();
         RenderTexture.active = null; //can help avoid errors 
 
-        latestCameraData = virtualPhoto.EncodeToPNG();
+        latestCameraData = virtualPhoto.GetPixelData<uint>(0).ToArray();
     }
 
     private void OnDestroy()
