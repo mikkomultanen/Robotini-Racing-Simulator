@@ -74,7 +74,8 @@ public class CameraOutputController : MonoBehaviour
     private byte[] latestCameraData = null;
     private const int width = 128;
     private const int height = 80;
-    private Boolean async;
+    private bool read = false;
+    private bool async;
     private volatile CarSocket socket;
     FPSLogger logger;
 
@@ -108,11 +109,19 @@ public class CameraOutputController : MonoBehaviour
             socket.FrameRequested = false;
             logger.LogFrameSent(socket.CarInfo);
         }
+        read = true;
     }
 
     void OnEndFrameRendering(ScriptableRenderContext context, Camera[] cameras)
     {
         if (socket == null) return;
+
+        if (!read)
+        {
+            //Debug.Log("Duplicate read call");
+            return;
+        }
+        read = false;
 
         if (async)
         {
