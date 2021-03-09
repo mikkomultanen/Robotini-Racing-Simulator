@@ -42,6 +42,7 @@ public class CarSocket {
                         throw new Exception("Team not found: " + carInfo.teamId);
                     }
                     carInfo.name = found.name;
+                    carInfo.color = found.color;
                 }
                 EventBus.Publish(new CarConnected(carInfo, this));
 

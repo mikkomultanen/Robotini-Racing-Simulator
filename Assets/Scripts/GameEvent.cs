@@ -62,15 +62,28 @@ public class CarInfo
 {
     public string teamId;
     public string name;
+    public string color;
 
-    public CarInfo(string teamId, string name)
+    [NonSerialized]
+    private Color _color = Color.clear;
+
+    public CarInfo(string teamId, string name, string color)
     {
         this.teamId = teamId;
         this.name = name;
+        this.color = color;
     }
     public LapCompleted ToLap()
     {
         return new LapCompleted(this, 0, float.NaN, float.NaN, 0, false);
+    }
+    public Color GetColor()
+    {
+        if (_color == Color.clear) {
+            ColorUtility.TryParseHtmlString(color, out _color);
+            _color.a = 1f;
+        }
+        return _color;
     }
 }
 

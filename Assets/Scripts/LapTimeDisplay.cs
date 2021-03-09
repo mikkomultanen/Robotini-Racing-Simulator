@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class LapTimeDisplay : MonoBehaviour
@@ -161,11 +162,13 @@ public class LapTimeDisplay : MonoBehaviour
             string[] texts = { car.name, lastLap, bestLap, lapCount, totalTime };
 
             var t = timeListElement.transform;
-            for (var i = 0; i < t.childCount; i++)
+            var count = System.Math.Min(texts.Length, t.childCount);
+            for (var i = 0; i < count; i++)
             {
                 var c = t.GetChild(i);                
                 c.GetComponent<TextMeshProUGUI>().text = texts[i];
             }
+            t.GetComponentInChildren<Image>().color = car.GetColor();
         }
 
         public void OnRemove()

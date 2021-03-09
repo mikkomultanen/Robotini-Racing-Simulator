@@ -11,7 +11,7 @@ The point is to connect your AI to localhost:11000. The simulator will feed you 
 Your bot should do the following:
 
 1. Connect to simulator:11000
-2. Send a "login" JSON message: `{"name":"your bot name", "teamId": "your team ID"}` followed by `\n`.
+2. Send a "login" JSON message: `{"name":"your bot name", "color": "team color e.g. #ff0000", "teamId": "your team ID"}` followed by `\n`.
 3. Read a frame: 2 bytes indicating the size of image, followed by PNG image data
 4. Respond with 1 or more commands (see below)
 5. goto 3

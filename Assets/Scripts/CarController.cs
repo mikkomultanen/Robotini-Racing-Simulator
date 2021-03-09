@@ -1,12 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System;
-using System.IO;
-using System.Net.Sockets;
-using System.Threading;
+﻿using System;
 using UnityEngine;
 using UniRx;
 
+[RequireComponent(typeof(Rigidbody))]
 public class CarController : MonoBehaviour
 {
     public WheelCollider frontLeftWC, frontRightWC, rearLeftWC, rearRightWC;
@@ -15,6 +11,7 @@ public class CarController : MonoBehaviour
     public float motorForce = 50;
     public float brakeForce = 100;
     public float maxAngleChangePerSecond = 10;
+    public MeshRenderer bodyRenderer;
     [HideInInspector]
     public float velocity;
     [HideInInspector]
@@ -28,8 +25,9 @@ public class CarController : MonoBehaviour
     private float targetAngle = 0;
     private float lastBotCommandTime = 0;
     private bool finished = false;
+    [HideInInspector]
     public Rigidbody rigidBody;
-    
+
     private volatile CarSocket socket;
     private WheelCollider[] allWheels;
     private DateTime collidingSince = DateTime.MaxValue;
@@ -41,12 +39,21 @@ public class CarController : MonoBehaviour
         rigidBody = GetComponent<Rigidbody>();
         allWheels = new WheelCollider[] { frontLeftWC, frontRightWC, rearLeftWC, rearRightWC };
         EventBus.Subscribe<CarFinished>(this, f => {
-            if (f.car.name == CarInfo.name)
+            if (f.car.name == CarInfo?.name)
             {
                 this.finished = true;
                 Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => { Destroy(gameObject); });
             }
         });
+    }
+
+    private void Start()
+    {
+        var carInfo = CarInfo;
+        if (carInfo != null)
+        {
+            bodyRenderer.material.color = carInfo.GetColor();
+        }
     }
 
     public void GetInput()
