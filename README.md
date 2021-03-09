@@ -2,7 +2,7 @@
 
 Simulator for training machine vision racing AIs, created with Unity.
 
-Clone this repo and open it in Unity. Run and enjoy!
+Clone this repo and open it in Unity. Select the "Track" scene on the editor (Project -> Scenes -> Track) and start the simulator using the Play button. You should see the race track and the message "Free practice".
 
 ## The bot connection
 
