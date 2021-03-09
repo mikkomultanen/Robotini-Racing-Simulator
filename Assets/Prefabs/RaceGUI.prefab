@@ -849,7 +849,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   labelPrefab: {fileID: 8842847246339879472, guid: bc587ee7127704987b4dd72feae5be88,
     type: 3}
-  offset: {x: 0, y: 1, z: 0}
+  offset: {x: 0, y: 0.8, z: 0}
   clampToScreen: 0
   clampBorderSize: 0.05
   useMainCamera: 1
@@ -1280,7 +1280,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2837295916940347193}
   m_Layer: 0
-  m_Name: RaceGUI 1
+  m_Name: RaceGUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
