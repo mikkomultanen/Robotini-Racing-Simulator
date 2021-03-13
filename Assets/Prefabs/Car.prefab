@@ -178,6 +178,50 @@ MonoBehaviour:
   maxSteerAngle: 30
   motorForce: 1
   brakeForce: 100
+  maxRPM: 1800
+  enginePitchMultiplier: 1.5
+  torqueCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -0.00050541345
+      outSlope: -0.00050541345
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.6505154
+      value: 0.9996712
+      inSlope: -0.0017722634
+      outSlope: -0.0017722634
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.31521344
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.7029596
+      value: 0.94783777
+      inSlope: -3.1297693
+      outSlope: -3.1297693
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.22759989
+      outWeight: 0.08260922
+    - serializedVersion: 3
+      time: 0.99994755
+      value: -0.0027735217
+      inSlope: -3.2008412
+      outSlope: -3.2008412
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   maxAngleChangePerSecond: 10
   bodyRenderer: {fileID: 4759284448920211465}
   velocity: 0
@@ -196,18 +240,18 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 0
+  m_audioClip: {fileID: 8300000, guid: b049660b860c8334a852b54855bce599, type: 3}
+  m_PlayOnAwake: 1
   m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
+  m_Pitch: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 10
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -242,7 +286,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0

@@ -8,8 +8,12 @@ public class CarController : MonoBehaviour
     public WheelCollider frontLeftWC, frontRightWC, rearLeftWC, rearRightWC;
     public Transform frontLeftT, frontRightT, rearLeftT, rearRightT;
     public float maxSteerAngle = 30;
-    public float motorForce = 50;
+    public float motorForce = 1;
     public float brakeForce = 100;
+    public float maxRPM = 1800;
+    [Range(1, 3)]
+    public float enginePitchMultiplier = 1;
+    public AnimationCurve torqueCurve;
     public float maxAngleChangePerSecond = 10;
     public MeshRenderer bodyRenderer;
     [HideInInspector]
@@ -27,6 +31,7 @@ public class CarController : MonoBehaviour
     private bool finished = false;
     [HideInInspector]
     public Rigidbody rigidBody;
+    private AudioSource engineAS;
 
     private volatile CarSocket socket;
     private WheelCollider[] allWheels;
@@ -37,6 +42,7 @@ public class CarController : MonoBehaviour
     private void OnEnable()
     {
         rigidBody = GetComponent<Rigidbody>();
+        engineAS = GetComponent<AudioSource>();
         allWheels = new WheelCollider[] { frontLeftWC, frontRightWC, rearLeftWC, rearRightWC };
         EventBus.Subscribe<CarFinished>(this, f => {
             if (f.car.name == CarInfo?.name)
@@ -85,8 +91,19 @@ public class CarController : MonoBehaviour
         return (raceController == null || raceController.motorsEnabled) && !finished;
     }
 
+    private float motorRPM()
+    {
+        float wheelRMP = 0;
+        foreach (WheelCollider wheel in allWheels)
+        {
+            wheelRMP += wheel.rpm;
+        }
+        return Mathf.Min(maxRPM, Mathf.Abs(wheelRMP / allWheels.Length));
+    }
+
     private void Accelerate()
     {
+
         if (!motorEnabled()) {
             started = false;
             foreach (WheelCollider wheel in allWheels)
@@ -97,7 +114,7 @@ public class CarController : MonoBehaviour
         }
         else if (brake == 0)
         {
-            float motorTorque = forward * motorForce;
+            float motorTorque = forward * motorForce * torqueCurve.Evaluate(motorRPM() / maxRPM);
             foreach (WheelCollider wheel in allWheels)
             {
                 wheel.motorTorque = motorTorque;
@@ -186,6 +203,7 @@ public class CarController : MonoBehaviour
 
     private void Update()
     {
+        engineAS.pitch = enginePitchMultiplier * motorRPM() / maxRPM;
         UpdateWheelPoses();
         ProcessBotCommands();
         velocity = Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity);

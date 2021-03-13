@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1698476123442335882}
   - component: {fileID: 7708220628765859793}
   - component: {fileID: 7496500180123283125}
+  - component: {fileID: 9211240292477164546}
   m_Layer: 0
   m_Name: StationaryCamera
   m_TagString: MainCamera
@@ -168,3 +169,11 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!81 &9211240292477164546
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7708220628765859792}
+  m_Enabled: 1
