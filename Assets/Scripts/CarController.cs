@@ -203,7 +203,7 @@ public class CarController : MonoBehaviour
 
     private void Update()
     {
-        engineAS.pitch = enginePitchMultiplier * motorRPM() / maxRPM;
+        engineAS.pitch = Mathf.Lerp(engineAS.pitch, enginePitchMultiplier * motorRPM() / maxRPM, Mathf.Pow(0.05f, 1/Time.deltaTime/60));
         UpdateWheelPoses();
         ProcessBotCommands();
         velocity = Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity);
