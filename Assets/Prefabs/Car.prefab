@@ -176,24 +176,24 @@ MonoBehaviour:
   rearLeftT: {fileID: 4759284449987079911}
   rearRightT: {fileID: 4759284449864841868}
   maxSteerAngle: 30
-  motorForce: 1
+  motorForce: 1.5
   brakeForce: 100
   maxRPM: 1800
-  enginePitchMultiplier: 1.5
+  enginePitchMultiplier: 2
   torqueCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: -0.00050541345
-      outSlope: -0.00050541345
+      inSlope: -0.0006871468
+      outSlope: -0.0006871468
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.6505154
+      time: 0.47847015
       value: 0.9996712
       inSlope: -0.0017722634
       outSlope: -0.0017722634
@@ -202,19 +202,19 @@ MonoBehaviour:
       inWeight: 0.31521344
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.7029596
-      value: 0.94783777
-      inSlope: -3.1297693
-      outSlope: -3.1297693
+      time: 0.5180943
+      value: 0.96069205
+      inSlope: -1.9057579
+      outSlope: -1.9057579
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.22759989
-      outWeight: 0.08260922
+      outWeight: 0.0735994
     - serializedVersion: 3
       time: 0.99994755
       value: -0.0027735217
-      inSlope: -3.2008412
-      outSlope: -3.2008412
+      inSlope: -1.9995
+      outSlope: -1.9995
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
