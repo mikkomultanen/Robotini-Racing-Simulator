@@ -35,19 +35,17 @@ public class CarSocket {
                 if (carInfo.name == null || carInfo.name == "") throw new Exception("CarInfo.name missing");
                 if (carInfo.teamId == null || carInfo.teamId == "") throw new Exception("CarInfo.teamId missing");
 
-                if (ModeController.Mode == SimulatorMode.Race)
+                var raceParameters = RaceParameters.readRaceParameters();
+                var cars = raceParameters.cars;
+                var found = cars?.FirstOrDefault(c => c.teamId == carInfo.teamId);
+                if (found != null)
                 {
-                    var cars = RaceParameters.readRaceParameters().cars;
-                    if (cars != null)
-                    {
-                        var found = cars.First(c => c.teamId == carInfo.teamId);
-                        if (found == null)
-                        {
-                            throw new Exception("Team not found: " + carInfo.teamId);
-                        }
-                        carInfo.name = found.name;
-                        carInfo.color = found.color;
-                    }
+                    carInfo.name = found.name;
+                    carInfo.color = found.color;
+                }
+                else if (raceParameters.mode == "race")
+                {
+                    throw new Exception("Team not found: " + carInfo.teamId);
                 }
                 EventBus.Publish(new CarConnected(carInfo, this));
 
