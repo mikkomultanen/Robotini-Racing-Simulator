@@ -711,6 +711,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2769617208009220434, guid: 8ece2a3adb74a4a2bbf94fec493f23ab,
+        type: 3}
+      propertyPath: m_text
+      value: Simulator not running
+      objectReference: {fileID: 0}
     - target: {fileID: 2837295916940347192, guid: 8ece2a3adb74a4a2bbf94fec493f23ab,
         type: 3}
       propertyPath: m_Name
