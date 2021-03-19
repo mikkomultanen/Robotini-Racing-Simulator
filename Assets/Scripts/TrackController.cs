@@ -51,7 +51,7 @@ public class TrackController : MonoBehaviour
         track.NodeListChanged += NodeListChanged;
     }
 
-    void LoadTrack(string fileName)
+    public void LoadTrack(string fileName)
     {
         SplineMesh.SplineNode[] trackNodes = null;
         if (fileName != null) {

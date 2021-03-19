@@ -16,11 +16,15 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
 
     public void ApplyEvent(GameEvent e)
     {
-        if (e is CarAdded) {
+        if (e is RaceParameters) {
+            FindObjectOfType<TrackController>().LoadTrack(((RaceParameters)e).track);
+        }
+        else if (e is CarAdded)
+        {
             CarInfo car = ((CarAdded)e).car;
             carInfos.Add(car.name, car);
         }
-        if (e is GameStatus)
+        else if (e is GameStatus)
         {
             cars = UpdateCars(cars, (e as GameStatus).cars);
         }
