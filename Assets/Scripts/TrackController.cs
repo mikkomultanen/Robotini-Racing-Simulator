@@ -21,6 +21,13 @@ public class TrackController : MonoBehaviour
         UpdateFinishLine();
         UpdateTriggers();
     }
+
+    [ContextMenu("LogTrackJson")]
+    void LogTrackJson()
+    {
+        track = GetComponent<SplineMesh.Spline>();
+        Debug.Log("Track JSON: " + JsonArrayHelper.ToJson(track.nodes.ToArray(), true));
+    }
 #endif
 
     void Start()
