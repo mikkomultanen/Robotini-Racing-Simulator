@@ -56,8 +56,12 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
                     Debug.Log("Add car to track: " + newCarStatus.name);
                     var carInfo = carInfos[newCarStatus.name];
 
+                    // TODO: terrible hack
+                    car.GetComponent<Rigidbody>().mass = 10000;
+
                     car.GetComponent<CarAppearanceController>().CarInfo = carInfo;
-                    // remove the unnecessary components that actually fails without a RaceController                    
+                    // remove the unnecessary components that actually fails without a RaceController
+                    foreach (var c in car.GetComponentsInChildren<BoxCollider>()) { Destroy(c); }                    
                     foreach (var c in car.GetComponentsInChildren<HudController>()) { Destroy(c); }
                     foreach (var c in car.GetComponentsInChildren<CarController>()) { Destroy(c); }
                     
