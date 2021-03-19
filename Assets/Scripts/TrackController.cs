@@ -17,36 +17,42 @@ public class TrackController : MonoBehaviour
     private Transform secondTrigger;
 
 #if UNITY_EDITOR
-    [ContextMenu("SaveTrackJson")]
-    void LogTrackJson()
+    [Header("EDITOR ONLY")]
+    [ContextMenuItem("Save", "SaveTrackJson")]
+    [ContextMenuItem("Load", "LoadTrackJson")]
+    public string trackFileName = "track.json";
+
+    void SaveTrackJson()
     {
         track = GetComponent<SplineMesh.Spline>();
-        var fileName = "track.json";
-        if (File.Exists(fileName))
+        if (File.Exists(trackFileName))
         {
-            Debug.Log(fileName + " already exists.");
+            Debug.Log(trackFileName + " already exists.");
             return;
         }
-        var sr = File.CreateText(fileName);
+        var sr = File.CreateText(trackFileName);
         sr.WriteLine(ToJson(track.nodes.ToArray(), true));
         sr.Close();
-        Debug.Log("Saved track to " + fileName);
+        Debug.Log("Saved track to " + trackFileName);
+    }
+
+    void LoadTrackJson() {
+        track = GetComponent<SplineMesh.Spline>();
+        LoadTrack(trackFileName);
     }
 #endif
 
     void Start()
     {
         track = GetComponent<SplineMesh.Spline>();
-        LoadTrackFromRaceParameters();
+        LoadTrack(RaceParameters.readRaceParameters().track);
         UpdateFinishLine();
         UpdateTriggers();
         track.NodeListChanged += NodeListChanged;
     }
 
-    [ContextMenu("LoadTrackFromRaceParameters")]
-    void LoadTrackFromRaceParameters()
+    void LoadTrack(string fileName)
     {
-        var fileName = RaceParameters.readRaceParameters().track;
         SplineMesh.SplineNode[] trackNodes = null;
         if (fileName != null) {
             string json = null;
