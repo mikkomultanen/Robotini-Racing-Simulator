@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Linq;
+using System;
+using System.IO;
 
 [RequireComponent(typeof(SplineMesh.Spline))]
 public class TrackController : MonoBehaviour
@@ -15,19 +17,20 @@ public class TrackController : MonoBehaviour
     private Transform secondTrigger;
 
 #if UNITY_EDITOR
-    [ContextMenu("TestGenerate")]
-    void TestGenerate()
-    {
-        track = GetComponent<SplineMesh.Spline>();
-        UpdateFinishLine();
-        UpdateTriggers();
-    }
-
-    [ContextMenu("LogTrackJson")]
+    [ContextMenu("SaveTrackJson")]
     void LogTrackJson()
     {
         track = GetComponent<SplineMesh.Spline>();
-        Debug.Log("Track JSON: " + JsonArrayHelper.ToJson(track.nodes.ToArray(), true));
+        var fileName = "track.json";
+        if (File.Exists(fileName))
+        {
+            Debug.Log(fileName + " already exists.");
+            return;
+        }
+        var sr = File.CreateText(fileName);
+        sr.WriteLine(ToJson(track.nodes.ToArray(), true));
+        sr.Close();
+        Debug.Log("Saved track to " + fileName);
     }
 #endif
 
@@ -43,19 +46,35 @@ public class TrackController : MonoBehaviour
     [ContextMenu("LoadTrackFromRaceParameters")]
     void LoadTrackFromRaceParameters()
     {
-        var raceParameters = RaceParameters.readRaceParameters();
-        if (raceParameters.trackNodes.Length > 0)
+        var fileName = RaceParameters.readRaceParameters().track;
+        SplineMesh.SplineNode[] trackNodes = null;
+        if (fileName != null) {
+            string json = null;
+            if (File.Exists(fileName))
+            {
+                json = new StreamReader(fileName).ReadToEnd();
+            }
+            else
+            {
+                json = Resources.Load<TextAsset>("Tracks/" + fileName.Replace(".json", ""))?.text;
+            }
+            if (json != null)
+            {
+                trackNodes = FromJson<SplineMesh.SplineNode>(json);
+            }
+        }
+        if (trackNodes != null && trackNodes.Length > 0)
         {
-            Debug.Log("Load track");
+            Debug.Log("Loading track " + fileName);
             track.enabled = false;
             track.IsLoop = false;
-            while (track.nodes.Count > raceParameters.trackNodes.Length)
+            while (track.nodes.Count > trackNodes.Length)
             {
                 track.RemoveNode(track.nodes.Last());
             }
-            for (int i = 0; i < raceParameters.trackNodes.Length; i++)
+            for (int i = 0; i < trackNodes.Length; i++)
             {
-                var node = raceParameters.trackNodes[i];
+                var node = trackNodes[i];
                 if (i < track.nodes.Count)
                 {
                     track.nodes[i].Position = node.Position;
@@ -111,5 +130,31 @@ public class TrackController : MonoBehaviour
         var curveSample = track.GetSampleAtDistance(track.Length * distance);
         trigger.position = curveSample.location;
         trigger.rotation = curveSample.Rotation;
+    }
+
+    public static T[] FromJson<T>(string json)
+    {
+        Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
+        return wrapper.trackNodes;
+    }
+
+    public static string ToJson<T>(T[] array)
+    {
+        Wrapper<T> wrapper = new Wrapper<T>();
+        wrapper.trackNodes = array;
+        return JsonUtility.ToJson(wrapper);
+    }
+
+    public static string ToJson<T>(T[] array, bool prettyPrint)
+    {
+        Wrapper<T> wrapper = new Wrapper<T>();
+        wrapper.trackNodes = array;
+        return JsonUtility.ToJson(wrapper, prettyPrint);
+    }
+
+    [Serializable]
+    private class Wrapper<T>
+    {
+        public T[] trackNodes;
     }
 }

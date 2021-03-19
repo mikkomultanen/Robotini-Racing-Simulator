@@ -11,7 +11,7 @@ public class RaceParameters
     public int autoStartRaceSeconds = 10;
     public int raceTimeoutSeconds = 300;
     public CarInfo[] cars;
-    public SplineMesh.SplineNode[] trackNodes;
+    public string track;
 
     public string mode = "development";
 
