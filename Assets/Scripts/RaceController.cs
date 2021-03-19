@@ -466,6 +466,7 @@ public class RaceController : MonoBehaviour
         car.name = e.car.name;
         Debug.Log("Add Car '" + e.car.name + "'");
         cars[e.car.name] = new CarStatus(e.car);
+        EventBus.Publish(new CarAdded(e.car));
         return carController;
     }
 
