@@ -149,10 +149,12 @@ public class CarController : MonoBehaviour
         var otherCar = collision.gameObject.GetComponent<CarController>();
         if (otherCar != null) {
             // Collision with other car
+            Debug.Log("Bumped other car: " + CarInfo?.name);
             EventBus.Publish(new CarBumped(CarInfo, otherCar.CarInfo));
             return;
         }
         EventBus.Publish(new CarCrashed(CarInfo));
+        Debug.Log("Collision: " + CarInfo?.name);
         this.collidingSince = DateTime.Now;   
     }
 
