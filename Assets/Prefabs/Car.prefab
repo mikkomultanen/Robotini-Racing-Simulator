@@ -179,7 +179,6 @@ MonoBehaviour:
   motorForce: 1.5
   brakeForce: 100
   maxRPM: 1800
-  enginePitchMultiplier: 2
   torqueCurve:
     serializedVersion: 2
     m_Curve:

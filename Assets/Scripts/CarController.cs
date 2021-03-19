@@ -11,8 +11,6 @@ public class CarController : MonoBehaviour
     public float motorForce = 1;
     public float brakeForce = 100;
     public float maxRPM = 1800;
-    [Range(1, 3)]
-    public float enginePitchMultiplier = 1;
     public AnimationCurve torqueCurve;
     public float maxAngleChangePerSecond = 10;
     public MeshRenderer bodyRenderer;
@@ -31,7 +29,6 @@ public class CarController : MonoBehaviour
     private bool finished = false;
     [HideInInspector]
     public Rigidbody rigidBody;
-    private AudioSource engineAS;
 
     private volatile CarSocket socket;
     private WheelCollider[] allWheels;
@@ -42,7 +39,6 @@ public class CarController : MonoBehaviour
     private void OnEnable()
     {
         rigidBody = GetComponent<Rigidbody>();
-        engineAS = GetComponent<AudioSource>();
         allWheels = new WheelCollider[] { frontLeftWC, frontRightWC, rearLeftWC, rearRightWC };
         EventBus.Subscribe<CarFinished>(this, f => {
             if (f.car.name == CarInfo?.name)
@@ -98,7 +94,7 @@ public class CarController : MonoBehaviour
         {
             wheelRMP += wheel.rpm;
         }
-        return Mathf.Min(maxRPM, Mathf.Abs(wheelRMP / allWheels.Length));
+        return Mathf.Clamp(Mathf.Abs(wheelRMP / allWheels.Length), 0, maxRPM);
     }
 
     private void Accelerate()
@@ -203,7 +199,6 @@ public class CarController : MonoBehaviour
 
     private void Update()
     {
-        engineAS.pitch = Mathf.Lerp(engineAS.pitch, enginePitchMultiplier * motorRPM() / maxRPM, Mathf.Pow(0.05f, 1/Time.deltaTime/60));
         UpdateWheelPoses();
         ProcessBotCommands();
         velocity = Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity);
