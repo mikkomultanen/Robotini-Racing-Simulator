@@ -471,6 +471,63 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1018524571}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1572498092
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1572498094}
+  - component: {fileID: 1572498093}
+  m_Layer: 0
+  m_Name: AudioController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1572498093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1572498092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65f42cb2787c94078a9b54cabd72caa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hornClip1: {fileID: 8300000, guid: ec32ee6300414d44e8296123359dc4be, type: 3}
+  hornClip2: {fileID: 8300000, guid: 016305ef1931b314795872a33dd5286d, type: 3}
+  fixClip1: {fileID: 8300000, guid: 6c4f0df741bf4af4b809f0839ddcc085, type: 3}
+  fixClip2: {fileID: 8300000, guid: 29549571fcd6d7a46be1eff7ac4717e9, type: 3}
+  bumpClip: {fileID: 8300000, guid: 89345ced2f8c940dcaa87e575c78b8a5, type: 3}
+  screamClip: {fileID: 8300000, guid: a1f7abf0dd920704dab30efe19ec8631, type: 3}
+  crashClip1: {fileID: 8300000, guid: 61ad195ee0adbcf43a81943f1745cb23, type: 3}
+  crashClip2: {fileID: 8300000, guid: a1f7abf0dd920704dab30efe19ec8631, type: 3}
+  turboClip: {fileID: 0}
+  raceAmbientClip: {fileID: 8300000, guid: 29965b26058fd4c0f9b42cc6a77b7a1f, type: 3}
+  engineClip1: {fileID: 8300000, guid: f42ee6c61e2b5a049b588a485b2f267f, type: 3}
+  engineClip2: {fileID: 8300000, guid: 1a39652b55ef6dc4c894ece2783c58c7, type: 3}
+  engineClip3: {fileID: 8300000, guid: 316224186e8ae6543990a05f4dc13981, type: 3}
+  engineClip4: {fileID: 8300000, guid: 5c224246aabdf2147b24b920563d9f85, type: 3}
+--- !u!4 &1572498094
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1572498092}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!108 &2138677392 stripped
 Light:
   m_CorrespondingSourceObject: {fileID: 8662640338840425039, guid: c53bf4124de6242c988d867025a62152,
