@@ -171,6 +171,7 @@ public class SpectatorSocket : MonoBehaviour
             });
             GameStatus myGameStatus = null;
             GameEvent gameEvent = null;
+            eventQueue.Enqueue(RaceParameters.readRaceParameters());
             foreach (var car in initialCars) {
                 eventQueue.Enqueue(new CarAdded(car));
             }

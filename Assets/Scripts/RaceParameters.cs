@@ -3,7 +3,7 @@ using UnityEngine;
 using System.IO;
 
 [Serializable]
-public class RaceParameters
+public class RaceParameters : GameEvent
 {
     public int lapCount = 5;
     public int autoStartQualifyingSeconds = 30;
