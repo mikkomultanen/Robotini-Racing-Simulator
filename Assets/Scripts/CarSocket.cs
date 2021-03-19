@@ -47,7 +47,7 @@ public class CarSocket {
                 {
                     throw new Exception("Team not found: " + carInfo.teamId);
                 }
-                Debug.Log("Using car info " + line);
+                Debug.Log("Using car name " + carInfo.name);
                 EventBus.Publish(new CarConnected(carInfo, this));
 
                 FrameRequested = true;

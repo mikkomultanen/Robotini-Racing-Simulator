@@ -15,6 +15,10 @@ public class RaceController : MonoBehaviour
     private RaceParameters raceParameters;
     private State state;
 
+    public IEnumerable<CarInfo> GetCars() {
+        return cars.Values.Select(car => car.CarInfo);
+    }
+
     private void OnEnable()
     {
         track = FindObjectOfType<SplineMesh.Spline>();
@@ -424,7 +428,8 @@ public class RaceController : MonoBehaviour
             }
         }
 
-        public void Countdown(int seconds, Action action) {
+        public void Countdown(int seconds, Action action) {            
+            Debug.Log("Start countdown, " + seconds + " seconds");
             var secondsRemaining = Observables.Countdown(seconds);
 
             Subscribe(secondsRemaining, EventBus.Publish);
@@ -474,7 +479,7 @@ public class RaceController : MonoBehaviour
     class CarStatus
     {        
         internal float lastLapRecordedAt = Time.time;
-        readonly CarInfo CarInfo;
+        public readonly CarInfo CarInfo;
         internal LapCompleted lastLap;
         private int trackSegment;
         internal bool disconnected = false;

@@ -7,13 +7,17 @@ using System.Threading;
 using System.Linq;
 using UnityEngine;
 using UniRx;
+using System.Collections.Generic;
 
 public class SpectatorSocket : MonoBehaviour
 {
     private GameStatus latestGameStatus;
     private Socket listener = null;
     private readonly ManualResetEvent allDone = new ManualResetEvent(false);
-    private DateTime startTime = System.DateTime.Now;    
+    private DateTime startTime = System.DateTime.Now;
+    // Collect here because the cars in RaceController can only be accessed in main thread
+    private Dictionary<string, CarInfo> carInfos = new Dictionary<string, CarInfo>();
+
 
     private void Update()
     {
@@ -43,8 +47,12 @@ public class SpectatorSocket : MonoBehaviour
                     Debug.Log("Writing race log to " + raceParams.raceLogFile);
                     var stream = new BinaryWriter(File.Open(raceParams.raceLogFile, FileMode.Create));
                 
-                    Spectate(b => stream.Write(b), () => stream.Close());
+                    Spectate(b => stream.Write(b), () => stream.Close(), new CarInfo[] { });
                 }
+                EventBus.Subscribe<CarAdded>(this, e => {
+                    CarInfo car = ((CarAdded)e).car;
+                    carInfos.Add(car.name, car);
+                });
                 break;
         }
     }
@@ -103,6 +111,10 @@ public class SpectatorSocket : MonoBehaviour
 
         Action close = () => socket.Close();
 
+        CarInfo[] initialCars = carInfos.Values.ToArray();
+
+        //Debug.Log("Initial cars " + string.Join(",", initialCars.Select(c => c.name).ToArray()));
+
         // Receiver thread
         new Thread(() => {
             var stream = new NetworkStream(socket);
@@ -127,7 +139,7 @@ public class SpectatorSocket : MonoBehaviour
             }
         }).Start();
 
-        Spectate(b => socket.Send(b), close);
+        Spectate(b => socket.Send(b), close, initialCars);
 
     }
 
@@ -140,14 +152,16 @@ public class SpectatorSocket : MonoBehaviour
         }
     }
 
-    void Spectate(Action<byte[]> sendBytes, Action close)
+    void Spectate(Action<byte[]> sendBytes, Action close, CarInfo[] initialCars)
     {
         Action<GameEvent> send = (GameEvent e) => {
             string jsonString = JsonUtility.ToJson(e);
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonString + "\n");
-            //Debug.Log("Writing " + jsonString + " as " + bytes.Length + " bytes");
+            //Debug.Log("Writing event " + e.type + " JSON " + jsonString + " as " + bytes.Length + " bytes");
             sendBytes(bytes);
         };
+
+        
 
         new Thread(() =>
         {
@@ -157,7 +171,9 @@ public class SpectatorSocket : MonoBehaviour
             });
             GameStatus myGameStatus = null;
             GameEvent gameEvent = null;
-
+            foreach (var car in initialCars) {
+                eventQueue.Enqueue(new CarAdded(car));
+            }
             try
             {
                 while (listener != null)

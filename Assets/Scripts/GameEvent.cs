@@ -225,7 +225,7 @@ public class FreePracticeStart : GameEvent, PhaseChange
 
 public class CarAdded : CarEvent
 {
-    public CarRemoved(CarInfo car): base(car) {}
+    public CarAdded(CarInfo car): base(car) {}
 }
 
 

@@ -22,7 +22,7 @@ public class RemoteController : RemoteEventPlayer
                 var reader = new StreamReader(stream);
                 try
                 {                
-                    var line = reader.ReadLine();
+                    string line = null;
                     while (client != null)
                     {
                         line = reader.ReadLine();
