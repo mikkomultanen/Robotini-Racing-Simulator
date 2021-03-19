@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-[System.Serializable]
-public class OnCollisionEvent : UnityEvent<GameObject> { }
-
 public class TriggerEventSource : MonoBehaviour
 {
-    [SerializeField] private OnCollisionEvent collisionEvent;
+    public event TriggerEventSourceEventHandler OnTrigger;
 
     private void OnTriggerEnter(Collider other)
     {
-        collisionEvent.Invoke(other.gameObject);
+        OnTrigger.Invoke(other.gameObject);
     }
 }
+
+public delegate void TriggerEventSourceEventHandler(GameObject other);
