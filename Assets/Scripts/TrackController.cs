@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 
 [RequireComponent(typeof(SplineMesh.Spline))]
 public class TrackController : MonoBehaviour
@@ -33,9 +34,44 @@ public class TrackController : MonoBehaviour
     void Start()
     {
         track = GetComponent<SplineMesh.Spline>();
+        LoadTrackFromRaceParameters();
         UpdateFinishLine();
         UpdateTriggers();
         track.NodeListChanged += NodeListChanged;
+    }
+
+    [ContextMenu("LoadTrackFromRaceParameters")]
+    void LoadTrackFromRaceParameters()
+    {
+        var raceParameters = RaceParameters.readRaceParameters();
+        if (raceParameters.trackNodes.Length > 0)
+        {
+            Debug.Log("Load track");
+            track.enabled = false;
+            track.IsLoop = false;
+            while (track.nodes.Count > raceParameters.trackNodes.Length)
+            {
+                track.RemoveNode(track.nodes.Last());
+            }
+            for (int i = 0; i < raceParameters.trackNodes.Length; i++)
+            {
+                var node = raceParameters.trackNodes[i];
+                if (i < track.nodes.Count)
+                {
+                    track.nodes[i].Position = node.Position;
+                    track.nodes[i].Direction = node.Direction;
+                    track.nodes[i].Up = node.Up;
+                    track.nodes[i].Scale = node.Scale;
+                    track.nodes[i].Roll = node.Roll;
+                }
+                else
+                {
+                    track.AddNode(node);
+                }
+            }
+            track.IsLoop = true;
+            track.enabled = true;
+        }
     }
 
     void NodeListChanged(object sender, SplineMesh.ListChangedEventArgs<SplineMesh.SplineNode> args)

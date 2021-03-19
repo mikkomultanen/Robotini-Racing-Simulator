@@ -26,31 +26,6 @@ public class RaceController : MonoBehaviour
         Application.targetFrameRate = 60;
         Time.captureFramerate = 60;
         raceParameters = RaceParameters.readRaceParameters();
-        if (raceParameters.trackNodes.Length > 0) {
-            Debug.Log("Load track");
-            track.enabled = false;
-            track.IsLoop = false;
-            while (track.nodes.Count > raceParameters.trackNodes.Length) {
-                track.RemoveNode(track.nodes.Last());
-            }
-            for (int i = 0; i < raceParameters.trackNodes.Length; i++) {
-                var node = raceParameters.trackNodes[i];
-                if (i < track.nodes.Count)
-                {
-                    track.nodes[i].Position = node.Position;
-                    track.nodes[i].Direction = node.Direction;
-                    track.nodes[i].Up = node.Up;
-                    track.nodes[i].Scale = node.Scale;
-                    track.nodes[i].Roll = node.Roll;
-                }
-                else
-                {
-                    track.AddNode(node);
-                }
-            }
-            track.IsLoop = true;
-            track.enabled = true;
-        }
         Observables.Delay(TimeSpan.FromMilliseconds(0)).Subscribe(_ => {
             if (ModeController.Mode == SimulatorMode.Playback || ModeController.Mode == SimulatorMode.RemoteControl)
             {
