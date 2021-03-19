@@ -46,11 +46,11 @@ public class FPSLogger : MonoBehaviour
 
             if (now > previousHeaders + headersInterval) {
                 var headers = String.Join(" ", allStats.Select(stat => { return stat.name.Substring(0, Math.Min(colWidth, stat.name.Length)).PadRight(colWidth); }));
-                Debug.Log(headers);
+                Debug.Log("FPS " + headers);
                 previousHeaders = now;
             }
             var values = String.Join(" ", allStats.Select(stat => { return Math.Round(stat.pop() / elapsed).ToString().PadRight(colWidth); }));
-            Debug.Log(values);
+            Debug.Log("FPS " + values);
             previousValues = now;
         }
     }
