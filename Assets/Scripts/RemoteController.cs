@@ -8,13 +8,14 @@ using System;
 public class RemoteController : RemoteEventPlayer
 {
     private readonly ConcurrentQueue<GameEvent> recvQueue = new ConcurrentQueue<GameEvent>();
+    private TcpClient client;
 
     void Start()
     {
         if (ModeController.Mode == SimulatorMode.RemoteControl)
         {
             Debug.Log("Initializing remote controller");
-            var client = new TcpClient("localhost", 11001);
+            client = new TcpClient("localhost", 11001);
             Debug.Log("Connected to Simulator");
 
             new Thread(() => {
@@ -46,7 +47,17 @@ public class RemoteController : RemoteEventPlayer
             });
         }
     }
-    
+
+    private void OnDestroy()
+    {
+        if (client != null)
+        {
+            Debug.Log("Close TCP client");
+            client.Close();
+            client = null;
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
