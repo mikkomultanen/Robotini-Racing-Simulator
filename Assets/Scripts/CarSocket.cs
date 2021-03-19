@@ -30,7 +30,7 @@ public class CarSocket {
                 Debug.Log("Reading car info...");
                 var line = reader.ReadLine();
                 this.carInfo = JsonUtility.FromJson<CarInfo>(line);
-                Debug.Log("car info " + line);
+                Debug.Log("Received info " + line);
                 // TODO: respond with error msgs
                 if (carInfo.name == null || carInfo.name == "") throw new Exception("CarInfo.name missing");
                 if (carInfo.teamId == null || carInfo.teamId == "") throw new Exception("CarInfo.teamId missing");
@@ -47,6 +47,7 @@ public class CarSocket {
                 {
                     throw new Exception("Team not found: " + carInfo.teamId);
                 }
+                Debug.Log("Using car info " + line);
                 EventBus.Publish(new CarConnected(carInfo, this));
 
                 FrameRequested = true;
