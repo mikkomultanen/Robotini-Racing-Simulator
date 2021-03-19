@@ -462,6 +462,7 @@ public class RaceController : MonoBehaviour
         var car = Instantiate(carPrefab, curveSample.location + 0.1f * Vector3.up, curveSample.Rotation);
         var carController = car.GetComponent<CarController>();
         carController.SetSocket(e.socket);
+        car.GetComponent<CarAppearanceController>().CarInfo = e.car;
         carController.raceController = this;
         car.name = e.car.name;
         Debug.Log("Add Car '" + e.car.name + "'");

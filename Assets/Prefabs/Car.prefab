@@ -94,6 +94,7 @@ GameObject:
   - component: {fileID: 4759284448989664003}
   - component: {fileID: 4759284448989664005}
   - component: {fileID: 4424708323091836145}
+  - component: {fileID: 729806925092156569}
   m_Layer: 10
   m_Name: Car
   m_TagString: Car
@@ -222,7 +223,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   maxAngleChangePerSecond: 10
-  bodyRenderer: {fileID: 4759284448920211465}
   velocity: 0
   angle: 0
   forward: 0
@@ -325,6 +325,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &729806925092156569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4759284448989664001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3867f6bec8899425bb5978b510d6e8b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bodyRenderer: {fileID: 4759284448920211465}
+  CarInfo:
+    teamId: 
+    name: 
+    color: 
 --- !u!1 &4759284449332738223
 GameObject:
   m_ObjectHideFlags: 0

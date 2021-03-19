@@ -13,7 +13,6 @@ public class CarController : MonoBehaviour
     public float maxRPM = 1800;
     public AnimationCurve torqueCurve;
     public float maxAngleChangePerSecond = 10;
-    public MeshRenderer bodyRenderer;
     [HideInInspector]
     public float velocity;
     [HideInInspector]
@@ -51,11 +50,6 @@ public class CarController : MonoBehaviour
 
     private void Start()
     {
-        var carInfo = CarInfo;
-        if (carInfo != null)
-        {
-            bodyRenderer.material.color = carInfo.GetColor();
-        }
     }
 
     public void GetInput()
