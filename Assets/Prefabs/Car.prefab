@@ -733,7 +733,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8660950fa3cc14a69be99edddcf2d3dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderTexture: {fileID: 0}
 --- !u!114 &3915212325315017591
 MonoBehaviour:
   m_ObjectHideFlags: 0

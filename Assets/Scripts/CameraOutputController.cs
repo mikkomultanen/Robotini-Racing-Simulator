@@ -68,7 +68,7 @@ public class CameraOutputController : MonoBehaviour
     private const int NEXT = READERS_LENGTH - 1;
 
     private Camera mCamera;
-    public RenderTexture renderTexture;
+    private RenderTexture renderTexture;
     private GPUReader[] readers = new GPUReader[READERS_LENGTH];
     private Texture2D virtualPhoto;
     private uint[] latestCameraData = null;
@@ -131,7 +131,7 @@ public class CameraOutputController : MonoBehaviour
         }
     }
 
-    void ReadAsync() 
+    void ReadAsync()
     {
         readers[NEXT].Read(renderTexture);
 
@@ -168,6 +168,10 @@ public class CameraOutputController : MonoBehaviour
             }
             readers[i] = null;
         }
+    }
+
+    public RenderTexture RenderTexture {
+        get { return renderTexture; }
     }
 
     public void SetSocket(CarSocket socket)

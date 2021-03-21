@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7708220628765859793}
   - component: {fileID: 7496500180123283125}
   - component: {fileID: 9211240292477164546}
+  - component: {fileID: 5839240202958843762}
   m_Layer: 0
   m_Name: StationaryCamera
   m_TagString: MainCamera
@@ -43,7 +44,7 @@ Camera:
   m_GameObject: {fileID: 7708220628765859792}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0.1981132, g: 0.1981132, b: 0.1981132, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -57,7 +58,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.1
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -177,3 +178,18 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7708220628765859792}
   m_Enabled: 1
+--- !u!114 &5839240202958843762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7708220628765859792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15a14e74ed1a64eff9d1207cffe13c91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {x: 0, y: 0.03, z: -0.3}
+  offsetRotation: {x: 0, y: 0, z: 0}
+  size: 0.25
