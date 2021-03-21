@@ -23,7 +23,7 @@ public class PlaybackController : RemoteEventPlayer
         if (ModeController.Mode == SimulatorMode.Playback)
         {
 #if UNITY_EDITOR
-            GetLocalRaceLog();
+            GetRaceLog(RaceParameters.readRaceParameters().raceLogFile);
 #else
             StartCoroutine(GetRaceLog());
 #endif
@@ -84,8 +84,8 @@ public class PlaybackController : RemoteEventPlayer
         }
     }
 
-    void GetLocalRaceLog() {
-        var reader = new StreamReader("race.log");
+    void GetRaceLog(string fileName) {
+        var reader = new StreamReader(fileName);
         List<string> lines = new List<string>();
         string line = null;
         while ((line = reader.ReadLine()) != null) {
