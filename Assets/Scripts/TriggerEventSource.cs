@@ -7,7 +7,7 @@ public class TriggerEventSource : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        OnTrigger.Invoke(other.gameObject);
+        OnTrigger.Invoke(other.attachedRigidbody.gameObject);
     }
 }
 
