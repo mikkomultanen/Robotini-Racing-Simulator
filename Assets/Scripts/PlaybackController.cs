@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Net;
@@ -20,8 +21,12 @@ public class PlaybackController : RemoteEventPlayer
     private void OnEnable()
     {
         if (ModeController.Mode == SimulatorMode.Playback)
-        {            
+        {
+#if UNITY_EDITOR
+            GetLocalRaceLog();
+#else
             StartCoroutine(GetRaceLog());
+#endif
         }        
     }
 
@@ -77,5 +82,18 @@ public class PlaybackController : RemoteEventPlayer
                 .Select(line => GameEvent.FromJson(line))
                 .ToArray();           
         }
+    }
+
+    void GetLocalRaceLog() {
+        var reader = new StreamReader("race.log");
+        List<string> lines = new List<string>();
+        string line = null;
+        while ((line = reader.ReadLine()) != null) {
+            lines.Add(line);
+        }
+        this.events = lines
+            .Where(line => line.Trim().Length > 0)
+            .Select(line => GameEvent.FromJson(line))
+            .ToArray();
     }
 }
