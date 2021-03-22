@@ -257,11 +257,13 @@ public class RaceController : MonoBehaviour
 
             checkForFinish();
         }
-
+        
         public override void OnSessionFinish()
         {
             Debug.Log("Race finished");
-            EventBus.Publish(new RaceFinished(CurrentStandings().standings));
+            EventBus.Publish(new RaceFinished(CurrentStandings().standings.Select(s => new CarRaceResult(
+                s.car, s.lapCount, s.bestLap, s.totalTime, s.dnf
+            )).ToArray()));
         }
 
         public override int compareLaps(LapCompleted a, LapCompleted b)

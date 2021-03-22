@@ -58,6 +58,11 @@ public class SpectatorSocket : MonoBehaviour
                 EventBus.Subscribe<RaceFinished>(this, e => {
                     Debug.Log("Race finished, stopping updates");
                     raceEnded = true;
+                    var stream = new BinaryWriter(File.Open(raceParams.raceResultFile, FileMode.Create));
+                    
+                    stream.Write(System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(e, true)));
+                    stream.Close();
+
                     Observables.Delay(TimeSpan.FromSeconds(2)).Subscribe(_ => {
                         Debug.Log("Quitting application");
                         Application.Quit();

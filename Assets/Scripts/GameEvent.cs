@@ -128,11 +128,31 @@ public class RaceWon: CarEvent
     public RaceWon(CarInfo car): base(car) { }  
 }
 
+
+[Serializable]
+public class CarRaceResult
+{
+    public CarInfo car;
+    public int lapCount;
+    public float bestLap;
+    public float totalTime;
+    public bool dnf;
+
+    public CarRaceResult(CarInfo car, int lapCount, float bestLap, float totalTime, bool dnf)
+    {
+        this.car = car;
+        this.lapCount = lapCount;
+        this.bestLap = bestLap;
+        this.totalTime = totalTime;
+        this.dnf = dnf;
+    }
+}
+
 public class RaceFinished: GameEvent, PhaseChange
 {
-    public LapCompleted[] standings;
+    public CarRaceResult[] standings;
 
-    public RaceFinished(LapCompleted[] standings)
+    public RaceFinished(CarRaceResult[] standings)
     {
         this.standings = standings;
     }
