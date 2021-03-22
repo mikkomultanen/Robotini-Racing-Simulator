@@ -36,13 +36,26 @@ It also moves automatically forward based on RaceParameters, see self-documentin
 
 In `playback` mode the simulators plays back a recorded race log. When running in WebGL, the playback mode is always assumed. See below.
 
-# Playback mode and WebGL
+## Playback
 
-You can build a WebGL build with Unity. It results into an index.html file containing the player. You need to server it over HTTP though - file protocol is not supported.
+The simulator saves all race events into the file `race.log`, or a file specified by the `raceLogFile` property in RaceParameters.json.
 
-At the moment it always looks for race data at http://localhost:8000/race-capture.json and this should be parameterized soon.
+### Playback in Unity Editor
 
-When running a race, the simulator saves race data to `race.log`. If you serve the resulting file over HTTP to the player, you should see a race.
+This file can be played back by running the simulator in `playback` mode (set in RaceParameters.json). When playing back in Unity Editor, it will use the file specified in RaceParameters (defaults to `race.log`).
+
+### Playback with WebGL
+
+You can build a WebGL build with Unity. It results into an index.html file containing the player. You need to server it over HTTP though - file protocol is not supported. The web build can only be used to playback earlierly recorded `race.log` files. At the moment it always looks for race data at http://localhost:8000/race.log.
+
+To build and play with WebGL:
+
+1. In build settings, choose WebGL build
+2. In player settings disable compression (otherwise won't work, at the moment)
+3. Build it to some directory, let's call it `webbuilddir`
+4. Copy a `race.log` file to `webbuilddir`
+5. Start a HTTP server in `webbuilddir`, serving the files on port 8000. 
+6. Open http://localhost:8000
 
 ## Spectator socket
 
