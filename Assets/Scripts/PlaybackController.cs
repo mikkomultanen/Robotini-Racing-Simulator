@@ -65,7 +65,7 @@ public class PlaybackController : RemoteEventPlayer
          Debug.Log("Params: " + ps.Keys.ToString());
          */
 
-        UnityWebRequest www = UnityWebRequest.Get("http://localhost:8000/race-capture.json");
+        UnityWebRequest www = UnityWebRequest.Get("http://localhost:8000/race.log");
         yield return www.SendWebRequest();
 
         if (www.isNetworkError || www.isHttpError)
