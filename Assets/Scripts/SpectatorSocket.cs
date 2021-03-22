@@ -12,6 +12,7 @@ using System.Collections.Generic;
 public class SpectatorSocket : MonoBehaviour
 {
     private GameStatus latestGameStatus;
+    private bool raceEnded = false;
     private Socket listener = null;
     private readonly ManualResetEvent allDone = new ManualResetEvent(false);
     private DateTime startTime = System.DateTime.Now;
@@ -21,6 +22,7 @@ public class SpectatorSocket : MonoBehaviour
 
     private void Update()
     {
+        if (raceEnded) return;
         CarController[] cars = FindObjectsOfType<CarController>();
         CarStatus[] statuses = cars.Select(c => new CarStatus(c.name, c.rigidBody.position, c.rigidBody.velocity, c.rigidBody.rotation)).ToArray();
 
@@ -47,11 +49,19 @@ public class SpectatorSocket : MonoBehaviour
                     Debug.Log("Writing race log to " + raceParams.raceLogFile);
                     var stream = new BinaryWriter(File.Open(raceParams.raceLogFile, FileMode.Create));
                 
-                    Spectate(b => stream.Write(b), () => stream.Close(), new CarInfo[] { });
+                    Spectate(b => {stream.Write(b); stream.Flush(); }, () => stream.Close(), new CarInfo[] { });
                 }
                 EventBus.Subscribe<CarAdded>(this, e => {
                     CarInfo car = ((CarAdded)e).car;
                     carInfos.Add(car.name, car);
+                });
+                EventBus.Subscribe<RaceFinished>(this, e => {
+                    Debug.Log("Race finished, stopping updates");
+                    raceEnded = true;
+                    Observables.Delay(TimeSpan.FromSeconds(2)).Subscribe(_ => {
+                        Debug.Log("Quitting application");
+                        Application.Quit();
+                    });
                 });
                 break;
         }
