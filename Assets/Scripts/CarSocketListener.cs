@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -9,6 +10,7 @@ public class CarSocketListener : MonoBehaviour {
     private readonly ManualResetEvent allDone = new ManualResetEvent(false);
     private readonly ConcurrentQueue<Socket> clientSocketQueue = new ConcurrentQueue<Socket>();
     private Socket listener = null;
+    private List<IDisposable> disposables = new List<IDisposable>();
 
     private void OnEnable()
     {
@@ -24,12 +26,21 @@ public class CarSocketListener : MonoBehaviour {
         EndListening();
     }
 
+    private void OnDestroy()
+    {
+        foreach (var d in disposables)
+        {
+            d.Dispose();
+        }
+        disposables.Clear();
+    }
+
     private void Update()
     {
         Socket socket;
         while (clientSocketQueue.TryDequeue(out socket))
         {
-           new CarSocket(socket, FindObjectOfType<RaceController>());                       
+           disposables.Add(new CarSocket(socket, FindObjectOfType<RaceController>()));
         }
     }
 
@@ -49,7 +60,7 @@ public class CarSocketListener : MonoBehaviour {
 
         Debug.Log("Starting car thread, listening on " + port);
 
-        new Thread(() =>
+        var listenerThread = new Thread(() =>
         {
             while (listener != null)
             {
@@ -65,7 +76,10 @@ public class CarSocketListener : MonoBehaviour {
                 // Wait until a connection is made before continuing.  
                 allDone.WaitOne();
             }
-        }).Start();
+        });
+        listenerThread.Name = "CarSocketListener";
+        listenerThread.IsBackground = true;
+        listenerThread.Start();
     }
 
     private void EndListening()

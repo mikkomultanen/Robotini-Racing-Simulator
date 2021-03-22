@@ -18,11 +18,11 @@ public class RemoteController : RemoteEventPlayer
             client = new TcpClient("localhost", 11001);
             Debug.Log("Connected to Simulator");
 
-            new Thread(() => {
+            var receiverThread = new Thread(() => {
                 var stream = client.GetStream();
                 var reader = new StreamReader(stream);
                 try
-                {                
+                {
                     string line = null;
                     while (client != null)
                     {
@@ -37,7 +37,10 @@ public class RemoteController : RemoteEventPlayer
                     Debug.Log("RemoteControl socket read failed:" + e.ToString());
                     client = null;
                 }
-            }).Start();
+            });
+            receiverThread.Name = "RemoteController Receiver";
+            receiverThread.IsBackground = true;
+            receiverThread.Start();
 
             EventBus.Subscribe<UICommand>(this, cmd => {
                 Debug.Log("Sending " + cmd.type);

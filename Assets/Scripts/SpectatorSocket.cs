@@ -88,7 +88,7 @@ public class SpectatorSocket : MonoBehaviour
 
         Debug.Log("Starting spectator thread, listening on " + port);
 
-        new Thread(() =>
+        var listenerThread = new Thread(() =>
         {
             while (listener != null)
             {
@@ -104,9 +104,10 @@ public class SpectatorSocket : MonoBehaviour
                 // Wait until a connection is made before continuing.  
                 allDone.WaitOne();
             }
-        }).Start();
-
-
+        });
+        listenerThread.Name = "SpectatorSocket Listener";
+        listenerThread.IsBackground = true;
+        listenerThread.Start();
     }
 
     private void AcceptCallback(IAsyncResult ar)
@@ -125,12 +126,11 @@ public class SpectatorSocket : MonoBehaviour
 
         //Debug.Log("Initial cars " + string.Join(",", initialCars.Select(c => c.name).ToArray()));
 
-        // Receiver thread
-        new Thread(() => {
+        var receiverThread = new Thread(() => {
             var stream = new NetworkStream(socket);
             var reader = new StreamReader(stream);
             try
-            {                
+            {
                 while (true)
                 {
                     var line = reader.ReadLine();
@@ -147,7 +147,10 @@ public class SpectatorSocket : MonoBehaviour
                 Debug.Log("Spectator socket read failed:" + e.ToString());
                 close();
             }
-        }).Start();
+        });
+        receiverThread.Name = "SpectatorSocket Receiver";
+        receiverThread.IsBackground = true;
+        receiverThread.Start();
 
         Spectate(b => socket.Send(b), close, initialCars);
 
@@ -171,9 +174,7 @@ public class SpectatorSocket : MonoBehaviour
             sendBytes(bytes);
         };
 
-        
-
-        new Thread(() =>
+        var senderThread = new Thread(() =>
         {
             var eventQueue = new ConcurrentQueue<GameEvent>();
             var subscription = EventBus.Receive<GameEvent>().Subscribe(e => {
@@ -188,13 +189,13 @@ public class SpectatorSocket : MonoBehaviour
             try
             {
                 while (listener != null)
-                {                                       
+                {
                     if (eventQueue.TryDequeue(out gameEvent))
                     {
                         //Debug.Log("Sending event " + gameEvent.type);
                         if (!(gameEvent is UICommand)) {
                             send(gameEvent);
-                        }                        
+                        }
                     }
                     else
                     {
@@ -210,6 +211,9 @@ public class SpectatorSocket : MonoBehaviour
                 return;
             }
 
-        }).Start();
+        });
+        senderThread.Name = "SpectatorSocket Sender";
+        senderThread.IsBackground = true;
+        senderThread.Start();
     }
 }

@@ -8,7 +8,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
-public class CarSocket {
+public class CarSocket : IDisposable {
     public static uint IMAGE_WIDTH = 128;
     public static uint IMAGE_HEIGHT = 80;
     private volatile Socket socket;
@@ -21,12 +21,12 @@ public class CarSocket {
     {
         this.socket = socket;
 
-        // Receiver thread
-        new Thread(() => {
+        var receiverThread = new Thread(() =>
+        {
             var stream = new NetworkStream(socket);
             var reader = new StreamReader(stream);
             try
-            {                
+            {
                 Debug.Log("Reading car info...");
                 var line = reader.ReadLine();
                 this.carInfo = JsonUtility.FromJson<CarInfo>(line);
@@ -66,11 +66,12 @@ public class CarSocket {
                 Debug.Log("Car socket read failed:" + e.ToString());
                 disconnected();
             }
-        }).Start();
+        });
+        receiverThread.Name = "CarSocket Receiver";
+        receiverThread.IsBackground = true;
+        receiverThread.Start();
 
-
-        // Sender thread        
-        new Thread(() =>
+        var senderThread = new Thread(() =>
         {
             while (this.socket != null)
             {
@@ -93,7 +94,10 @@ public class CarSocket {
                     Thread.Sleep(10);
                 }
             }
-        }).Start();
+        });
+        senderThread.Name = "CarSocket Sender";
+        senderThread.IsBackground = true;
+        senderThread.Start();
     }
 
     private byte[] encodeFrame(uint[] rawData)
@@ -151,5 +155,11 @@ public class CarSocket {
             }            
         }
         return commands;
+    }
+
+    public void Dispose()
+    {
+        socket?.Close();
+        socket = null;
     }
 }

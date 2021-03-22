@@ -100,7 +100,7 @@ public class CameraOutputController : MonoBehaviour
 
     void Update()
     {
-        if (socket != null && socket.FrameRequested && latestCameraData != null)
+        if (socket != null && socket.IsConnected() && socket.FrameRequested && latestCameraData != null)
         {
             socket.Send(latestCameraData);
             latestCameraData = null;
@@ -112,7 +112,7 @@ public class CameraOutputController : MonoBehaviour
 
     void OnEndFrameRendering(ScriptableRenderContext context, Camera[] cameras)
     {
-        if (socket == null) return;
+        if (socket == null || !socket.IsConnected()) return;
 
         if (!read)
         {
