@@ -135,6 +135,7 @@ public class RaceController : MonoBehaviour
 
         public override void OnEnable()
         {
+            Debug.Log("Qualifying starting");
             base.OnEnable();
             foreach (CarConnected car in cars)
             {
@@ -189,6 +190,7 @@ public class RaceController : MonoBehaviour
 
         public override void OnEnable()
         {
+            Debug.Log("Starting grid for race");
             EventBus.Publish(new StartingGridInit(startingGrid));
             EventBus.Publish(CurrentStandings());
             
@@ -235,6 +237,7 @@ public class RaceController : MonoBehaviour
 
         public override void OnEnable()
         {
+            Debug.Log("Race started");
             base.OnEnable();
             EventBus.Publish(new RaceStart());
             EventBus.Publish(CurrentStandings());
@@ -257,6 +260,7 @@ public class RaceController : MonoBehaviour
 
         public override void OnSessionFinish()
         {
+            Debug.Log("Race finished");
             EventBus.Publish(new RaceFinished(CurrentStandings().standings));
         }
 
@@ -275,6 +279,7 @@ public class RaceController : MonoBehaviour
 
         override public void OnEnable()
         {
+            Debug.Log("Starting free practice");
             base.OnEnable();
             EventBus.Publish(new FreePracticeStart());            
 

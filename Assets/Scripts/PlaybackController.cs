@@ -20,6 +20,7 @@ public class PlaybackController : RemoteEventPlayer
 
     private void OnEnable()
     {
+        Debug.Log("Playback init");
         if (ModeController.Mode == SimulatorMode.Playback)
         {
 #if UNITY_EDITOR
