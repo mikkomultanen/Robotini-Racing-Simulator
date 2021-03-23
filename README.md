@@ -48,14 +48,23 @@ This file can be played back by running the simulator in `playback` mode (set in
 
 You can build a WebGL build with Unity. It results into an index.html file containing the player. You need to server it over HTTP though - file protocol is not supported. The web build can only be used to playback earlierly recorded `race.log` files. At the moment it always looks for race data at http://localhost:8000/race.log.
 
+### Building the WebGL Player
+
 To build and play with WebGL:
 
 1. In build settings, choose WebGL build
 2. In player settings disable compression (otherwise won't work, at the moment)
-3. Build it to some directory, let's call it `webbuilddir`
-4. Copy a `race.log` file to `webbuilddir`
-5. Start a HTTP server in `webbuilddir`, serving the files on port 8000. 
-6. Open http://localhost:8000
+3. Build it to `./robotini-web-player`
+
+### Try the WebGL player locally
+
+1. Copy a `race.log` file to `./robotini-web-player`
+2. Start a HTTP server in `./robotini-web-player`, serving the files on port 8000. 
+3. Open http://localhost:8000
+
+### Publishing the WebGL player
+
+To publish the latest WebGL player build it first and the run `./publish-web-player.sh`. This will require AWS permissions.
 
 ## Spectator socket
 

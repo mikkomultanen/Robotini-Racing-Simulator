@@ -26,9 +26,15 @@ public class PlaybackController : RemoteEventPlayer
 #if UNITY_EDITOR
             GetRaceLog(RaceParameters.readRaceParameters().raceLogFile);
 #else
-            StartCoroutine(GetRaceLog());
+            StartCoroutine(FetchRaceLogOverHTTP("http://localhost:8000/race.log"));
 #endif
         }        
+    }
+
+    // Called from the page javascript!
+    public void PlayUrl(string url) 
+    {
+        StartCoroutine(FetchRaceLogOverHTTP(url));
     }
 
     private void FixedUpdate()
@@ -52,7 +58,7 @@ public class PlaybackController : RemoteEventPlayer
 
     
 
-    IEnumerator GetRaceLog()
+    IEnumerator FetchRaceLogOverHTTP(string raceLogUrl)
     {
         Debug.Log("Initializing playback");
 
@@ -65,7 +71,7 @@ public class PlaybackController : RemoteEventPlayer
          Debug.Log("Params: " + ps.Keys.ToString());
          */
 
-        UnityWebRequest www = UnityWebRequest.Get("http://localhost:8000/race.log");
+        UnityWebRequest www = UnityWebRequest.Get(raceLogUrl);
         yield return www.SendWebRequest();
 
         if (www.isNetworkError || www.isHttpError)
