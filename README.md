@@ -64,7 +64,7 @@ To build and play with WebGL:
 
 ### Publishing the WebGL player
 
-To publish the latest WebGL player build it first and the run `./publish-web-player.sh`. This will require AWS permissions.
+To publish the latest WebGL player build it first and the run `make publish-web-player`. This will require AWS permissions.
 
 ## Spectator socket
 
