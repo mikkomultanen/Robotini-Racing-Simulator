@@ -27,7 +27,7 @@ public class PlaybackController : RemoteEventPlayer
 #if UNITY_EDITOR
             GetRaceLog(RaceParameters.readRaceParameters().raceLogFile);
 #else
-            StartCoroutine(FetchRaceLogOverHTTP("http://localhost:8000/race.log"));
+            //StartCoroutine(FetchRaceLogOverHTTP("http://localhost:8000/race.log"));
 #endif
         }
 
