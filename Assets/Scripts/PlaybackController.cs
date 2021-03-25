@@ -125,5 +125,8 @@ public class PlaybackController : RemoteEventPlayer
             .Where(line => line.Trim().Length > 0)
             .Select(line => GameEvent.FromJson(line))
             .ToArray();
+        this.position = 0;
+        this.index = 0;
+        Debug.Log("Race contains " + this.events.Length + " events");
     }
 }
