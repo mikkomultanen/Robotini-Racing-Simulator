@@ -73,3 +73,9 @@ The simulator serves a full capture of race events on port 11001 as a newline-se
 You can also send UICommands through the socket, such as:
 
     {"type":"ProceedToNextPhase"}
+
+## Command-line build
+
+To build on the command-line, Unity editor must be closed.
+
+    make linux-player
