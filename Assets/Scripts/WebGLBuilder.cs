@@ -6,9 +6,11 @@ using UnityEngine;
 //$ Unity -quit -batchmode -executeMethod WebGLBuilder.build
 
 class WebGLBuilder {
+    #if UNITY_EDITOR
     static void build() {
         Debug.Log("Starting WebGL build");
         string[] scenes = {"Assets/Track.unity"};
         BuildPipeline.BuildPlayer(scenes, "robotini-web-player", BuildTarget.WebGL, BuildOptions.None);
     }
+    #endif
 }
