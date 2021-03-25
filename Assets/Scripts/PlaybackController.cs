@@ -50,7 +50,7 @@ public class PlaybackController : RemoteEventPlayer
         StartCoroutine(FetchRaceLogOverHTTP(url));
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (events == null) return;
         if (index >= events.Length) return;
