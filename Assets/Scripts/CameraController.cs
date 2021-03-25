@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
@@ -7,13 +5,30 @@ public class CameraController : MonoBehaviour
 {
     public Vector3 offset = Vector3.up * 0.1f;
     public Vector3 offsetRotation = Vector3.zero;
-    [Range(0.1f,1f)]
+    [Range(0.1f, 1f)]
     public float size = 0.2f;
 
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     private CameraOutputController follow = null;
     private int nextCameraIndex = 0;
+
+    private void SetFollow(CameraOutputController value) {
+        if (follow != null)
+        {
+            follow.Camera.enabled = CameraOutputController.ShouldEnableCamera;
+        }
+        follow = value;
+        if (value != null)
+        {
+            value.Camera.enabled = true;
+        }
+        else
+        {
+            transform.position = originalPosition;
+            transform.rotation = originalRotation;
+        }
+    }
 
     void Start()
     {
@@ -25,15 +40,7 @@ public class CameraController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C)) {
             var cameras = FindObjectsOfType<CameraOutputController>();
-            if (nextCameraIndex >= cameras.Length)
-            {
-                follow = null;
-                transform.position = originalPosition;
-                transform.rotation = originalRotation;
-            }
-            else {
-                follow = cameras[nextCameraIndex];
-            }
+            SetFollow(nextCameraIndex >= cameras.Length ? null : cameras[nextCameraIndex]);
             nextCameraIndex = (nextCameraIndex + 1) % (cameras.Length + 1);
         }
         if (follow != null) {

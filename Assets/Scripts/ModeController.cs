@@ -11,32 +11,43 @@ public enum SimulatorMode
 
 public class ModeController : MonoBehaviour
 {
-    public static SimulatorMode Mode;
-
-    static ModeController()
-    {
-        if (Application.platform == RuntimePlatform.WebGLPlayer)
-        {
-            Debug.Log("WebGL player detected. Playback mode it is.");
-            Mode = SimulatorMode.Playback;
-        }
-        else
-        {
-            Debug.Log("Environment " + Application.platform + " detected.");
-            string mode = RaceParameters.readRaceParameters().mode;
-            switch (mode) {
-                case "development":
-                    Mode = SimulatorMode.Development; break;
-                case "race":
-                    Mode = SimulatorMode.Race; break;
-                case "playback":
-                    Mode = SimulatorMode.Playback; break;
-                case "remote":
-                    Mode = SimulatorMode.RemoteControl; break;
-                default:
-                    throw new Exception("Illegal mode " + mode + ", expecting race or development");
+    private static bool dirty = true;
+    private static SimulatorMode _mode;
+    public static SimulatorMode Mode {
+        get {
+            if (dirty) {
+                dirty = false;
+                if (Application.platform == RuntimePlatform.WebGLPlayer)
+                {
+                    Debug.Log("WebGL player detected. Playback mode it is.");
+                    _mode = SimulatorMode.Playback;
+                }
+                else
+                {
+                    Debug.Log("Environment " + Application.platform + " detected.");
+                    string mode = RaceParameters.readRaceParameters().mode;
+                    switch (mode)
+                    {
+                        case "development":
+                            _mode = SimulatorMode.Development; break;
+                        case "race":
+                            _mode = SimulatorMode.Race; break;
+                        case "playback":
+                            _mode = SimulatorMode.Playback; break;
+                        case "remote":
+                            _mode = SimulatorMode.RemoteControl; break;
+                        default:
+                            throw new Exception("Illegal mode " + mode + ", expecting race or development");
+                    }
+                }
             }
+            return _mode;
         }
+    }
+
+    private void OnDisable()
+    {
+        dirty = true;
     }
 
     // Use this for initialization

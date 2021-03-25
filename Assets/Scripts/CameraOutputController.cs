@@ -77,6 +77,15 @@ public class CameraOutputController : MonoBehaviour
     private volatile CarSocket socket;
     FPSLogger logger;
 
+    public Camera Camera {
+        get { return mCamera; }
+    }
+
+    public static bool ShouldEnableCamera
+    {
+        get { return ModeController.Mode == SimulatorMode.Development || ModeController.Mode == SimulatorMode.Race; }
+    }
+
     private void Start()
     {
         mCamera = GetComponent<Camera>();
@@ -91,7 +100,7 @@ public class CameraOutputController : MonoBehaviour
         mCamera.rect = new Rect(0, 0, 1, 1);
         mCamera.aspect = 1.0f * CarSocket.IMAGE_WIDTH / CarSocket.IMAGE_HEIGHT;
         mCamera.targetTexture = renderTexture;
-        mCamera.enabled = true;
+        mCamera.enabled = ShouldEnableCamera;
         RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
         this.async = SystemInfo.supportsAsyncGPUReadback;
         Debug.Log("Async GPU Readback supported: " + this.async);
