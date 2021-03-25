@@ -42,6 +42,7 @@ public class CarSocket : IDisposable {
                 {
                     carInfo.name = found.name;
                     carInfo.color = found.color;
+                    carInfo.texture = found.texture;
                 }
                 else if (raceParameters.mode == "race")
                 {

@@ -63,6 +63,7 @@ public class CarInfo
     public string teamId;
     public string name;
     public string color;
+    public string texture;
 
     [NonSerialized]
     private Color _color = Color.clear;
