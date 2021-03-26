@@ -28,7 +28,9 @@ public class RemoteController : RemoteEventPlayer
                     {
                         line = reader.ReadLine();
                         var command = GameEvent.FromJson(line);
-                        recvQueue.Enqueue(command);
+                        if (!(command is UICommand)) {
+                            recvQueue.Enqueue(command);
+                        }
                     }
 
                 }
