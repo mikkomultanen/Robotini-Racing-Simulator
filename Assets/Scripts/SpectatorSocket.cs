@@ -59,6 +59,7 @@ public class SpectatorSocket : MonoBehaviour
                     Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => {
                         Debug.Log("Race finished, stopping updates");
                         raceEnded = true;
+                        EventBus.Publish(new GameStatus(new CarStatus[0]));
                         var stream = new BinaryWriter(File.Open(raceParams.raceResultFile, FileMode.Create));
 
                         stream.Write(System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(e, true)));
