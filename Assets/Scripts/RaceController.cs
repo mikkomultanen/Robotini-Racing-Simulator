@@ -520,14 +520,16 @@ public class RaceController : MonoBehaviour
             lastLap = new LapCompleted(
                 CarInfo,
                 -1, // Not even started first lap yet, 0 would be running first lap.
-                float.NaN, float.NaN, 0, disconnected);
+                null, null, 0, disconnected);
         }
 
         internal void Disconnected()
         {
-            Debug.Log("Disconnected: " + CarInfo.name);
-            this.disconnected = true;
-            lastLap = new LapCompleted(CarInfo, lastLap.lapCount, lastLap.lastLap, lastLap.bestLap, lastLap.totalTime, true);
+            if (!finished) {
+                Debug.Log("Disconnected: " + CarInfo.name);
+                this.disconnected = true;
+                lastLap = new LapCompleted(CarInfo, lastLap.lapCount, lastLap.lastLap, lastLap.bestLap, lastLap.totalTime, true);
+            }
         }
 
         internal void Finished() {
