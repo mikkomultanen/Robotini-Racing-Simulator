@@ -76,7 +76,7 @@ public class CarInfo
     }
     public LapCompleted ToLap()
     {
-        return new LapCompleted(this, 0, float.NaN, float.NaN, 0, false);
+        return new LapCompleted(this, 0, 0, 0, 0, false);
     }
     public Color GetColor()
     {

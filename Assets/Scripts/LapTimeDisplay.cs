@@ -11,7 +11,7 @@ public class LapTimeDisplay : MonoBehaviour
 
     public static string FormattedTime(float inputTime)
     {
-        if (float.IsNaN(inputTime)) return "";
+        if (inputTime == 0) return "";
         int minutes = (int)(inputTime / 60);
         int seconds = (int)inputTime % 60;
         return string.Format("{0:00}:{1:00}{2:.000}", minutes, seconds, inputTime - Mathf.Floor(inputTime));

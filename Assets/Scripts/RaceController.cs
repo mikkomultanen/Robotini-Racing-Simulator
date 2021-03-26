@@ -178,7 +178,7 @@ public class RaceController : MonoBehaviour
             Debug.Log("End of qualifying");
             c.motorsEnabled = false;
 
-            var results = c.cars.Values.Select(v => v.LastLap).OrderBy(l => float.IsNaN(l.bestLap) ? float.MaxValue : l.bestLap).ToArray();
+            var results = c.cars.Values.Select(v => v.LastLap).OrderBy(l => l.bestLap == 0 ? float.MaxValue : l.bestLap).ToArray();
             EventBus.Publish(new QualifyingResults(results));
             var startingOrder = results.Select(l => l.car).ToArray();
 
@@ -361,7 +361,7 @@ public class RaceController : MonoBehaviour
 
         static float getComparableTime(LapCompleted t)
         {
-            if (t != null && !float.IsNaN(t.bestLap)) return t.bestLap;
+            if (t != null && t.bestLap != 0) return t.bestLap;
             return float.MaxValue;
         }
 
@@ -520,7 +520,7 @@ public class RaceController : MonoBehaviour
             lastLap = new LapCompleted(
                 CarInfo,
                 -1, // Not even started first lap yet, 0 would be running first lap.
-                null, null, 0, disconnected);
+                0, 0, 0, disconnected);
         }
 
         internal void Disconnected()
@@ -558,13 +558,13 @@ public class RaceController : MonoBehaviour
             {
                 // crossed finish line, starting first lap.
                 lastLapRecordedAt = now;
-                lastLap = new LapCompleted(CarInfo, 0, float.NaN, float.NaN, totalTime, false);
+                lastLap = new LapCompleted(CarInfo, 0, 0, 0, totalTime, false);
                 return;
             }
             var lastTime = now - lastLapRecordedAt;
             Debug.Log("Lap Time for '" + CarInfo.name + "': " + lastTime);
             lastLapRecordedAt = now;
-            var bestTime = (lastTime < lastLap.bestLap || float.IsNaN(lastLap.bestLap)) ? lastTime : lastLap.bestLap;
+            var bestTime = (lastTime < lastLap.bestLap || lastLap.bestLap == 0) ? lastTime : lastLap.bestLap;
             
             this.lastLap = new LapCompleted(CarInfo, lapCount, lastTime, bestTime, totalTime, false);
             EventBus.Publish(lastLap);
