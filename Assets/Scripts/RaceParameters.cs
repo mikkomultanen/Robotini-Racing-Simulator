@@ -10,6 +10,7 @@ public class RaceParameters : GameEvent
     public int qualifyingDurationSeconds = 30;
     public int autoStartRaceSeconds = 10;
     public int raceTimeoutSeconds = 300;
+    public int raceTimeoutAfterWinnerSeconds = 60;
     public CarInfo[] cars;
     public string track;
 

@@ -58,6 +58,17 @@ public class RaceController : MonoBehaviour
         });        
     }
 
+    bool isCurrentState(State state) {
+        return this.state == state;
+    }
+
+    private void Update()
+    {
+        if (this.state != null) {
+            this.state.Update();
+        }
+    }
+
     void setState(State state)
     {
         if (this.state != null)
@@ -170,11 +181,12 @@ public class RaceController : MonoBehaviour
             EventBus.Publish(new QualifyingStart(cars.Select(c => c.car).ToArray()));
             EventBus.Publish(CurrentStandings());
 
-            Countdown(c.raceParameters.qualifyingDurationSeconds, OnSessionFinish);
+            Countdown(c.raceParameters.qualifyingDurationSeconds, OnSessionFinish);            
         }
 
         public override void OnSessionFinish()
         {
+
             Debug.Log("End of qualifying");
             c.motorsEnabled = false;
 
@@ -240,6 +252,9 @@ public class RaceController : MonoBehaviour
     public class Race : Racing
     {
         int finishers = 0;
+        internal float raceStarted = Time.time;
+        internal float firstCarFinished = float.MaxValue;
+        int secondsRemaining = 0;
 
         public Race(RaceController c): base(c)
         {            
@@ -261,6 +276,7 @@ public class RaceController : MonoBehaviour
                     c.cars[l.car.name].Finished();                    
                     if (finishers++ == 0)
                     {
+                        firstCarFinished = Time.time;
                         EventBus.Publish(new RaceWon(l.car));
                     }                    
                     checkForFinish();
@@ -269,13 +285,34 @@ public class RaceController : MonoBehaviour
 
             checkForFinish();
         }
-        
+
+        public override void Update()
+        {
+            float raceEndsAt = Math.Min(
+                raceStarted + c.raceParameters.raceTimeoutSeconds,
+                firstCarFinished + c.raceParameters.raceTimeoutAfterWinnerSeconds);
+            int remaining = (int)(raceEndsAt - Time.time);
+            
+            if (remaining != secondsRemaining) {
+                secondsRemaining = remaining;
+                EventBus.Publish(new SecondsRemaining(secondsRemaining));
+                if (secondsRemaining == 0) {
+                    Debug.Log("Race timed out");
+                    OnSessionFinish();
+                } else {
+                    Debug.Log("Race time remaining: " + remaining);
+                }
+            }
+        }
+
         public override void OnSessionFinish()
         {
-            Debug.Log("Race finished");
-            EventBus.Publish(new RaceFinished(CurrentStandings().standings.Select(s => new CarRaceResult(
-                s.car, s.lapCount, s.bestLap, s.totalTime, s.dnf
-            )).ToArray()));
+            if (c.isCurrentState(this)) {
+                Debug.Log("Race finished");
+                EventBus.Publish(new RaceFinished(CurrentStandings().standings.Select(s => new CarRaceResult(
+                    s.car, s.lapCount, s.bestLap, s.totalTime, s.dnf
+                )).ToArray()));
+            }
         }
 
         public override int compareLaps(LapCompleted a, LapCompleted b)
@@ -421,6 +458,8 @@ public class RaceController : MonoBehaviour
                 checkForFinish();
             });
         }
+
+        public virtual void Update() { }
 
         public abstract CurrentStandings CurrentStandings();
 
