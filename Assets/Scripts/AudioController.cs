@@ -48,13 +48,16 @@ public class AudioController : MonoBehaviour
             foreach (var car in s.cars)
             {
                 var src = getCarAudioSource(car.name);
-                if (src.clip == null) {
-                    src.clip = randomClip(engines);
-                    src.loop = true;
-                    src.Play();
+                if (src != null) {
+                    if (src.clip == null)
+                    {
+                        src.clip = randomClip(engines);
+                        src.loop = true;
+                        src.Play();
+                    }
+                    src.pitch = 0.5f + (float)Math.Pow(car.velocity.magnitude, 0.7f);
+                    src.volume = 0.2f + (car.velocity.magnitude - 2) / 3;
                 }
-                src.pitch = 0.5f + (float)Math.Pow(car.velocity.magnitude, 0.7f);
-                src.volume = 0.2f + (car.velocity.magnitude - 2) / 3;
             }            
         });
     }
