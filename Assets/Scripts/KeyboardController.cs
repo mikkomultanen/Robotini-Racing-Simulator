@@ -27,6 +27,15 @@ public class KeyboardController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Backspace)) {
                 EventBus.Publish(new CameraFollow(null));
             }
+            if (Input.GetKeyDown(KeyCode.S)) {
+                var track = FindObjectOfType<SplineMesh.Spline>();
+                var curveSample = track.GetSampleAtDistance(0);
+                var position = curveSample.location + 0.4f * Vector3.up;
+                curveSample = track.GetSampleAtDistance(track.Length - 0.7f);
+                var lookAt = curveSample.location;
+                var rotation = Quaternion.LookRotation(lookAt - position, Vector3.up);
+                EventBus.Publish(new CameraPosition(position, rotation));
+            }
         }
         if (Input.GetKeyDown(KeyCode.P))
         {

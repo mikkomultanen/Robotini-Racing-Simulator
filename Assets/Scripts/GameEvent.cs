@@ -276,6 +276,17 @@ public class CameraFollow: UICommand {
     }
 }
 
+public class CameraPosition : UICommand
+{
+    public Vector3 position;
+    public Quaternion rotation;
+    public CameraPosition(Vector3 position, Quaternion rotation)
+    {
+        this.position = position;
+        this.rotation = rotation;
+    }
+}
+
 public abstract class UICommand: GameEvent {
 }
 
