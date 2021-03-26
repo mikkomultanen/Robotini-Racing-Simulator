@@ -85,7 +85,6 @@ public class CameraOutputController : MonoBehaviour
     {
         get { return ModeController.Mode == SimulatorMode.Development || ModeController.Mode == SimulatorMode.Race; }
     }
-
     private void Start()
     {
         mCamera = GetComponent<Camera>();

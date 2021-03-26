@@ -198,10 +198,8 @@ public class SpectatorSocket : MonoBehaviour
                 {
                     if (eventQueue.TryDequeue(out gameEvent))
                     {
-                        //Debug.Log("Sending event " + gameEvent.type);
-                        if (!(gameEvent is UICommand)) {
-                            send(gameEvent);
-                        }
+                        //Debug.Log("Sending event " + gameEvent.type);                        
+                        send(gameEvent);                    
                     }
                     else
                     {

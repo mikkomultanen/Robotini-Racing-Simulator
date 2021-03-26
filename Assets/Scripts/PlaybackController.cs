@@ -56,11 +56,12 @@ public class PlaybackController : RemoteEventPlayer
         ApplyEvent(GameEvent.FromJson(eventJson));
     }
 
+    // Called from the page javascript!
     public void ResetPlayback() {
         this.events = new GameEvent[] { };
         this.position = 0;
         this.index = 0;
-    }
+    }   
 
     private void Update()
     {

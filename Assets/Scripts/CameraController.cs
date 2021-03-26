@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq;
 
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
@@ -10,8 +11,7 @@ public class CameraController : MonoBehaviour
 
     private Vector3 originalPosition;
     private Quaternion originalRotation;
-    private CameraOutputController follow = null;
-    private int nextCameraIndex = 0;
+    private CameraOutputController follow = null;    
 
     private void SetFollow(CameraOutputController value) {
         if (follow != null)
@@ -27,23 +27,30 @@ public class CameraController : MonoBehaviour
         {
             transform.position = originalPosition;
             transform.rotation = originalRotation;
-        }
+        }        
     }
 
     void Start()
     {
         originalPosition = transform.position;
         originalRotation = transform.rotation;
+
+        EventBus.Subscribe<CameraFollow>(this, f => {
+            if (f.carName == null)
+            {
+                SetFollow(null);
+            } else {
+                var car = GameObject.Find(f.carName);
+                var camera = car?.GetComponentInChildren<CameraOutputController>();
+                SetFollow(camera);
+            }           
+        });
     }
 
     void LateUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.C)) {
-            var cameras = FindObjectsOfType<CameraOutputController>();
-            SetFollow(nextCameraIndex >= cameras.Length ? null : cameras[nextCameraIndex]);
-            nextCameraIndex = (nextCameraIndex + 1) % (cameras.Length + 1);
-        }
         if (follow != null) {
+
             transform.position = follow.transform.position + follow.transform.TransformVector(offset);
             transform.rotation = follow.transform.rotation * Quaternion.Euler(offsetRotation);
         }

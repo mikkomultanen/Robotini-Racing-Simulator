@@ -269,6 +269,13 @@ public class CarConnected : CarEvent
     }
 }
 
+public class CameraFollow: UICommand {
+    public string carName;
+    public CameraFollow(string carName) {
+        this.carName = carName;
+    }
+}
+
 public abstract class UICommand: GameEvent {
 }
 
