@@ -50,6 +50,18 @@ public class PlaybackController : RemoteEventPlayer
         StartCoroutine(FetchRaceLogOverHTTP(url));
     }
 
+    // Called from the page javascript!
+    public void ApplyJSONEvent(string eventJson) 
+    {
+        ApplyEvent(GameEvent.FromJson(eventJson));
+    }
+
+    public void ResetPlayback() {
+        this.events = new GameEvent[] { };
+        this.position = 0;
+        this.index = 0;
+    }
+
     private void Update()
     {
         if (events == null) return;
@@ -104,12 +116,11 @@ public class PlaybackController : RemoteEventPlayer
             string text = www.downloadHandler.text;
 
             string[] lines = text.Split('\n');
+            ResetPlayback();
             this.events = lines
                 .Where(line => line.Trim().Length > 0)
                 .Select(line => GameEvent.FromJson(line))
                 .ToArray();
-            this.position = 0;
-            this.index = 0;
             Debug.Log("Race contains " + this.events.Length + " events");
         }
     }
