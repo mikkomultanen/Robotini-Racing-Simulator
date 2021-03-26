@@ -171,7 +171,7 @@ public class RaceController : MonoBehaviour
             float spacing = totalLength / (float)controllers.Count();
             foreach (var car in controllers)
             {
-                var curveSample = c.track.GetSampleAtDistance(c.track.Length - (++i * spacing));
+                var curveSample = c.track.GetSampleAtDistance(Mathf.Max(0, c.track.Length - (++i * spacing)));
                 car.transform.position = curveSample.location + 0.1f * Vector3.up;
                 car.transform.rotation = curveSample.Rotation;
                 car.GetComponent<Rigidbody>().velocity = Vector3.zero;
