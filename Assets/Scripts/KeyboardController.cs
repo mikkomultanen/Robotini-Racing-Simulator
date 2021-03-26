@@ -1,10 +1,10 @@
-﻿using UnityEngine;
-using UniRx;
+﻿using System.Linq;
+using UnityEngine;
 
 public class KeyboardController : MonoBehaviour
 {
-    private int nextCameraIndex = 0;
     private bool useRemoteCameraPosition;
+    private readonly KeyCode[] numberKeys = { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9 };
 
     // Called from js
     void UseCameraPositionsFromStream() {
@@ -14,12 +14,18 @@ public class KeyboardController : MonoBehaviour
     private void Update()
     {
         if (!useRemoteCameraPosition) {
-            if (Input.GetKeyDown(KeyCode.C)) {
-                var cars = GameObject.FindGameObjectsWithTag("Car");
-                EventBus.Publish(
-                    new CameraFollow(nextCameraIndex >= cars.Length ? null : cars[nextCameraIndex].name)
-                );                
-                nextCameraIndex = (nextCameraIndex + 1) % (cars.Length + 1);
+            for (int i = 0; i < numberKeys.Length; i++) {
+                if (Input.GetKeyDown(numberKeys[i]))
+                {
+                    var cars = FindObjectOfType<LapTimeDisplay>()?.CarInfos;
+                    if (cars != null && cars.Length > i)
+                    {
+                        EventBus.Publish(new CameraFollow(cars[i].name));
+                    }
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.Backspace)) {
+                EventBus.Publish(new CameraFollow(null));
             }
         }
         if (Input.GetKeyDown(KeyCode.P))

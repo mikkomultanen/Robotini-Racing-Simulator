@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -64,6 +65,14 @@ public class LapTimeDisplay : MonoBehaviour
     }
 
     public void ToggleLapTimeList() => lapTimeList?.SetActive(!lapTimeList.activeSelf);
+
+    public CarInfo[] CarInfos {
+        get {
+            List<TimeWrapper> times = new List<TimeWrapper>(timers.Values);
+            times.Sort(compareTimes);
+            return times.Select(e => e.car).ToArray();
+        } 
+    }
 
     private int compareTimes(TimeWrapper t1, TimeWrapper t2)
     {
