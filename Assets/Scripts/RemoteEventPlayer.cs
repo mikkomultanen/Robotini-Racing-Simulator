@@ -1,14 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
-using System.IO;
 
 public abstract class RemoteEventPlayer : MonoBehaviour {
     private readonly Dictionary<string, GameObject> cars = new Dictionary<string, GameObject>();
@@ -21,8 +13,12 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
         }
         else if (e is CarAdded)
         {
-            CarInfo car = ((CarAdded)e).car;
-            carInfos.Add(car.name, car);
+            CarInfo carInfo = ((CarAdded)e).car;
+            carInfos.Add(carInfo.name, carInfo);
+            GameObject car;
+            if (cars.TryGetValue(carInfo.name, out car)) {
+                car.GetComponent<CarAppearanceController>().CarInfo = carInfo;
+            }
         }
         else if (e is GameStatus)
         {
@@ -57,11 +53,13 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
                 car.name = newStatus.name;
 
                 Debug.Log("Add car to track: " + newStatus.name);
-                var carInfo = carInfos[newStatus.name];
-
                 car.GetComponent<Rigidbody>().isKinematic = true;
 
-                car.GetComponent<CarAppearanceController>().CarInfo = carInfo;
+                CarInfo carInfo;
+                if (carInfos.TryGetValue(newStatus.name, out carInfo)) {
+                    car.GetComponent<CarAppearanceController>().CarInfo = carInfo;
+                }
+
                 // remove the unnecessary components that actually fails without a RaceController
                 foreach (var c in car.GetComponentsInChildren<HudController>()) { Destroy(c); }
                 foreach (var c in car.GetComponentsInChildren<CarController>()) { Destroy(c); }
