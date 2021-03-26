@@ -652,10 +652,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyRenderer: {fileID: 4759284448920211465}
-  CarInfo:
-    teamId: 
-    name: 
-    color: 
+  tireRenderers:
+  - {fileID: 156716194495366028}
+  - {fileID: 3456332577708605364}
+  - {fileID: 1043805308450049124}
+  - {fileID: 4759284449332738225}
 --- !u!1 &4759284449332738223
 GameObject:
   m_ObjectHideFlags: 0
