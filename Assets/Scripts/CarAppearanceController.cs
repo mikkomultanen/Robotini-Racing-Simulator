@@ -14,7 +14,7 @@ public class CarAppearanceController : MonoBehaviour
         if (carInfo != null)
         {
             bodyRenderer.material.color = carInfo.GetColor();
-            if (carInfo.texture != null) {
+            if (carInfo.texture != null && carInfo.texture.Length > 0) {
                 StartCoroutine(GetTexture(carInfo.texture));
             }
         }
