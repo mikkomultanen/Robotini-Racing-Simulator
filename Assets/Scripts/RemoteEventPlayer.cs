@@ -11,8 +11,8 @@ using UnityEngine.Networking;
 using System.IO;
 
 public abstract class RemoteEventPlayer : MonoBehaviour {
-    private GameObject[] cars = { };
-    private Dictionary<string, CarInfo> carInfos = new Dictionary<string, CarInfo>();
+    private readonly Dictionary<string, GameObject> cars = new Dictionary<string, GameObject>();
+    private readonly Dictionary<string, CarInfo> carInfos = new Dictionary<string, CarInfo>();
 
     public void ApplyEvent(GameEvent e)
     {
@@ -26,47 +26,48 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
         }
         else if (e is GameStatus)
         {
-            cars = UpdateCars(cars, (e as GameStatus).cars);
+            UpdateCars((e as GameStatus).cars);
         }
         EventBus.Publish(e);
     }
 
-    GameObject[] UpdateCars(GameObject[] cars, CarStatus[] newStatuses)
+    void UpdateCars(CarStatus[] newStatuses)
     {
         // remove cars that no longer exist
-        foreach (var car in cars.Skip(newStatuses.Length)) {
-            Destroy(car); 
+        var carNames = newStatuses.Select(s => s.name);
+        var oldNames = cars.Keys.ToList();
+        foreach (var n in oldNames) {
+            if (!carNames.Contains(n)) {
+                Destroy(cars[n]);
+                cars.Remove(n);
+            }
         }
-
-        cars = cars
-            .Zip(newStatuses, (car, newStatus) => {
+        foreach (var newStatus in newStatuses) {
+            GameObject car;
+            if (cars.TryGetValue(newStatus.name, out car)) {
                 car.name = newStatus.name;
                 car.transform.position = newStatus.position;
                 car.transform.rotation = newStatus.rotation;
-                return car;
-            })
-            .Concat(newStatuses
-                .Skip(cars.Length)
-                .Select((newCarStatus, index) => {
-                    var raceController = FindObjectOfType<RaceController>();
-                    var carPrefab = raceController.carPrefab;
-                    var car = Instantiate(carPrefab, newCarStatus.position, newCarStatus.rotation);
-                    car.name = newCarStatus.name;
+            }
+            else
+            {
+                var raceController = FindObjectOfType<RaceController>();
+                var carPrefab = raceController.carPrefab;
+                car = Instantiate(carPrefab, newStatus.position, newStatus.rotation);
+                car.name = newStatus.name;
 
-                    Debug.Log("Add car to track: " + newCarStatus.name);
-                    var carInfo = carInfos[newCarStatus.name];
+                Debug.Log("Add car to track: " + newStatus.name);
+                var carInfo = carInfos[newStatus.name];
 
-                    car.GetComponent<Rigidbody>().isKinematic = true;
+                car.GetComponent<Rigidbody>().isKinematic = true;
 
-                    car.GetComponent<CarAppearanceController>().CarInfo = carInfo;
-                    // remove the unnecessary components that actually fails without a RaceController
-                    foreach (var c in car.GetComponentsInChildren<HudController>()) { Destroy(c); }
-                    foreach (var c in car.GetComponentsInChildren<CarController>()) { Destroy(c); }
-                    
-                    return car;
-                })
-            ).ToArray();
+                car.GetComponent<CarAppearanceController>().CarInfo = carInfo;
+                // remove the unnecessary components that actually fails without a RaceController
+                foreach (var c in car.GetComponentsInChildren<HudController>()) { Destroy(c); }
+                foreach (var c in car.GetComponentsInChildren<CarController>()) { Destroy(c); }
 
-        return cars;
+                cars[newStatus.name] = car;
+            }
+        }
     }
 }
