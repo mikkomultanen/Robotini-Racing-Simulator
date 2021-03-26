@@ -13,6 +13,7 @@ public class RaceParameters : GameEvent
     public int raceTimeoutAfterWinnerSeconds = 60;
     public CarInfo[] cars;
     public string track;
+    public string visibility = "team";
 
     public string mode = "development";
 
