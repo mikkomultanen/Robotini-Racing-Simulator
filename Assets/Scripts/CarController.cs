@@ -163,11 +163,11 @@ public class CarController : MonoBehaviour
         if (collision.gameObject.GetComponent<CarController>() != null) return; // ignore if colliding with other car
         float collidingFor = GameEvent.TimeDiff(System.DateTime.Now, this.collidingSince);
         if (collidingFor >= 2) {
-            returnToTrack(true);
+            returnToTrack();
         }
     }
 
-    private void returnToTrack(bool force) {
+    private void returnToTrack() {
         Debug.Log("Returning car to track: " + CarInfo?.name);
         var track = FindObjectOfType<SplineMesh.Spline>();
         SplineMesh.CurveSample closest = null;
@@ -183,8 +183,9 @@ public class CarController : MonoBehaviour
             }
         }
 
-        gameObject.transform.position = closest.location + 0.1f * Vector3.up;
-        gameObject.transform.rotation = closest.Rotation;
+        rigidBody.position = closest.location + 0.1f * Vector3.up;
+        rigidBody.rotation = closest.Rotation;
+        rigidBody.velocity = Vector3.zero;
         EventBus.Publish(new CarReturnedToTrack(CarInfo));
     }
 
@@ -199,8 +200,11 @@ public class CarController : MonoBehaviour
     {
         UpdateWheelPoses();
         ProcessBotCommands();
-        velocity = Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity);
-        if (velocity < 0.01f) {
+        if (rigidBody.position.y < 0) {
+            stationarySince = DateTime.MaxValue;
+            started = false;
+            returnToTrack();
+        } else if (Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity) < 0.01f) {
             if (started) {
                 if (stationarySince == DateTime.MaxValue) {
                     // Not moving, mark as colliding
@@ -208,7 +212,7 @@ public class CarController : MonoBehaviour
                 } else if (GameEvent.TimeDiff(DateTime.Now, stationarySince) >= 2) {
                     stationarySince = DateTime.MaxValue;
                     started = false;
-                    returnToTrack(false);
+                    returnToTrack();
                 }
             }
         } else {
