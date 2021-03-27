@@ -175,7 +175,7 @@ public class CarController : MonoBehaviour
         for (float i = 0; i < track.Length; i += 0.05f) {
             var curveSample = track.GetSampleAtDistance(i);
             var d = (gameObject.transform.position - 0.048f * Vector3.up - curveSample.location);
-            d.y *= 1000;
+            d.y *= 10;
             var distance = d.magnitude;
             if (distance < closestDistance) {
                 closestDistance = distance;
