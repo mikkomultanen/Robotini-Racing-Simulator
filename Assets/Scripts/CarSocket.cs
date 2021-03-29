@@ -75,16 +75,13 @@ public class CarSocket : IDisposable {
 
         var senderThread = new Thread(() =>
         {
-            using var stream = new NetworkStream(socket);
-            using var writer = new BinaryWriter(stream);
-
             while (this.socket != null)
             {
                 if (sendQueue.TryDequeue(out var data))
                 {
                     try
                     {
-                        WriteFrame(writer, data);
+                        WriteFrame(this.socket, data);
                     }
                     catch (Exception e)
                     {
@@ -103,13 +100,17 @@ public class CarSocket : IDisposable {
         senderThread.Start();
     }
 
-    private void WriteFrame(BinaryWriter writer, uint[] rawData)
+    private void WriteFrame(Socket socket, uint[] rawData)
     {
         var data = ImageConversion.EncodeArrayToPNG(rawData, GraphicsFormat.R8G8B8_UNorm, IMAGE_WIDTH, IMAGE_HEIGHT);
         if (data.Length > ushort.MaxValue) throw new Exception("Max image size exceeded");
 
-        writer.Write((ushort) data.Length);
-        writer.Write(data);
+        // We could write this directly with a single method call... except this is in big endian.
+        byte lowerByte = (byte)(data.Length & 0xff);
+        byte higherByte = (byte)((data.Length & 0xff00) >> 8);
+
+        socket.Send(new[] { higherByte, lowerByte });
+        socket.Send(data);
     }
 
     private void disconnected()
