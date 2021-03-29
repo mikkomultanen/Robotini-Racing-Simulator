@@ -146,17 +146,14 @@ public class CarSocket : IDisposable {
     
     public IEnumerable<JsonControlCommand> ReceiveCommands()
     {        
-        var commands = new List<JsonControlCommand>();
-        JsonControlCommand command = null;
-        while (recvQueue.TryDequeue(out command))
+        while (recvQueue.TryDequeue(out var command))
         {
             if (command != null)
             {
                 // Seems we get null commands sometimes, when socket closing or something
-                commands.Add(command);
-            }            
+                yield return command;
+            }           
         }
-        return commands;
     }
 
     public void Dispose()
