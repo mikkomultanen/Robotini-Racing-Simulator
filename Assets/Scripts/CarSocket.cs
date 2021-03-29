@@ -23,8 +23,9 @@ public class CarSocket : IDisposable {
 
         var receiverThread = new Thread(() =>
         {
-            var stream = new NetworkStream(socket);
-            var reader = new StreamReader(stream);
+            using var stream = new NetworkStream(socket);
+            using var reader = new StreamReader(stream);
+
             try
             {
                 Debug.Log("Reading car info...");
@@ -74,6 +75,9 @@ public class CarSocket : IDisposable {
 
         var senderThread = new Thread(() =>
         {
+            using var stream = new NetworkStream(socket);
+            using var writer = new BinaryWriter(stream);
+
             while (this.socket != null)
             {
                 uint[] data;
@@ -82,7 +86,7 @@ public class CarSocket : IDisposable {
                 {
                     try
                     {
-                        socket.Send(encodeFrame(data));
+                        WriteFrame(writer, data);
                     }
                     catch (Exception e)
                     {
@@ -101,16 +105,13 @@ public class CarSocket : IDisposable {
         senderThread.Start();
     }
 
-    private byte[] encodeFrame(uint[] rawData)
+    private void WriteFrame(BinaryWriter writer, uint[] rawData)
     {
         var data = ImageConversion.EncodeArrayToPNG(rawData, GraphicsFormat.R8G8B8_UNorm, IMAGE_WIDTH, IMAGE_HEIGHT);
-        if (data.Length > 65535) throw new Exception("Max image size exceeded");
-        byte lowerByte = (byte)(data.Length & 0xff);
-        byte higherByte = (byte)((data.Length & 0xff00) >> 8);
-        //Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
-        byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
-        byte[] encodedBytes = lengthAsBytes.Concat(data).ToArray();
-        return encodedBytes;
+        if (data.Length > ushort.MaxValue) throw new Exception("Max image size exceeded");
+
+        writer.Write((ushort) data.Length);
+        writer.Write(data);
     }
 
     private void disconnected()
