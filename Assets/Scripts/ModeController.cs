@@ -26,19 +26,14 @@ public class ModeController : MonoBehaviour
                 {
                     Debug.Log("Environment " + Application.platform + " detected.");
                     string mode = RaceParameters.readRaceParameters().mode;
-                    switch (mode)
+                    _mode = mode switch
                     {
-                        case "development":
-                            _mode = SimulatorMode.Development; break;
-                        case "race":
-                            _mode = SimulatorMode.Race; break;
-                        case "playback":
-                            _mode = SimulatorMode.Playback; break;
-                        case "remote":
-                            _mode = SimulatorMode.RemoteControl; break;
-                        default:
-                            throw new Exception("Illegal mode " + mode + ", expecting race or development");
-                    }
+                        "development" => SimulatorMode.Development,
+                        "race" => SimulatorMode.Race,
+                        "playback" => SimulatorMode.Playback,
+                        "remote" => SimulatorMode.RemoteControl,
+                        _ => throw new Exception("Illegal mode " + mode + ", expecting race or development"),
+                    };
                 }
             }
             return _mode;
