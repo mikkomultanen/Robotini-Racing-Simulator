@@ -31,13 +31,13 @@ public class BigTextDisplay : MonoBehaviour
             {
                 return keepShowing("Free practice");
             }
-            else if (e is RaceWon)
+            else if (e is RaceWon raceWon)
             {
-                return showForAWhile("Winner: " + (e as RaceWon).car.name);
+                return showForAWhile("Winner: " + raceWon.car.name);
             }
-            else if (e is RaceFinished)
+            else if (e is RaceFinished raceFinished)
             {
-                return keepShowing("Race over. Winner: " + (e as RaceFinished).standings.FirstOrDefault()?.car?.name);
+                return keepShowing("Race over. Winner: " + raceFinished.standings.FirstOrDefault()?.car?.name);
             }
             else if (e is FreePracticeStart) {
                 return keepShowing("Free practice");

@@ -52,7 +52,7 @@ public class SpectatorSocket : MonoBehaviour
                     Spectate(b => {stream.Write(b); stream.Flush(); }, () => stream.Close(), new CarInfo[] { });
                 }
                 EventBus.Subscribe<CarAdded>(this, e => {
-                    CarInfo car = ((CarAdded)e).car;
+                    CarInfo car = e.car;
                     carInfos.Add(car.name, car);
                 });
                 EventBus.Subscribe<RaceFinished>(this, e => {
