@@ -80,9 +80,7 @@ public class CarSocket : IDisposable {
 
             while (this.socket != null)
             {
-                uint[] data;
-
-                if (sendQueue.TryDequeue(out data))
+                if (sendQueue.TryDequeue(out var data))
                 {
                     try
                     {

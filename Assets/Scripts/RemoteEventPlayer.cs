@@ -15,8 +15,7 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
         {
             CarInfo carInfo = ((CarAdded)e).car;
             carInfos.Add(carInfo.name, carInfo);
-            GameObject car;
-            if (cars.TryGetValue(carInfo.name, out car)) {
+            if (cars.TryGetValue(carInfo.name, out var car)) {
                 car.GetComponent<CarAppearanceController>().CarInfo = carInfo;
             }
         }
@@ -39,8 +38,7 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
             }
         }
         foreach (var newStatus in newStatuses) {
-            GameObject car;
-            if (cars.TryGetValue(newStatus.name, out car)) {
+            if (cars.TryGetValue(newStatus.name, out var car)) {
                 car.name = newStatus.name;
                 car.transform.position = newStatus.position;
                 car.transform.rotation = newStatus.rotation;
@@ -55,8 +53,7 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
                 Debug.Log("Add car to track: " + newStatus.name);
                 car.GetComponent<Rigidbody>().isKinematic = true;
 
-                CarInfo carInfo;
-                if (carInfos.TryGetValue(newStatus.name, out carInfo)) {
+                if (carInfos.TryGetValue(newStatus.name, out var carInfo)) {
                     car.GetComponent<CarAppearanceController>().CarInfo = carInfo;
                 }
 
