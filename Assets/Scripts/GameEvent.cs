@@ -88,6 +88,16 @@ public class CarInfo
     }
 }
 
+[Serializable]
+public class CarLogin : CarInfo
+{
+    public int imageWidth;
+    public CarLogin(string teamId, string name, string color, int imageWidth): base(teamId, name, color)
+    {
+        this.imageWidth = imageWidth;
+    }
+}
+
 public abstract class CarEvent: GameEvent {
     public CarInfo car;
 

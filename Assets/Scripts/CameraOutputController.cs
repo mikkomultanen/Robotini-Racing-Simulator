@@ -88,19 +88,21 @@ public class CameraOutputController : MonoBehaviour
     private void Start()
     {
         mCamera = GetComponent<Camera>();
-        renderTexture = new RenderTexture((int)CarSocket.IMAGE_WIDTH, (int)CarSocket.IMAGE_HEIGHT, 24, RenderTextureFormat.ARGB32);
+        renderTexture = new RenderTexture((int)socket.imageWidth, (int)socket.imageHeight, 24, RenderTextureFormat.ARGB32);
         renderTexture.antiAliasing = 2;
         for (int i = 0; i < readers.Length; ++i)
         {
-            readers[i] = new GPUReader((int)CarSocket.IMAGE_WIDTH * (int)CarSocket.IMAGE_HEIGHT);
+            readers[i] = new GPUReader((int)socket.imageWidth * (int)socket.imageHeight);
         }
-        virtualPhoto = new Texture2D((int)CarSocket.IMAGE_WIDTH, (int)CarSocket.IMAGE_HEIGHT, TextureFormat.RGB24, false);
+        virtualPhoto = new Texture2D((int)socket.imageWidth, (int)socket.imageHeight, TextureFormat.RGB24, false);
         Debug.Log("CameraOutputController started");
         mCamera.rect = new Rect(0, 0, 1, 1);
-        mCamera.aspect = 1.0f * CarSocket.IMAGE_WIDTH / CarSocket.IMAGE_HEIGHT;
+        mCamera.aspect = 1.0f * socket.imageWidth / socket.imageHeight;
         mCamera.targetTexture = renderTexture;
         mCamera.enabled = ShouldEnableCamera;
+
         RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
+
         this.async = SystemInfo.supportsAsyncGPUReadback;
         Debug.Log("Async GPU Readback supported: " + this.async);
         logger = FindObjectOfType<FPSLogger>();
@@ -155,7 +157,7 @@ public class CameraOutputController : MonoBehaviour
     void ReadSync()
     {
         RenderTexture.active = renderTexture;
-        virtualPhoto.ReadPixels(new Rect(0, 0, CarSocket.IMAGE_WIDTH, CarSocket.IMAGE_HEIGHT), 0, 0);
+        virtualPhoto.ReadPixels(new Rect(0, 0, socket.imageWidth, socket.imageHeight), 0, 0);
         virtualPhoto.Apply();
         RenderTexture.active = null; //can help avoid errors 
 

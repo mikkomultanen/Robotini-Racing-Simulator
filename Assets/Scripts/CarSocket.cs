@@ -13,32 +13,41 @@ public class VirtualCarSocket {
 }
 
 public abstract class CarSocketBase {
+    public static uint IMAGE_WIDTH = 128;
+    public static uint IMAGE_HEIGHT = 80;
+    public uint imageWidth = IMAGE_WIDTH;
+    public uint imageHeight = IMAGE_HEIGHT;
+
     protected readonly ConcurrentQueue<JsonControlCommand> recvQueue = new ConcurrentQueue<JsonControlCommand>();
     protected readonly ConcurrentQueue<uint[]> sendQueue = new ConcurrentQueue<uint[]>();
     private CarInfo carInfo;
+
     public volatile bool FrameRequested = false;
 
-    protected void init(CarInfo c)
+    protected void init(CarLogin c)
     {
-        this.carInfo = c;
         // TODO: respond with error msgs
-        if (carInfo.name == null || carInfo.name == "") throw new Exception("CarInfo.name missing");
-        if (carInfo.teamId == null || carInfo.teamId == "") throw new Exception("CarInfo.teamId missing");
+        if (c.name == null || c.name == "") throw new Exception("CarInfo.name missing");
+        if (c.teamId == null || c.teamId == "") throw new Exception("CarInfo.teamId missing");
 
         var raceParameters = RaceParameters.readRaceParameters();
         var cars = raceParameters.cars;
-        var found = cars?.FirstOrDefault(c => c.teamId == carInfo.teamId);
+        var found = cars?.FirstOrDefault(d => d.teamId == c.teamId);
         if (found != null)
         {
-            carInfo.name = found.name;
-            carInfo.color = found.color;
-            carInfo.texture = found.texture;
+            carInfo = found;
         }
         else if (raceParameters.mode == "race")
         {
-            throw new Exception("Team not found: " + carInfo.teamId);
+            throw new Exception("Team not found: " + c.teamId);
         }
-        Debug.Log("Using car name " + carInfo.name);
+        else {
+            carInfo = new CarInfo(c.teamId, c.name, c.color);
+        }
+
+        this.imageWidth = (c.imageWidth < 8 || c.imageWidth > 128) ? 128 : (uint)c.imageWidth;
+        this.imageHeight = imageWidth * IMAGE_HEIGHT / IMAGE_WIDTH;
+        Debug.Log("Using car name " + carInfo.name + " and image size " + imageWidth + "x" + imageHeight);
         EventBus.Publish(new CarConnected(carInfo, this));
 
         FrameRequested = true;
@@ -78,8 +87,6 @@ public abstract class CarSocketBase {
 }
 
 public class CarSocket : CarSocketBase, IDisposable {
-    public static uint IMAGE_WIDTH = 128;
-    public static uint IMAGE_HEIGHT = 80;
     private volatile Socket socket;
 
     public CarSocket(Socket socket, RaceController raceController)
@@ -96,7 +103,7 @@ public class CarSocket : CarSocketBase, IDisposable {
                 var line = reader.ReadLine();
                 Debug.Log("Received info " + line);
 
-                init(JsonUtility.FromJson<CarInfo>(line));
+                init(JsonUtility.FromJson<CarLogin>(line));
 
                 while (this.socket != null)
                 {
@@ -148,7 +155,7 @@ public class CarSocket : CarSocketBase, IDisposable {
 
     private byte[] encodeFrame(uint[] rawData)
     {
-        var data = ImageConversion.EncodeArrayToPNG(rawData, GraphicsFormat.R8G8B8_UNorm, IMAGE_WIDTH, IMAGE_HEIGHT);
+        var data = ImageConversion.EncodeArrayToPNG(rawData, GraphicsFormat.R8G8B8_UNorm, imageWidth, imageHeight);
         if (data.Length > 65535) throw new Exception("Max image size exceeded");
         byte lowerByte = (byte)(data.Length & 0xff);
         byte higherByte = (byte)((data.Length & 0xff00) >> 8);
