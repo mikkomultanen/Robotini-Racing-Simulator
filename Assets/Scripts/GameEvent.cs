@@ -88,6 +88,16 @@ public class CarInfo
     }
 }
 
+[Serializable]
+public class CarLogin : CarInfo
+{
+    public int imageWidth;
+    public CarLogin(string teamId, string name, string color, int imageWidth): base(teamId, name, color)
+    {
+        this.imageWidth = imageWidth;
+    }
+}
+
 public abstract class CarEvent: GameEvent {
     public CarInfo car;
 
@@ -262,8 +272,8 @@ public class CarDisconnected : CarEvent
 
 public class CarConnected : CarEvent
 {
-    public CarSocket socket; // <- non serializable object, not included in JSON
-    public CarConnected(CarInfo car, CarSocket socket): base(car)
+    public CarSocketBase socket; // <- non serializable object, not included in JSON
+    public CarConnected(CarInfo car, CarSocketBase socket): base(car)
     {
         this.socket = socket;
     }
@@ -295,5 +305,9 @@ public class MotorsToggle: UICommand
 }
 
 public class ProceedToNextPhase: UICommand
+{
+}
+
+public class ResetSimulator: UICommand
 {
 }

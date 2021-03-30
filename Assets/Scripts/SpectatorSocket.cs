@@ -55,6 +55,7 @@ public class SpectatorSocket : MonoBehaviour
                     CarInfo car = e.car;
                     carInfos.Add(car.name, car);
                 });
+
                 EventBus.Subscribe<RaceFinished>(this, e => {
                     Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => {
                         Debug.Log("Race finished, stopping updates");

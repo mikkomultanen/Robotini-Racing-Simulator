@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.IO;
 using UniRx;
+using System.Runtime.InteropServices;
 
 public class PlaybackController : RemoteEventPlayer
 {
@@ -43,6 +44,12 @@ public class PlaybackController : RemoteEventPlayer
 
     }
 
+
+#if UNITY_WEBGL
+    [DllImport("__Internal")]
+    private static extern void HelloString(string str);
+#endif
+
     // Called from the page javascript!
     public void PlayUrl(string url) 
     {
@@ -56,11 +63,19 @@ public class PlaybackController : RemoteEventPlayer
         ApplyEvent(GameEvent.FromJson(eventJson));
     }
 
+    public void Ping(string msg) {
+#if UNITY_WEBGL
+        HelloString(msg);
+#endif
+    }
+
     // Called from the page javascript!
     public void ResetPlayback() {
         this.events = new GameEvent[] { };
         this.position = 0;
         this.index = 0;
+        UpdateCars(new CarStatus[]{ });
+        EventBus.Publish(new ResetSimulator());
     }   
 
     private void Update()

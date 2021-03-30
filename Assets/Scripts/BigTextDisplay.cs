@@ -42,6 +42,9 @@ public class BigTextDisplay : MonoBehaviour
             else if (e is FreePracticeStart) {
                 return keepShowing("Free practice");
             }
+            else if (e is ResetSimulator) {
+                return keepShowing("");
+            }
             return Observable.Never<string>();
         }).Switch();
         events.Subscribe(showBigText);

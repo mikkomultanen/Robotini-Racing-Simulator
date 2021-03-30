@@ -29,7 +29,7 @@ public class CarController : MonoBehaviour
     [HideInInspector]
     public Rigidbody rigidBody;
 
-    private volatile CarSocket socket;
+    private volatile CarSocketBase socket;
     private WheelCollider[] allWheels;
     private DateTime collidingSince = DateTime.MaxValue;
     private DateTime stationarySince = DateTime.MaxValue;
@@ -231,7 +231,7 @@ public class CarController : MonoBehaviour
         }
     }
 
-    public void SetSocket(CarSocket socket) {
+    public void SetSocket(CarSocketBase socket) {
         this.socket = socket;
         var cameraOutput = GetComponentInChildren<CameraOutputController>();
         cameraOutput.SetSocket(socket);        
