@@ -74,7 +74,7 @@ public class CameraOutputController : MonoBehaviour
     private uint[] latestCameraData = null;
     private bool read = false;
     private bool async;
-    private volatile CarSocket socket;
+    private volatile CarSocketBase socket;
     FPSLogger logger;
 
     public Camera Camera {
@@ -182,7 +182,7 @@ public class CameraOutputController : MonoBehaviour
         get { return renderTexture; }
     }
 
-    public void SetSocket(CarSocket socket)
+    public void SetSocket(CarSocketBase socket)
     {
         if (this.socket != null) return;
         this.socket = socket;

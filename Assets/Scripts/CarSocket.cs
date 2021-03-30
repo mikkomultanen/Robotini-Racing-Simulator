@@ -8,14 +8,79 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
-public class CarSocket : IDisposable {
+public class VirtualCarSocket {
+
+}
+
+public abstract class CarSocketBase {
+    protected readonly ConcurrentQueue<JsonControlCommand> recvQueue = new ConcurrentQueue<JsonControlCommand>();
+    protected readonly ConcurrentQueue<uint[]> sendQueue = new ConcurrentQueue<uint[]>();
+    private CarInfo carInfo;
+    public volatile bool FrameRequested = false;
+
+    protected void init(CarInfo c)
+    {
+        this.carInfo = c;
+        // TODO: respond with error msgs
+        if (carInfo.name == null || carInfo.name == "") throw new Exception("CarInfo.name missing");
+        if (carInfo.teamId == null || carInfo.teamId == "") throw new Exception("CarInfo.teamId missing");
+
+        var raceParameters = RaceParameters.readRaceParameters();
+        var cars = raceParameters.cars;
+        var found = cars?.FirstOrDefault(c => c.teamId == carInfo.teamId);
+        if (found != null)
+        {
+            carInfo.name = found.name;
+            carInfo.color = found.color;
+            carInfo.texture = found.texture;
+        }
+        else if (raceParameters.mode == "race")
+        {
+            throw new Exception("Team not found: " + carInfo.teamId);
+        }
+        Debug.Log("Using car name " + carInfo.name);
+        EventBus.Publish(new CarConnected(carInfo, this));
+
+        FrameRequested = true;
+    }
+
+    public CarInfo CarInfo { get {
+        return carInfo;
+    }}
+
+
+    public abstract bool IsConnected();
+
+    public void Send(uint[] data)
+    {
+        sendQueue.Enqueue(data);
+    }
+
+    public int SendQueueSize()
+    {
+        return sendQueue.Count;
+    }
+
+    public IEnumerable<JsonControlCommand> ReceiveCommands()
+    {        
+        var commands = new List<JsonControlCommand>();
+        JsonControlCommand command = null;
+        while (recvQueue.TryDequeue(out command))
+        {
+            if (command != null)
+            {
+                // Seems we get null commands sometimes, when socket closing or something
+                commands.Add(command);
+            }            
+        }
+        return commands;
+    }
+}
+
+public class CarSocket : CarSocketBase, IDisposable {
     public static uint IMAGE_WIDTH = 128;
     public static uint IMAGE_HEIGHT = 80;
     private volatile Socket socket;
-    private readonly ConcurrentQueue<JsonControlCommand> recvQueue = new ConcurrentQueue<JsonControlCommand>();
-    private readonly ConcurrentQueue<uint[]> sendQueue = new ConcurrentQueue<uint[]>();
-    private CarInfo carInfo;
-    public volatile bool FrameRequested = false;
 
     public CarSocket(Socket socket, RaceController raceController)
     {
@@ -29,29 +94,9 @@ public class CarSocket : IDisposable {
             {
                 Debug.Log("Reading car info...");
                 var line = reader.ReadLine();
-                this.carInfo = JsonUtility.FromJson<CarInfo>(line);
                 Debug.Log("Received info " + line);
-                // TODO: respond with error msgs
-                if (carInfo.name == null || carInfo.name == "") throw new Exception("CarInfo.name missing");
-                if (carInfo.teamId == null || carInfo.teamId == "") throw new Exception("CarInfo.teamId missing");
 
-                var raceParameters = RaceParameters.readRaceParameters();
-                var cars = raceParameters.cars;
-                var found = cars?.FirstOrDefault(c => c.teamId == carInfo.teamId);
-                if (found != null)
-                {
-                    carInfo.name = found.name;
-                    carInfo.color = found.color;
-                    carInfo.texture = found.texture;
-                }
-                else if (raceParameters.mode == "race")
-                {
-                    throw new Exception("Team not found: " + carInfo.teamId);
-                }
-                Debug.Log("Using car name " + carInfo.name);
-                EventBus.Publish(new CarConnected(carInfo, this));
-
-                FrameRequested = true;
+                init(JsonUtility.FromJson<CarInfo>(line));
 
                 while (this.socket != null)
                 {
@@ -115,47 +160,18 @@ public class CarSocket : IDisposable {
 
     private void disconnected()
     {
-        if (this.carInfo != null) {
-            Debug.Log("Car disconnected: " + carInfo.name);
-            EventBus.Publish(new CarDisconnected(carInfo));
+        if (this.CarInfo != null) {
+            Debug.Log("Car disconnected: " + CarInfo.name);
+            EventBus.Publish(new CarDisconnected(CarInfo));
         } else {
             Debug.Log("Car disconnected: " + socket.RemoteEndPoint);
         }
         this.socket = null;
     }
 
-    public Boolean IsConnected()
+    public override Boolean IsConnected()
     {
         return socket != null;
-    }
-
-    public CarInfo CarInfo { get {
-        return carInfo;
-    } }
-
-    public void Send(uint[] data)
-    {
-        sendQueue.Enqueue(data);
-    }
-
-    public int SendQueueSize()
-    {
-        return sendQueue.Count;
-    }
-    
-    public IEnumerable<JsonControlCommand> ReceiveCommands()
-    {        
-        var commands = new List<JsonControlCommand>();
-        JsonControlCommand command = null;
-        while (recvQueue.TryDequeue(out command))
-        {
-            if (command != null)
-            {
-                // Seems we get null commands sometimes, when socket closing or something
-                commands.Add(command);
-            }            
-        }
-        return commands;
     }
 
     public void Dispose()

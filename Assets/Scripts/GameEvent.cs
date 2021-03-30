@@ -262,8 +262,8 @@ public class CarDisconnected : CarEvent
 
 public class CarConnected : CarEvent
 {
-    public CarSocket socket; // <- non serializable object, not included in JSON
-    public CarConnected(CarInfo car, CarSocket socket): base(car)
+    public CarSocketBase socket; // <- non serializable object, not included in JSON
+    public CarConnected(CarInfo car, CarSocketBase socket): base(car)
     {
         this.socket = socket;
     }
