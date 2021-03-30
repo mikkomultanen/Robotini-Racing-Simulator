@@ -44,6 +44,9 @@ public class PlaybackController : RemoteEventPlayer
 
     }
 
+    [DllImport("__Internal")]
+    private static extern void HelloString(string str);
+
     // Called from the page javascript!
     public void PlayUrl(string url) 
     {
@@ -55,6 +58,10 @@ public class PlaybackController : RemoteEventPlayer
     public void ApplyJSONEvent(string eventJson) 
     {
         ApplyEvent(GameEvent.FromJson(eventJson));
+    }
+
+    public void Ping(string msg) {
+        HelloString(msg);
     }
 
     // Called from the page javascript!
