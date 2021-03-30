@@ -44,8 +44,11 @@ public class PlaybackController : RemoteEventPlayer
 
     }
 
+
+#if UNITY_WEBGL
     [DllImport("__Internal")]
     private static extern void HelloString(string str);
+#endif
 
     // Called from the page javascript!
     public void PlayUrl(string url) 
@@ -61,7 +64,9 @@ public class PlaybackController : RemoteEventPlayer
     }
 
     public void Ping(string msg) {
+#if UNITY_WEBGL
         HelloString(msg);
+#endif
     }
 
     // Called from the page javascript!
