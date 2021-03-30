@@ -72,17 +72,14 @@ public abstract class CarSocketBase {
 
     public IEnumerable<JsonControlCommand> ReceiveCommands()
     {        
-        var commands = new List<JsonControlCommand>();
-        JsonControlCommand command = null;
-        while (recvQueue.TryDequeue(out command))
+        while (recvQueue.TryDequeue(out var command))
         {
             if (command != null)
             {
                 // Seems we get null commands sometimes, when socket closing or something
-                commands.Add(command);
-            }            
+                yield return command;
+            }           
         }
-        return commands;
     }
 }
 
@@ -95,8 +92,9 @@ public class CarSocket : CarSocketBase, IDisposable {
 
         var receiverThread = new Thread(() =>
         {
-            var stream = new NetworkStream(socket);
-            var reader = new StreamReader(stream);
+            using var stream = new NetworkStream(socket);
+            using var reader = new StreamReader(stream);
+
             try
             {
                 Debug.Log("Reading car info...");
@@ -128,13 +126,11 @@ public class CarSocket : CarSocketBase, IDisposable {
         {
             while (this.socket != null)
             {
-                uint[] data;
-
-                if (sendQueue.TryDequeue(out data))
+                if (sendQueue.TryDequeue(out var data))
                 {
                     try
                     {
-                        socket.Send(encodeFrame(data));
+                        WriteFrame(this.socket, data);
                     }
                     catch (Exception e)
                     {
@@ -153,16 +149,17 @@ public class CarSocket : CarSocketBase, IDisposable {
         senderThread.Start();
     }
 
-    private byte[] encodeFrame(uint[] rawData)
+    private void WriteFrame(Socket socket, uint[] rawData)
     {
         var data = ImageConversion.EncodeArrayToPNG(rawData, GraphicsFormat.R8G8B8_UNorm, imageWidth, imageHeight);
-        if (data.Length > 65535) throw new Exception("Max image size exceeded");
+        if (data.Length > ushort.MaxValue) throw new Exception("Max image size exceeded");
+
+        // We could write this directly with a single method call... except this is in big endian.
         byte lowerByte = (byte)(data.Length & 0xff);
         byte higherByte = (byte)((data.Length & 0xff00) >> 8);
-        //Debug.Log("Length " + data.Length + " " + higherByte + " " + lowerByte);
-        byte[] lengthAsBytes = new byte[] { higherByte, lowerByte };
-        byte[] encodedBytes = lengthAsBytes.Concat(data).ToArray();
-        return encodedBytes;
+
+        socket.Send(new[] { higherByte, lowerByte });
+        socket.Send(data);
     }
 
     private void disconnected()

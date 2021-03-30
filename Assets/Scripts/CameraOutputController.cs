@@ -145,8 +145,7 @@ public class CameraOutputController : MonoBehaviour
     {
         readers[NEXT].Read(renderTexture);
 
-        uint[] data;
-        if (readers[CURRENT].WriteTo(out data))
+        if (readers[CURRENT].WriteTo(out var data))
         {
             latestCameraData = data;
         }

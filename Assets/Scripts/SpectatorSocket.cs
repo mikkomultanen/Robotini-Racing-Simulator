@@ -52,7 +52,7 @@ public class SpectatorSocket : MonoBehaviour
                     Spectate(b => {stream.Write(b); stream.Flush(); }, () => stream.Close(), new CarInfo[] { });
                 }
                 EventBus.Subscribe<CarAdded>(this, e => {
-                    CarInfo car = ((CarAdded)e).car;
+                    CarInfo car = e.car;
                     carInfos.Add(car.name, car);
                 });
 
@@ -189,7 +189,6 @@ public class SpectatorSocket : MonoBehaviour
             var subscription = EventBus.Receive<GameEvent>().Subscribe(e => {
                 eventQueue.Enqueue(e);
             });
-            GameEvent gameEvent = null;
             eventQueue.Enqueue(RaceParameters.readRaceParameters());
             foreach (var car in initialCars) {
                 eventQueue.Enqueue(new CarAdded(car));
@@ -198,7 +197,7 @@ public class SpectatorSocket : MonoBehaviour
             {
                 while (listener != null)
                 {
-                    if (eventQueue.TryDequeue(out gameEvent))
+                    if (eventQueue.TryDequeue(out var gameEvent))
                     {
                         //Debug.Log("Sending event " + gameEvent.type);                        
                         send(gameEvent);                    

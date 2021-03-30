@@ -66,8 +66,7 @@ public class RemoteController : RemoteEventPlayer
     // Update is called once per frame
     void Update()
     {
-        GameEvent command = null;
-        while (recvQueue.TryDequeue(out command))
+        while (recvQueue.TryDequeue(out var command))
         {
             if (command != null)
             {

@@ -8,21 +8,21 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
 
     public void ApplyEvent(GameEvent e)
     {
-        if (e is RaceParameters) {
-            FindObjectOfType<TrackController>().LoadTrack(((RaceParameters)e).track);
-        }
-        else if (e is CarAdded)
+        if (e is RaceParameters raceParameters)
         {
-            CarInfo carInfo = ((CarAdded)e).car;
+            FindObjectOfType<TrackController>().LoadTrack(raceParameters.track);
+        }
+        else if (e is CarAdded carAdded)
+        {
+            CarInfo carInfo = carAdded.car;
             carInfos.Add(carInfo.name, carInfo);
-            GameObject car;
-            if (cars.TryGetValue(carInfo.name, out car)) {
+            if (cars.TryGetValue(carInfo.name, out var car)) {
                 car.GetComponent<CarAppearanceController>().CarInfo = carInfo;
             }
         }
-        else if (e is GameStatus)
+        else if (e is GameStatus gameStatus)
         {
-            UpdateCars((e as GameStatus).cars);
+            UpdateCars(gameStatus.cars);
         }
         EventBus.Publish(e);
     }
@@ -39,8 +39,7 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
             }
         }
         foreach (var newStatus in newStatuses) {
-            GameObject car;
-            if (cars.TryGetValue(newStatus.name, out car)) {
+            if (cars.TryGetValue(newStatus.name, out var car)) {
                 car.name = newStatus.name;
                 car.transform.position = newStatus.position;
                 car.transform.rotation = newStatus.rotation;
@@ -55,8 +54,7 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
                 Debug.Log("Add car to track: " + newStatus.name);
                 car.GetComponent<Rigidbody>().isKinematic = true;
 
-                CarInfo carInfo;
-                if (carInfos.TryGetValue(newStatus.name, out carInfo)) {
+                if (carInfos.TryGetValue(newStatus.name, out var carInfo)) {
                     car.GetComponent<CarAppearanceController>().CarInfo = carInfo;
                 }
 
