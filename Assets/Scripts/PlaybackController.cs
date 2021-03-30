@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.IO;
 using UniRx;
+using System.Runtime.InteropServices;
 
 public class PlaybackController : RemoteEventPlayer
 {
@@ -61,6 +62,8 @@ public class PlaybackController : RemoteEventPlayer
         this.events = new GameEvent[] { };
         this.position = 0;
         this.index = 0;
+        UpdateCars(new CarStatus[]{ });
+        EventBus.Publish(new ResetSimulator());
     }   
 
     private void Update()

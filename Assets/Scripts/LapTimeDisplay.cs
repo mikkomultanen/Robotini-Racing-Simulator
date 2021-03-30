@@ -51,6 +51,9 @@ public class LapTimeDisplay : MonoBehaviour
                 timers.Remove(key);
             }
         });
+        EventBus.Subscribe<ResetSimulator>(this, e => {
+            ResetTimers();
+        });
     }
 
     private void addCar(CarInfo car)

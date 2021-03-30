@@ -297,3 +297,7 @@ public class MotorsToggle: UICommand
 public class ProceedToNextPhase: UICommand
 {
 }
+
+public class ResetSimulator: UICommand
+{
+}

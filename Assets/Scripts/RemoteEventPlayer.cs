@@ -27,7 +27,7 @@ public abstract class RemoteEventPlayer : MonoBehaviour {
         EventBus.Publish(e);
     }
 
-    void UpdateCars(CarStatus[] newStatuses)
+    public void UpdateCars(CarStatus[] newStatuses)
     {
         // remove cars that no longer exist
         var carNames = newStatuses.Select(s => s.name);
