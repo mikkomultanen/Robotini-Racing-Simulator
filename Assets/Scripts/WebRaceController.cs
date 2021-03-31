@@ -15,8 +15,7 @@ public class WebRaceController : MonoBehaviour
 #endif
 
     public void SendToWeb(GameEvent msg) {
-        string jsonString = JsonUtility.ToJson(msg);
-        Debug.Log("Trying to send: " + jsonString);
+        string jsonString = JsonUtility.ToJson(msg);        
 #if UNITY_EDITOR
         Debug.Log("Would send to web: " + jsonString);
 #elif UNITY_WEBGL

@@ -62,6 +62,10 @@ public class RaceController : MonoBehaviour
         setState(new FreePractice(this));
     }
 
+    public Boolean IsSimulation { get {
+        return this.state is Simulation;
+    } }
+
     bool isCurrentState(State state) {
         return this.state == state;
     }
@@ -115,7 +119,7 @@ public class RaceController : MonoBehaviour
         }
     }
 
-    public class RaceLobby: State
+    public class RaceLobby: Simulation
     {
         private Dictionary<string, CarConnected> cars = new Dictionary<string, CarConnected>();
 
@@ -149,6 +153,13 @@ public class RaceController : MonoBehaviour
 
         public override void OnSessionFinish() {
             c.setState(new Qualifying(c, cars.Values.ToArray()));
+        }
+    }
+
+    public abstract class Simulation : State {
+        public Simulation(RaceController c): base(c)
+        {
+            
         }
     }
 
@@ -207,7 +218,7 @@ public class RaceController : MonoBehaviour
         }
     }
 
-    public class StartingGrid : State
+    public class StartingGrid : Simulation
     {
         CarInfo[] startingGrid;
 
@@ -371,7 +382,7 @@ public class RaceController : MonoBehaviour
         }
     }
 
-    public abstract class Racing : State
+    public abstract class Racing : Simulation
     {
         public bool qualifying = true;
         public Racing(RaceController c): base(c)

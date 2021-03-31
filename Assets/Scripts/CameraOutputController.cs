@@ -240,7 +240,11 @@ public class CameraOutputController : MonoBehaviour
 
     public static bool ShouldEnableCamera
     {
-        get { return ModeController.Mode == SimulatorMode.Development || ModeController.Mode == SimulatorMode.Race; }
+        get {
+            var enable = FindObjectOfType<RaceController>().IsSimulation;
+            Debug.Log("Enable camera:" + enable);
+            return enable;
+        }
     }
     private void Start()
     {
