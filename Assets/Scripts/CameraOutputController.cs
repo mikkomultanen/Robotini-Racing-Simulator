@@ -267,6 +267,7 @@ public class CameraOutputController : MonoBehaviour
             if (async) {
                 this.c = new AsyncC(s, renderTexture, logger);
             } else {
+                // TODO: Async GPU doesn't currently work, needs a re-impl.
                 this.c = new SyncC(s, renderTexture, logger);
             }
         } else if (socket is WebCarSocket ws) {
