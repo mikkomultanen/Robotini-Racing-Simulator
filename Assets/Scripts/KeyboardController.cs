@@ -11,6 +11,13 @@ public class KeyboardController : MonoBehaviour
         useRemoteCameraPosition = true;
     }
 
+    private void Start()
+    {
+       #if !UNITY_EDITOR && UNITY_WEBGL
+        WebGLInput.captureAllKeyboardInput = false;
+       #endif
+    }
+
     private void Update()
     {
         if (!useRemoteCameraPosition) {
