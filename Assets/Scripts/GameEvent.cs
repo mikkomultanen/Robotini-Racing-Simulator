@@ -58,7 +58,7 @@ public class GameStatus: GameEvent
 }
 
 [Serializable]
-public class CarInfo
+public class CarInfo: GameEvent
 {
     public string teamId;
     public string name;
@@ -310,4 +310,21 @@ public class ProceedToNextPhase: UICommand
 
 public class ResetSimulator: UICommand
 {
+}
+
+public class WebCarCommand: UICommand
+{
+    public string carName;
+    public JsonControlCommand command;
+}
+
+public class WebCarFrame: GameEvent
+{
+    public string carName;
+    public int[] pixels;
+    public WebCarFrame(string carName, int[] pixels)
+    {
+        this.carName = carName;
+        this.pixels = pixels;
+    }
 }

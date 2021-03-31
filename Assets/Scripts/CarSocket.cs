@@ -8,8 +8,23 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
-public class VirtualCarSocket {
+public class WebCarSocket: CarSocketBase {
+    WebRaceController controller;
+    public WebCarSocket(CarLogin login, WebRaceController controller) {
+        init(login);
+        this.controller = controller;
+    }
 
+    public override bool IsConnected()
+    {
+        return true;
+    }
+
+    public void Send(Color32[] data)
+    {
+        var pixels = data.SelectMany(color => new int[] { color.r, color.g, color.b }).ToArray();
+        controller.SendToWeb(new WebCarFrame(CarInfo.name, pixels));
+    }
 }
 
 public abstract class CarSocketBase {
@@ -19,7 +34,6 @@ public abstract class CarSocketBase {
     public uint imageHeight = IMAGE_HEIGHT;
 
     protected readonly ConcurrentQueue<JsonControlCommand> recvQueue = new ConcurrentQueue<JsonControlCommand>();
-    protected readonly ConcurrentQueue<uint[]> sendQueue = new ConcurrentQueue<uint[]>();
     private CarInfo carInfo;
 
     public volatile bool FrameRequested = false;
@@ -60,14 +74,9 @@ public abstract class CarSocketBase {
 
     public abstract bool IsConnected();
 
-    public void Send(uint[] data)
-    {
-        sendQueue.Enqueue(data);
-    }
-
-    public int SendQueueSize()
-    {
-        return sendQueue.Count;
+    public void EnqueueCommand(JsonControlCommand command) {
+        recvQueue.Enqueue(command);
+        FrameRequested = true;
     }
 
     public IEnumerable<JsonControlCommand> ReceiveCommands()
@@ -88,8 +97,9 @@ public abstract class CarSocketBase {
 
 public class CarSocket : CarSocketBase, IDisposable {
     private volatile Socket socket;
+    protected readonly ConcurrentQueue<uint[]> sendQueue = new ConcurrentQueue<uint[]>();
 
-    public CarSocket(Socket socket, RaceController raceController)
+    public CarSocket(Socket socket)
     {
         this.socket = socket;
 
@@ -109,8 +119,7 @@ public class CarSocket : CarSocketBase, IDisposable {
                 {
                     line = reader.ReadLine();
                     var command = JsonUtility.FromJson<JsonControlCommand>(line);
-                    recvQueue.Enqueue(command);
-                    FrameRequested = true;
+                    EnqueueCommand(command);
                 }
 
             }
@@ -179,6 +188,11 @@ public class CarSocket : CarSocketBase, IDisposable {
     public override Boolean IsConnected()
     {
         return socket != null;
+    }
+
+    public void Send(uint[] data)
+    {
+        sendQueue.Enqueue(data);
     }
 
     public void Dispose()

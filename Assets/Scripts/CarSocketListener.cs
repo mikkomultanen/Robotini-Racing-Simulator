@@ -40,7 +40,7 @@ public class CarSocketListener : MonoBehaviour {
         Socket socket;
         while (clientSocketQueue.TryDequeue(out socket))
         {
-           disposables.Add(new CarSocket(socket, FindObjectOfType<RaceController>()));
+           disposables.Add(new CarSocket(socket));
         }
     }
 

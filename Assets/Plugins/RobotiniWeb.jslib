@@ -28,4 +28,10 @@ mergeInto(LibraryManager.library, {
   BindWebGLTexture: function (texture) {
     GLctx.bindTexture(GLctx.TEXTURE_2D, GL.textures[texture]);
   },
+
+  SendMessageToWebAsJSON: function (msgString) {
+    console.log("Sending from UNITY: " + msgString)
+    if (typeof window.RMQ === "undefined") window.RMQ = []
+    window.RMQ.push(msgString)
+  }
 });

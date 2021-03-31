@@ -1,5 +1,70 @@
 {
     "lapCount": 5,
-    "autoStartQualifyingSeconds": 5,
-    "mode": "development"
+    "autoStartQualifyingSeconds": 3600,
+    "mode": "development",
+    "visibility": "public",
+    "cars": [
+        {
+          "teamId": "hameen-kunto",
+          "color": "#A941D8",
+          "name": "H\u00e4meen kunto",
+          "repo_url": "git@gitlab.com:robotini-racing/camp-2021-hameen-kunto.git",
+          "texture": "https://raw.githubusercontent.com/petmat/auto/main/Car_Hameen_Kunto.png"
+        },
+        {
+          "teamId": "palju",
+          "color": "#FFFFFF",
+          "name": "Paljun On Filett\u00e4",
+          "repo_url": "git@gitlab.com:robotini-racing/camp-2021-paljun-on-filetta.git",
+          "texture": "https://i.ibb.co/rcrgcpJ/Car-And-Tire-Albedo.png"
+        },
+        {
+          "teamId": "tampere-test-dummies",
+          "color": "#2DA7D5",
+          "name": "Tampere test dummies",
+          "repo_url": "git@gitlab.com:robotini-racing/camp-2021-tampere-test-dummies.git",
+          "commit": "5aa77449d83cfafa92f65450ae86fd834fb5009a"
+        },
+        {
+          "teamId": "fsharp",
+          "color": "#7AD705",
+          "name": "FSharpMasterRace",
+          "repo_url": "git@gitlab.com:robotini-racing/camp-2021-fsharp-master-race.git",
+          "commit": "ede8cdf9adbc7c28998b1fac078a4340869bea90"
+        },
+        {
+          "teamId": "ei-sunkka-reissink",
+          "color": "#F62A5C",
+          "name": "Ei sunkka",
+          "repo_url": "git@gitlab.com:robotini-racing/camp-2021-ei-sunkka-reissink.git",
+          "texture": "https://i.ibb.co/L0851gj/ei-sunkka-texture.png"
+        },
+        {
+          "teamId": "talk-is-cheap",
+          "color": "#FDC4E7",
+          "name": "Talk is cheap",
+          "repo_url": "git@gitlab.com:robotini-racing/camp-2021-talk-is-cheap-show-me-the-code.git"
+        },
+        {
+          "teamId": "team-fast-lein",
+          "color": "#F8B504",
+          "name": "Team fast lein",
+          "repo_url": "git@gitlab.com:robotini-racing/camp-2021-fast-lein.git",
+          "texture": "http://mikkoreinikainen.fi/2021/Car_And_Tire_Albedo-fast_lein.png"
+        },
+        {
+          "teamId": "aitron-senna",
+          "color": "#FBFC86",
+          "name": "Aitron Senna",
+          "repo_url": "git@gitlab.com:robotini-racing/camp-2021-aitron-senna.git",
+          "texture": "http://esmo.kapsi.fi/aitron.png"
+        },
+        {
+          "teamId": "natiivi-ja-nopea",
+          "color": "#000000",
+          "name": "Natiivi ja nopea",
+          "repo_url": "git@gitlab.com:robotini-racing/camp-2021-natiivi-ja-nopea.git",
+          "texture": "https://stuff.h4x0rb34.rs/robotini.png"
+        }
+      ]
 }

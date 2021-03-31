@@ -58,6 +58,10 @@ public class RaceController : MonoBehaviour
         });        
     }
 
+    public void StartFreePractice() {
+        setState(new FreePractice(this));
+    }
+
     bool isCurrentState(State state) {
         return this.state == state;
     }
