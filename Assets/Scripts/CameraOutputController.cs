@@ -249,6 +249,12 @@ public class CameraOutputController : MonoBehaviour
     private void Start()
     {
         mCamera = GetComponent<Camera>();
+        mCamera.enabled = ShouldEnableCamera;
+        if (!mCamera.enabled) return;
+        if (socket == null) {
+            Debug.LogWarning("Camera enabled, but socket missing");
+            return;
+        }
         renderTexture = new RenderTexture((int)socket.imageWidth, (int)socket.imageHeight, 24, RenderTextureFormat.ARGB32);
         renderTexture.antiAliasing = 2;        
         
@@ -256,7 +262,6 @@ public class CameraOutputController : MonoBehaviour
         mCamera.rect = new Rect(0, 0, 1, 1);
         mCamera.aspect = 1.0f * socket.imageWidth / socket.imageHeight;
         mCamera.targetTexture = renderTexture;
-        mCamera.enabled = ShouldEnableCamera;
 
         RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
 
@@ -277,8 +282,10 @@ public class CameraOutputController : MonoBehaviour
 
     void Update()
     {
-        c.Update();
-        read = true;
+        if (c != null) {
+            c.Update();
+            read = true;
+        }
     }
 
     void OnEndFrameRendering(ScriptableRenderContext context, Camera[] cameras)
