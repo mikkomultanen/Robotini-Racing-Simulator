@@ -61,8 +61,8 @@ public class CameraController : MonoBehaviour
         targetPosition = transform.position;
         targetRotation = originalRotation;
 
-        EventBus.Subscribe<CameraFollow>(this, f => {
-            if (f.carName == null)
+        EventBus.Subscribe<CameraFollow>(this, f => {            
+            if (f.carName == null || f.carName == "") // <- empty string accepted because the null turns into empty string in JSON (huoh)
             {
                 SetFollow(null);
             }
