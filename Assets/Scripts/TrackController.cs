@@ -58,20 +58,25 @@ public class TrackController : MonoBehaviour
             string json = null;
             if (File.Exists(fileName))
             {
+                Debug.Log("Loading track from filesystem: " + fileName);
                 json = new StreamReader(fileName).ReadToEnd();
             }
             else
             {
+                Debug.Log("Loading track as Unity resource: " + fileName);
                 json = Resources.Load<TextAsset>("Tracks/" + fileName.Replace(".json", ""))?.text;
             }
             if (json != null)
             {
                 trackNodes = FromJson<SplineMesh.SplineNode>(json);
             }
+            else
+            {
+                Debug.Log("Unknown track " + fileName + ": not found as a resource or in the file system");
+            }
         }
         if (trackNodes != null && trackNodes.Length > 0)
         {
-            Debug.Log("Loading track " + fileName);
             track.enabled = false;
             track.IsLoop = false;
             while (track.nodes.Count > trackNodes.Length)
