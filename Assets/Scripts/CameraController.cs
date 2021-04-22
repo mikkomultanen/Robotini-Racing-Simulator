@@ -102,6 +102,7 @@ public class CameraController : MonoBehaviour
     }
 
     private Vector3 CalculateTopPosition() {
+        Debug.Log("Set camera automatically based on track");
         var track = FindObjectOfType<SplineMesh.Spline>();
         var floorBounds = track.transform.GetChild(0).GetComponent<SplineMesh.SplineExtrusion>().bounds;
         var x = floorBounds.center.x;

@@ -2,6 +2,7 @@
 using System.Linq;
 using System;
 using System.IO;
+using UniRx;
 
 [RequireComponent(typeof(SplineMesh.Spline))]
 public class TrackController : MonoBehaviour
@@ -101,6 +102,10 @@ public class TrackController : MonoBehaviour
             }
             track.IsLoop = true;
             track.enabled = true;
+            Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => {
+                EventBus.Publish(new CameraFollow(null));
+            });
+            
         }
     }
 
