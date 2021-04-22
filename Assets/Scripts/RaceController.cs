@@ -55,7 +55,8 @@ public class RaceController : MonoBehaviour
             {
                 setState(new FreePractice(this));
             }
-        });        
+            EventBus.Publish(new CameraFollow(null));
+        }).AddTo(this);        
     }
 
     public void StartFreePractice() {

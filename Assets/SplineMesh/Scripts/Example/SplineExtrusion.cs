@@ -27,6 +27,11 @@ namespace SplineMesh {
         private Spline spline = null;
         private bool toUpdate = true;
         private GameObject generated;
+        private Bounds _bounds;
+        public Bounds bounds
+        {
+            get { return _bounds; }
+        }
 
         public List<ExtrusionSegment.Vertex> shapeVertices = new List<ExtrusionSegment.Vertex>();
         public bool loopAround = true;
@@ -71,6 +76,7 @@ namespace SplineMesh {
         private void GenerateMesh() {
             UOUtility.DestroyChildren(generated);
 
+            _bounds = new Bounds();
             int i = 0;
             float textureOffset = 0.0f;
             foreach (CubicBezierCurve curve in spline.GetCurves()) {
@@ -88,6 +94,7 @@ namespace SplineMesh {
                 mb.SetCurve(curve, true);
                 mb.SetTextureOffset(textureOffset, true);
                 textureOffset += curve.Length;
+                _bounds.Encapsulate(go.GetComponent<MeshFilter>().sharedMesh.bounds);
             }
         }
 

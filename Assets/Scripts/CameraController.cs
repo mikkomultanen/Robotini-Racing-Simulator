@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Linq;
 
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
@@ -9,7 +8,7 @@ public class CameraController : MonoBehaviour
     [Range(0.1f, 1f)]
     public float size = 0.2f;
 
-    private Vector3 originalPosition;
+    private Camera _camera;
     private Quaternion originalRotation;
     private CameraOutputController follow = null;
     private Vector3 oldPosition;
@@ -36,7 +35,7 @@ public class CameraController : MonoBehaviour
         }
         else
         {
-            SetPosition(originalPosition, originalRotation);
+            SetPosition(CalculateTopPosition(), originalRotation);
         }        
     }
 
@@ -55,11 +54,11 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
-        originalPosition = transform.position;
+        _camera = GetComponent<Camera>();
         originalRotation = transform.rotation;
-        oldPosition = originalPosition;
+        oldPosition = transform.position;
         oldRotation = originalRotation;
-        targetPosition = originalPosition;
+        targetPosition = transform.position;
         targetRotation = originalRotation;
 
         EventBus.Subscribe<CameraFollow>(this, f => {
@@ -70,8 +69,10 @@ public class CameraController : MonoBehaviour
             else
             {
                 var car = GameObject.Find(f.carName);
-                var camera = car?.GetComponentInChildren<CameraOutputController>();
-                SetFollow(camera);
+                if (car != null) {
+                    var camera = car.GetComponentInChildren<CameraOutputController>();
+                    SetFollow(camera);
+                }
             }           
         });
         EventBus.Subscribe<CameraPosition>(this, p => {
@@ -98,5 +99,19 @@ public class CameraController : MonoBehaviour
             var height = width * CarSocket.IMAGE_HEIGHT / CarSocket.IMAGE_WIDTH;
             Graphics.DrawTexture(new Rect(0, Screen.height - height, width, height), follow.RenderTexture);
         }
+    }
+
+    private Vector3 CalculateTopPosition() {
+        var track = FindObjectOfType<SplineMesh.Spline>();
+        var floorBounds = track.transform.GetChild(0).GetComponent<SplineMesh.SplineExtrusion>().bounds;
+        var x = floorBounds.center.x;
+        var z = floorBounds.center.z;
+        var trackAspect = floorBounds.extents.x / floorBounds.extents.z;
+        var h = floorBounds.extents.z;
+        if (trackAspect > _camera.aspect) {
+            h *= trackAspect / _camera.aspect;
+        }
+        var y = Mathf.Clamp(1.1f * h / Mathf.Tan(Mathf.Deg2Rad * 0.5f * _camera.fieldOfView), 4, 18);
+        return new Vector3(x, y, z);
     }
 }
