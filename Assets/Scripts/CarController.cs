@@ -23,6 +23,8 @@ public class CarController : MonoBehaviour
     public float brake;
     [HideInInspector]
     public RaceController raceController;
+    [HideInInspector]
+    public BotCommandLogger botCommandLogger;
     private float targetAngle = 0;
     private float lastBotCommandTime = 0;
     private bool finished = false;
@@ -50,6 +52,7 @@ public class CarController : MonoBehaviour
 
     private void Start()
     {
+        botCommandLogger = FindObjectOfType<BotCommandLogger>();
     }
 
     public void GetInput()
@@ -246,12 +249,14 @@ public class CarController : MonoBehaviour
     private void ProcessBotCommands()
     {
         if (socket == null) return;
+        
         if (!socket.IsConnected())
         {
             Destroy(gameObject);
         }
         foreach (var command in socket.ReceiveCommands())
         {
+            botCommandLogger.LogCommand(this.CarInfo, command);
             lastBotCommandTime = Time.time;
             //Debug.Log("Processing " + JsonUtility.ToJson(command));
             if (command.action == "forward")
