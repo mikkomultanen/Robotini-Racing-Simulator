@@ -208,7 +208,9 @@ public class RaceController : MonoBehaviour
 
             var results = c.cars.Values.Select(v => v.LastLap).OrderBy(l => l.bestLap == 0 ? float.MaxValue : l.bestLap).ToArray();
             EventBus.Publish(new QualifyingResults(results));
-            var startingOrder = results.Select(l => l.car).ToArray();
+            var startingOrder = results
+                .Where(r => !r.dnf)
+                .Select(l => l.car).ToArray();
 
             c.setState(new StartingGrid(c, startingOrder));                
         }
