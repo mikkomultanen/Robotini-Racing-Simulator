@@ -8,6 +8,11 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
+class JoinException : Exception {
+    public JoinException(string message): base(message) {
+    }
+}
+
 public class WebCarSocket: CarSocketBase {
     WebRaceController controller;
     public WebCarSocket(CarLogin login, WebRaceController controller) {
@@ -40,9 +45,8 @@ public abstract class CarSocketBase {
 
     protected void init(CarLogin c)
     {
-        // TODO: respond with error msgs
-        if (c.name == null || c.name == "") throw new Exception("CarInfo.name missing");
-        if (c.teamId == null || c.teamId == "") throw new Exception("CarInfo.teamId missing");
+        if (c.name == null || c.name == "") throw new JoinException("CarInfo.name missing");
+        if (c.teamId == null || c.teamId == "") throw new JoinException("CarInfo.teamId missing");
 
         var raceParameters = RaceParameters.readRaceParameters();
         var cars = raceParameters.cars;
@@ -53,7 +57,7 @@ public abstract class CarSocketBase {
         }
         else if (raceParameters.mode == "race")
         {
-            throw new Exception("Team not found: " + c.teamId);
+            throw new JoinException("Team not found by teamId: " + c.teamId);
         }
         else {
             carInfo = new CarInfo(c.teamId, c.name, c.color);
@@ -113,7 +117,14 @@ public class CarSocket : CarSocketBase, IDisposable {
                 var line = reader.ReadLine();
                 Debug.Log("Received info " + line);
 
-                init(JsonUtility.FromJson<CarLogin>(line));
+                try {
+                    init(JsonUtility.FromJson<CarLogin>(line));
+                } catch (JoinException e) {
+                    string jsonString = JsonUtility.ToJson(e);
+                    byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonString + "\n");
+                    socket.Send(bytes);
+                    return;
+                }
 
                 while (this.socket != null)
                 {

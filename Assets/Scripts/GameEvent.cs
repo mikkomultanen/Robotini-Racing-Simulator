@@ -98,6 +98,14 @@ public class CarLogin : CarInfo
     }
 }
 
+[Serializable]
+public class LoginDenied {
+    public string reason;
+    public LoginDenied(string reason) {
+        this.reason = reason;
+    }
+}
+
 public abstract class CarEvent: GameEvent {
     public CarInfo car;
 
