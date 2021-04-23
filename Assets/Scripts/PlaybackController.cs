@@ -22,9 +22,10 @@ public class PlaybackController : RemoteEventPlayer
 
     private void OnEnable()
     {
-        Debug.Log("Playback init");
         if (ModeController.Mode == SimulatorMode.Playback)
         {
+            Debug.Log("Playback init");
+
 #if UNITY_EDITOR
             GetRaceLog(RaceParameters.readRaceParameters().raceLogFile);
 #else
