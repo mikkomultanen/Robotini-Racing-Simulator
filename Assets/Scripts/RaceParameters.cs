@@ -19,6 +19,7 @@ public class RaceParameters : GameEvent
 
     public string raceLogFile = "race.log";
     public string raceResultFile = "race-result.json";
+    public string memoryLogFile = "memory.log";
 
     public static RaceParameters readRaceParameters()
     {
