@@ -120,9 +120,8 @@ public class CarSocket : CarSocketBase, IDisposable {
                 try {
                     init(JsonUtility.FromJson<CarLogin>(line));
                 } catch (JoinException e) {
-                    string jsonString = JsonUtility.ToJson(e);
-                    byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonString + "\n");
-                    socket.Send(bytes);
+                    Debug.Log("Car login denied: " + e.Message);
+                    socket.Close();
                     return;
                 }
 
