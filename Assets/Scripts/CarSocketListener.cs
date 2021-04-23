@@ -7,6 +7,7 @@ using System.Threading;
 using UnityEngine;
 
 public class CarSocketListener : MonoBehaviour {
+    private RaceController raceController;
     private readonly ManualResetEvent allDone = new ManualResetEvent(false);
     private readonly ConcurrentQueue<Socket> clientSocketQueue = new ConcurrentQueue<Socket>();
     private Socket listener = null;
@@ -14,6 +15,7 @@ public class CarSocketListener : MonoBehaviour {
 
     private void OnEnable()
     {
+        raceController = FindObjectOfType<RaceController>();
         if (ModeController.Mode != SimulatorMode.Playback && ModeController.Mode != SimulatorMode.RemoteControl)
         {
             Debug.Log("Initializing car socket");
@@ -40,7 +42,7 @@ public class CarSocketListener : MonoBehaviour {
         Socket socket;
         while (clientSocketQueue.TryDequeue(out socket))
         {
-           disposables.Add(new CarSocket(socket));
+           disposables.Add(new CarSocket(socket, raceController));
         }
     }
 

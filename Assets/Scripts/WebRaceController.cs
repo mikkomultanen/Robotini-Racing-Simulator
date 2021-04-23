@@ -7,6 +7,7 @@ using UniRx;
 
 public class WebRaceController : MonoBehaviour
 {
+    public RaceController raceController;
     private readonly Dictionary<string, WebCarSocket> cars = new Dictionary<string, WebCarSocket>();
 
 #if UNITY_WEBGL
@@ -28,6 +29,7 @@ public class WebRaceController : MonoBehaviour
 
     private void Start()
     {
+        raceController = FindObjectOfType<RaceController>();
         // Uncomment to simulate what happens with a web bot
         //SimulateWebClient();
     }

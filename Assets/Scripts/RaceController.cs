@@ -63,6 +63,11 @@ public class RaceController : MonoBehaviour
         setState(new FreePractice(this));
     }
 
+    public void CarConnected(CarConnected c)
+    {
+        this.state.CarConnected(c);
+    }
+
     public Boolean IsSimulation { get {
         return this.state is Simulation;
     } }
@@ -133,11 +138,7 @@ public class RaceController : MonoBehaviour
             
             Debug.Log("RaceParameters:" + JsonUtility.ToJson(c.raceParameters));
 
-            EventBus.Publish(new RaceLobbyInit(c.raceParameters));
-            Subscribe<CarConnected>(e =>
-            {
-                cars[e.car.name] = e;
-            });
+            EventBus.Publish(new RaceLobbyInit(c.raceParameters));            
             Subscribe<CarDisconnected>(e =>
             {                
                 cars.Remove(e.car.name);
@@ -148,6 +149,14 @@ public class RaceController : MonoBehaviour
 
         }
 
+        public override void CarConnected(CarConnected c) {
+            if (cars.ContainsKey(c.car.name)) {
+                throw new JoinException("Car " + c.car.name + " already connected");
+            }
+            cars[c.car.name] = c;
+            EventBus.Publish(c);
+        }
+
         override public CurrentStandings CurrentStandings() {
             return new CurrentStandings(cars.Values.Select(c => c.car.ToLap()).ToArray(), false);
         }
@@ -156,6 +165,7 @@ public class RaceController : MonoBehaviour
             c.setState(new Qualifying(c, cars.Values.ToArray()));
         }
     }
+
 
     public abstract class Simulation : State {
         public Simulation(RaceController c): base(c)
@@ -350,30 +360,41 @@ public class RaceController : MonoBehaviour
         {
             Debug.Log("Starting free practice");
             base.OnEnable();
-            EventBus.Publish(new FreePracticeStart());            
+            EventBus.Publish(new FreePracticeStart());
 
-            Subscribe<CarConnected>(e =>
-            {
-                var car = c.addCarOnTrack(e);
-
-                var controllers = FindObjectsOfType<CarController>();
-                float totalLength = c.track.Length;
-                float spacing = totalLength / (float)10; // always 10 segments
+            Subscribe<CarConnected>(e => {
+                try {
+                    var car = c.addCarOnTrack(e);
+                    var controllers = FindObjectsOfType<CarController>();
+                    float totalLength = c.track.Length;
+                    float spacing = totalLength / (float)10; // always 10 segments                                        
+                    var curveSample = c.track.GetSampleAtDistance(c.track.Length - (i * spacing));
+                    car.transform.position = curveSample.location + 0.1f * Vector3.up;
+                    car.transform.rotation = curveSample.Rotation;
+                    car.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    i++;
                 
-                
-                var curveSample = c.track.GetSampleAtDistance(c.track.Length - (i * spacing));
-                car.transform.position = curveSample.location + 0.1f * Vector3.up;
-                car.transform.rotation = curveSample.Rotation;
-                car.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                i++;
-
+                } catch (JoinException ex) {
+                    Debug.Log(ex.Message);
+                    e.socket.Close();
+                }     
             });
+
 
             Subscribe<CarDisconnected>(e =>
             {
                 EventBus.Publish(new CarRemoved(e.car));
             });
         }
+
+        public override void CarConnected(CarConnected e) {
+            if (c.cars.ContainsKey(e.car.name))
+            {
+                throw new JoinException("Duplicate car");
+            }
+            EventBus.Publish(e);                   
+        }
+
 
         public override void OnSessionFinish() {
             // Never gonna stop
@@ -454,6 +475,10 @@ public class RaceController : MonoBehaviour
             this.c = c;
         }
 
+        public virtual void CarConnected(CarConnected c)
+        {
+            throw new JoinException("Car connections not supported in this state");
+        }
 
         public virtual void OnEnable()
         {            
@@ -536,7 +561,7 @@ public class RaceController : MonoBehaviour
     {
         if (cars.ContainsKey(e.car.name))
         {
-            throw new Exception("TODO: duplicate car");
+            throw new JoinException("Duplicate car");
         }
 
         var curveSample = track.GetSampleAtDistance(0.95f * track.Length);

@@ -16,7 +16,7 @@ class JoinException : Exception {
 public class WebCarSocket: CarSocketBase {
     WebRaceController controller;
     public WebCarSocket(CarLogin login, WebRaceController controller) {
-        init(login);
+        init(login, controller.raceController);
         this.controller = controller;
     }
 
@@ -29,6 +29,11 @@ public class WebCarSocket: CarSocketBase {
     {
         var pixels = data.SelectMany(color => new int[] { color.r, color.g, color.b }).ToArray();
         controller.SendToWeb(new WebCarFrame(CarInfo.name, pixels));
+    }
+
+    public override void Close()
+    {
+        throw new NotImplementedException();
     }
 }
 
@@ -43,7 +48,7 @@ public abstract class CarSocketBase {
 
     public volatile bool FrameRequested = false;
 
-    protected void init(CarLogin c)
+    protected void init(CarLogin c, RaceController raceController)
     {
         if (c.name == null || c.name == "") throw new JoinException("CarInfo.name missing");
         if (c.teamId == null || c.teamId == "") throw new JoinException("CarInfo.teamId missing");
@@ -66,7 +71,8 @@ public abstract class CarSocketBase {
         this.imageWidth = (c.imageWidth < 8 || c.imageWidth > 128) ? 128 : (uint)c.imageWidth;
         this.imageHeight = imageWidth * IMAGE_HEIGHT / IMAGE_WIDTH;
         Debug.Log("Using car name " + carInfo.name + " and image size " + imageWidth + "x" + imageHeight);
-        EventBus.Publish(new CarConnected(carInfo, this));
+
+        raceController.CarConnected(new CarConnected(carInfo, this));
 
         FrameRequested = true;
     }
@@ -75,6 +81,7 @@ public abstract class CarSocketBase {
         return carInfo;
     }}
 
+    public abstract void Close();
 
     public abstract bool IsConnected();
 
@@ -103,7 +110,7 @@ public class CarSocket : CarSocketBase, IDisposable {
     private volatile Socket socket;
     protected readonly ConcurrentQueue<uint[]> sendQueue = new ConcurrentQueue<uint[]>();
 
-    public CarSocket(Socket socket)
+    public CarSocket(Socket socket, RaceController raceController)
     {
         this.socket = socket;
 
@@ -118,7 +125,7 @@ public class CarSocket : CarSocketBase, IDisposable {
                 Debug.Log("Received info " + line);
 
                 try {
-                    init(JsonUtility.FromJson<CarLogin>(line));
+                    init(JsonUtility.FromJson<CarLogin>(line), raceController);
                 } catch (JoinException e) {
                     Debug.Log("Car login denied: " + e.Message);
                     socket.Close();
@@ -184,6 +191,12 @@ public class CarSocket : CarSocketBase, IDisposable {
         return encodedBytes;
     }
 
+    public override void Close()
+    {
+        socket?.Close();
+        disconnected();
+    }
+
     private void disconnected()
     {
         if (this.CarInfo != null) {
@@ -207,7 +220,6 @@ public class CarSocket : CarSocketBase, IDisposable {
 
     public void Dispose()
     {
-        socket?.Close();
-        socket = null;
+        Close();
     }
 }
