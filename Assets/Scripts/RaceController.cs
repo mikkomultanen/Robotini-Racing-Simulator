@@ -582,7 +582,7 @@ public class RaceController : MonoBehaviour
         internal float lastLapRecordedAt = Time.time;
         public readonly CarInfo CarInfo;
         internal LapCompleted lastLap;
-        private int trackSegment;
+        public int trackSegment;
         internal bool disconnected = false;
         internal bool finished = false;
 
