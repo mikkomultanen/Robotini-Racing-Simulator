@@ -48,8 +48,8 @@ public class SpectatorSocket : MonoBehaviour
                 if (raceParams.raceLogFile != null) {
                     Debug.Log("Writing race log to " + raceParams.raceLogFile);
                     var stream = new BinaryWriter(File.Open(raceParams.raceLogFile, FileMode.Create));
-                
-                    Spectate(b => {stream.Write(b); stream.Flush(); }, () => stream.Close(), new CarInfo[] { });
+
+                    Spectate(b => { stream.Write(b); }, () => stream.Close(), new CarInfo[] { });
                 }
                 EventBus.Subscribe<CarAdded>(this, e => {
                     CarInfo car = ((CarAdded)e).car;
