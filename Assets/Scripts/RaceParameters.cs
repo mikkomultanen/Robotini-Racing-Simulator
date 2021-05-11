@@ -6,6 +6,8 @@ using System.IO;
 public class RaceParameters : GameEvent
 {
     public int lapCount = 5;
+    public int numSegments = 3;
+    public int numSegmentsBetweenCars = 1;
     public int autoStartQualifyingSeconds = 30;
     public int qualifyingDurationSeconds = 30;
     public int autoStartRaceSeconds = 10;
