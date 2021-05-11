@@ -55,6 +55,10 @@ public class SpectatorSocket : MonoBehaviour
                     CarInfo car = ((CarAdded)e).car;
                     carInfos.Add(car.name, car);
                 });
+                EventBus.Subscribe<CarRemoved>(this, e => {
+                    CarInfo car = ((CarRemoved)e).car;
+                    carInfos.Remove(car.name);
+                });
 
                 EventBus.Subscribe<RaceFinished>(this, e => {
                     Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => {

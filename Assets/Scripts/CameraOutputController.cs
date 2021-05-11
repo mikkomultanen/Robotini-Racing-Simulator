@@ -278,6 +278,7 @@ public class CameraOutputController : MonoBehaviour
         } else if (socket is WebCarSocket ws) {
             this.c = new WebC(ws, renderTexture, logger);
         }
+        EventBus.Subscribe<CarRemoved>(this, e => logger.Remove(e.car));
     }
 
     void Update()
