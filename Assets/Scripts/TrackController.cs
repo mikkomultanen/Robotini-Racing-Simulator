@@ -14,8 +14,7 @@ public class TrackController : MonoBehaviour
 
     private Transform finishLine;
     private Transform finishLineTrigger;
-    private Transform firstTrigger;
-    private Transform secondTrigger;
+    private Transform[] lineTriggers;
 
 #if UNITY_EDITOR
     [Header("EDITOR ONLY")]
@@ -128,10 +127,17 @@ public class TrackController : MonoBehaviour
 
     void UpdateTriggers()
     {
+        int numSegments = RaceParameters.readRaceParameters().numSegments;
+        Array.Resize(ref lineTriggers, numSegments);
         var raceController = FindObjectOfType<RaceController>();
         UpdateTrigger(ref finishLineTrigger, 0, raceController.FinishLineTrigger);
-        UpdateTrigger(ref firstTrigger, 0.33f, raceController.TrackSegmentTrigger1);
-        UpdateTrigger(ref secondTrigger, 0.67f, raceController.TrackSegmentTrigger2);
+        for (int i = 0; i < numSegments; ++i) {
+            int segment = i;
+            UpdateTrigger(
+                    ref lineTriggers[i],
+                    (i+1)/(float)(numSegments+1),
+                    car => raceController.TrackSegmentTrigger(car, segment));
+        }
     }
 
     private void UpdateTrigger(ref Transform trigger, float distance, TriggerEventSourceEventHandler eventHandler)
