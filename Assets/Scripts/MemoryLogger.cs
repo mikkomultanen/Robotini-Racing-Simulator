@@ -1,15 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Concurrent;
-using System;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using System.Linq;
-using UnityEngine;
-using UniRx;
-using System.Collections.Generic;
 using UnityEngine.Profiling;
 
 public class MemoryLogger : MonoBehaviour
