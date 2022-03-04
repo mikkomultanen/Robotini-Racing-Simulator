@@ -3,6 +3,7 @@
     "autoStartQualifyingSeconds": 3600,
     "mode": "development",
     "visibility": "public",
+    "track": "final_koira",
     "cars": [
         {
           "teamId": "hameen-kunto",
