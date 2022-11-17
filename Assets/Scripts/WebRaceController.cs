@@ -32,6 +32,11 @@ public class WebRaceController : MonoBehaviour
         raceController = FindObjectOfType<RaceController>();
         // Uncomment to simulate what happens with a web bot
         //SimulateWebClient();
+
+#if UNITY_WEBGL
+        EventBus.Subscribe<LapCompleted>(this, SendToWeb);
+#endif
+
     }
 
     void SendFromWeb(string msgJson) {
