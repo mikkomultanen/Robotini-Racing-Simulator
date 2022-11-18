@@ -29,7 +29,7 @@ public class BigTextDisplay : MonoBehaviour
             }
             else if (e is FreePracticeStart)
             {
-                return keepShowing("Free practice");
+                return keepShowing("");
             }
             else if (e is RaceWon)
             {
@@ -38,9 +38,6 @@ public class BigTextDisplay : MonoBehaviour
             else if (e is RaceFinished)
             {
                 return keepShowing("Race over. Winner: " + (e as RaceFinished).standings.FirstOrDefault()?.car?.name);
-            }
-            else if (e is FreePracticeStart) {
-                return keepShowing("Free practice");
             }
             else if (e is ResetSimulator) {
                 return keepShowing("");
