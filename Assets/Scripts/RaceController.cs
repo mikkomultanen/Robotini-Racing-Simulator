@@ -364,6 +364,7 @@ public class RaceController : MonoBehaviour
 
             Subscribe<CarConnected>(e => {
                 try {
+                    Debug.Log("Car connected, adding on track");
                     var car = c.addCarOnTrack(e);
                     var controllers = FindObjectsOfType<CarController>();
                     float totalLength = c.track.Length;
@@ -375,7 +376,7 @@ public class RaceController : MonoBehaviour
                     i++;
                 
                 } catch (JoinException ex) {
-                    Debug.Log(ex.Message);
+                    Debug.Log("Error adding car in RaceController:" + ex.Message);
                     e.socket.Close();
                 }     
             });
@@ -561,6 +562,7 @@ public class RaceController : MonoBehaviour
     {
         if (cars.ContainsKey(e.car.name))
         {
+            Debug.Log("Error adding car: Duplicate");
             throw new JoinException("Duplicate car");
         }
 
