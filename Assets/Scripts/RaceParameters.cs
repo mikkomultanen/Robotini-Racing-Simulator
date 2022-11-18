@@ -24,6 +24,11 @@ public class RaceParameters : GameEvent
 
     public static RaceParameters readRaceParameters()
     {
+#if UNITY_WEBGL        
+        var raceParams = new RaceParameters();
+        raceParams.track = "final_koira";
+        return raceParams;
+#else
         try
         {
             var reader = new StreamReader("RaceParameters.json");
@@ -34,5 +39,6 @@ public class RaceParameters : GameEvent
         {
             return new RaceParameters();
         }
+#endif
     }
 }
