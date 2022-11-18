@@ -849,6 +849,11 @@ PrefabInstance:
       propertyPath: m_text
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2769617208640483433, guid: 8ece2a3adb74a4a2bbf94fec493f23ab,
+        type: 3}
+      propertyPath: m_text
+      value: Name
+      objectReference: {fileID: 0}
     - target: {fileID: 2837295916940347192, guid: 8ece2a3adb74a4a2bbf94fec493f23ab,
         type: 3}
       propertyPath: m_Name
