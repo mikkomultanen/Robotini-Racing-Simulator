@@ -27,6 +27,7 @@ public class AudioController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+#if !UNITY_WEBGL
         AudioClip[] engines = { engineClip1, engineClip2, engineClip3, engineClip4 };
         AudioClip[] bumps = { bumpClip, bumpClip, bumpClip, bumpClip, bumpClip, bumpClip, bumpClip, hornClip1, hornClip2 };
         AudioClip[] laps = { turboClip };
@@ -60,6 +61,7 @@ public class AudioController : MonoBehaviour
                 }
             }            
         });
+#endif
     }
 
     private Action<E> carPlay<E>(AudioClip[] clips) where E : CarEvent {
