@@ -49,8 +49,14 @@ public class WebRaceController : MonoBehaviour
             var name = c.carName;
             var socket = cars[name];
             socket.EnqueueCommand(c.command);
+        } else if (e is CarDisconnected d) {
+            var name = d.car.name;
+            var socket = cars[name];
+            socket.Close();
+        } else if (e is RaceParameters) {
+            FindObjectOfType<TrackController>().LoadTrack(((RaceParameters)e).track);
         } else {
-            Debug.Log("Unhandled message from web: " + msgJson);
+            EventBus.Publish(e);
         }        
     }
 

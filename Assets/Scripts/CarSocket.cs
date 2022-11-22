@@ -15,6 +15,7 @@ class JoinException : Exception {
 
 public class WebCarSocket: CarSocketBase {
     WebRaceController controller;
+    private bool connected = true;
     public WebCarSocket(CarLogin login, WebRaceController controller) {
         init(login, controller.raceController);
         this.controller = controller;
@@ -22,7 +23,7 @@ public class WebCarSocket: CarSocketBase {
 
     public override bool IsConnected()
     {
-        return true;
+        return connected;
     }
 
     public void Send(Color32[] data)
@@ -33,7 +34,9 @@ public class WebCarSocket: CarSocketBase {
 
     public override void Close()
     {
-        throw new NotImplementedException();
+        connected = false;
+        Debug.Log("Car disconnected: " + CarInfo.name);
+        EventBus.Publish(new CarDisconnected(CarInfo));
     }
 }
 
