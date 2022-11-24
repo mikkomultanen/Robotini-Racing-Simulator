@@ -15,8 +15,25 @@ public class RaceController : MonoBehaviour
     private RaceParameters raceParameters;
     private State state;
 
+    public int GetNumSegments() {
+        return raceParameters.numSegments;
+    }
+
     public IEnumerable<CarInfo> GetCars() {
         return cars.Values.Select(car => car.CarInfo);
+    }
+
+    public int GetTrackSegment(string car) {
+        return cars[car].trackSegment;
+    }
+
+    public float TrackDistanceAtSegment(int segment) {
+        float spacing = track.Length / (float)raceParameters.numSegments;
+        return (segment * spacing) % track.Length;
+    }
+
+    public int NextSegment(int segment) {
+        return (segment + 1) % raceParameters.numSegments;
     }
 
     private void OnEnable()
@@ -98,16 +115,10 @@ public class RaceController : MonoBehaviour
         state.CarHitTrigger(car, 0);
     }
 
-    public void TrackSegmentTrigger1(GameObject car)
+    public void TrackSegmentTrigger(GameObject car, int segment)
     {
-        state.CarHitTrigger(car, 1);
+        state.CarHitTrigger(car, segment);
     }
-
-    public void TrackSegmentTrigger2(GameObject car)
-    {
-        state.CarHitTrigger(car, 2);
-    }
-
 
     public class Playback: State
     {
@@ -366,10 +377,13 @@ public class RaceController : MonoBehaviour
                 try {
                     Debug.Log("Car connected, adding on track");
                     var car = c.addCarOnTrack(e);
+
                     var controllers = FindObjectsOfType<CarController>();
                     float totalLength = c.track.Length;
-                    float spacing = totalLength / (float)10; // always 10 segments                                        
-                    var curveSample = c.track.GetSampleAtDistance(c.track.Length - (i * spacing));
+                    float spacing = c.raceParameters.numSegmentsBetweenCars * totalLength / (float)c.raceParameters.numSegments;
+
+                    var curveSample = c.track.GetSampleAtDistance(
+                            c.track.Length - ((i * spacing) % c.track.Length));
                     car.transform.position = curveSample.location + 0.1f * Vector3.up;
                     car.transform.rotation = curveSample.Rotation;
                     car.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -420,7 +434,7 @@ public class RaceController : MonoBehaviour
         override public void CarHitTrigger(GameObject car, int segment)
         {
             var totalTime = GameEvent.TimeDiff(System.DateTime.Now, sessionStartTime);
-            bool updateStandings = c.cars[car.name].TrackSegmentStarted(segment, totalTime);
+            bool updateStandings = c.cars[car.name].TrackSegmentStarted(segment, totalTime, c.raceParameters.numSegments);
             if (updateStandings)
             {
                 EventBus.Publish(CurrentStandings());
@@ -621,15 +635,16 @@ public class RaceController : MonoBehaviour
             EventBus.Publish(new CarFinished(CarInfo));
         }
 
-        internal bool TrackSegmentStarted(int segment, float totalTime)
+        internal bool TrackSegmentStarted(int segment, float totalTime, int numSegments)
         {
-            if (segment == (this.trackSegment + 1) % 3) {
-                this.trackSegment = segment;
+            int currentSegment = this.trackSegment;
+            this.trackSegment = segment;
+            if (segment == (currentSegment + 1) % numSegments) {
                 if (segment == 0)
-                {                    
+                {
                     NewLapTime(totalTime);
-                    return true;
                 }
+                return true;
             }
             return false;
         }
