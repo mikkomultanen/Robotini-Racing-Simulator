@@ -52,6 +52,7 @@ public class WebRaceController : MonoBehaviour
         } else if (e is CarDisconnected d) {
             var name = d.car.name;
             var socket = cars[name];
+            cars.Remove(name);
             socket.Close();
         } else if (e is RaceParameters) {
             FindObjectOfType<TrackController>().LoadTrack(((RaceParameters)e).track);
