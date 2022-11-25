@@ -57,6 +57,7 @@ public class GameStatus: GameEvent
     public CarStatus[] cars;
 }
 
+
 [Serializable]
 public class CarInfo: GameEvent
 {
@@ -329,9 +330,11 @@ public class WebCarFrame: GameEvent
 {
     public string carName;
     public int[] pixels;
-    public WebCarFrame(string carName, int[] pixels)
+    public CarStatus carStatus;
+    public WebCarFrame(string carName, int[] pixels, CarStatus carStatus)
     {
         this.carName = carName;
         this.pixels = pixels;
+        this.carStatus = carStatus;
     }
 }

@@ -29,7 +29,8 @@ public class WebCarSocket: CarSocketBase {
     public void Send(Color32[] data)
     {
         var pixels = data.SelectMany(color => new int[] { color.r, color.g, color.b }).ToArray();
-        controller.SendToWeb(new WebCarFrame(CarInfo.name, pixels));
+        var c = this.CarController;
+        controller.SendToWeb(new WebCarFrame(CarInfo.name, pixels, new CarStatus(c.name, c.rigidBody.position, c.rigidBody.velocity, c.rigidBody.rotation)));
     }
 
     public override void Close()
@@ -45,6 +46,7 @@ public abstract class CarSocketBase {
     public static uint IMAGE_HEIGHT = 80;
     public uint imageWidth = IMAGE_WIDTH;
     public uint imageHeight = IMAGE_HEIGHT;
+    public CarController CarController;
 
     protected readonly ConcurrentQueue<JsonControlCommand> recvQueue = new ConcurrentQueue<JsonControlCommand>();
     private CarInfo carInfo;

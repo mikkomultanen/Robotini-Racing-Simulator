@@ -236,6 +236,7 @@ public class CarController : MonoBehaviour
 
     public void SetSocket(CarSocketBase socket) {
         this.socket = socket;
+        this.socket.CarController = this;
         var cameraOutput = GetComponentInChildren<CameraOutputController>();
         cameraOutput.SetSocket(socket);        
     }
