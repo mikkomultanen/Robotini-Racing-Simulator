@@ -501,6 +501,10 @@ public class RaceController : MonoBehaviour
                 EventBus.Publish(CurrentStandings());
                 checkForFinish();
             });
+            Subscribe<InvalidateLap>(e => {
+                c.cars[e.carName].ResetLap();
+                EventBus.Publish(CurrentStandings());
+            });
         }
 
         public virtual void Update() { }

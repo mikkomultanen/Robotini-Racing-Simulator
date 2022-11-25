@@ -187,6 +187,13 @@ public class CarReturnedToTrack: CarEvent {
     public CarReturnedToTrack(CarInfo car): base(car) { }
 }
 
+public class InvalidateLap : GameEvent {
+    public String carName;
+    public InvalidateLap(String carName){
+        this.carName = carName;
+    }
+}
+
 public class CurrentStandings: GameEvent {
     public LapCompleted[] standings;
     public bool qualifying;
