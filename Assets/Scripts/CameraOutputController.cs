@@ -30,7 +30,6 @@ class WebC : C {
         virtualPhoto.ReadPixels(new Rect(0, 0, socket.imageWidth, socket.imageHeight), 0, 0);
         virtualPhoto.Apply();
         RenderTexture.active = null; //can help avoid errors 
-        // TODO: Abstract this into socket, use Pixel32 in web player
         latestCameraData = virtualPhoto.GetPixels32();
     }
 
