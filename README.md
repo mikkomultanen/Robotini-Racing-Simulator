@@ -56,6 +56,8 @@ To build and play with WebGL:
 2. In player settings disable compression (otherwise won't work, at the moment)
 3. Build it to `./robotini-web-player`
 
+Note: if you get an error along the lines of "No such file or directory", this may be because you don't have a Python2.7 on path. In the `PreBuildProcessing.cs` we've defined that Python should be found at `/usr/local/bin/python`. Make sure it's there.
+
 ### Try the WebGL player locally
 
 1. Copy a `race.log` file to `./robotini-web-player`
