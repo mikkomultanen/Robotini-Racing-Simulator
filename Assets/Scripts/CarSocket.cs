@@ -26,11 +26,12 @@ public class WebCarSocket: CarSocketBase {
         return connected;
     }
 
-    public void Send(Color32[] data)
+    public void Send(byte[] data)
     {
-        var pixels = data.SelectMany(color => new int[] { color.r, color.g, color.b }).ToArray();
+        //var pixels = data.SelectMany(color => new int[] { color.r, color.g, color.b }).ToArray();
+        string dataString = Convert.ToBase64String(data, 0, data.Length);
         var c = this.CarController;
-        controller.SendToWeb(new WebCarFrame(CarInfo.name, pixels, new CarStatus(c.name, c.rigidBody.position, c.rigidBody.velocity, c.rigidBody.rotation)));
+        controller.SendToWeb(new WebCarFrame(CarInfo.name, dataString, new CarStatus(c.name, c.rigidBody.position, c.rigidBody.velocity, c.rigidBody.rotation)));
     }
 
     public override void Close()
@@ -186,7 +187,7 @@ public class CarSocket : CarSocketBase, IDisposable {
 
     private byte[] encodeFrame(uint[] rawData)
     {
-        var data = ImageConversion.EncodeArrayToPNG(rawData, GraphicsFormat.R8G8B8_UNorm, imageWidth, imageHeight);
+        byte[] data = ImageConversion.EncodeArrayToPNG(rawData, GraphicsFormat.R8G8B8_UNorm, imageWidth, imageHeight);
         if (data.Length > 65535) throw new Exception("Max image size exceeded");
         byte lowerByte = (byte)(data.Length & 0xff);
         byte higherByte = (byte)((data.Length & 0xff00) >> 8);

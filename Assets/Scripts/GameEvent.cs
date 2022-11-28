@@ -329,9 +329,9 @@ public class WebCarCommand: UICommand
 public class WebCarFrame: GameEvent
 {
     public string carName;
-    public int[] pixels;
+    public string pixels;
     public CarStatus carStatus;
-    public WebCarFrame(string carName, int[] pixels, CarStatus carStatus)
+    public WebCarFrame(string carName, string pixels, CarStatus carStatus)
     {
         this.carName = carName;
         this.pixels = pixels;

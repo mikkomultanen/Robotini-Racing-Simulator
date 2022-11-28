@@ -15,7 +15,7 @@ class WebC : C {
     private RenderTexture renderTexture;
     FPSLogger logger;
     private Texture2D virtualPhoto;
-    private Color32[] latestCameraData = null;
+    private byte[] latestCameraData = null;
 
     public WebC(WebCarSocket socket, RenderTexture renderTexture, FPSLogger logger) {
         this.socket = socket;
@@ -30,7 +30,7 @@ class WebC : C {
         virtualPhoto.ReadPixels(new Rect(0, 0, socket.imageWidth, socket.imageHeight), 0, 0);
         virtualPhoto.Apply();
         RenderTexture.active = null; //can help avoid errors 
-        latestCameraData = virtualPhoto.GetPixels32();
+        latestCameraData = virtualPhoto.GetPixelData<byte>(0).ToArray();
     }
 
     public void Update()
@@ -200,7 +200,6 @@ class SyncC : C {
         virtualPhoto.ReadPixels(new Rect(0, 0, socket.imageWidth, socket.imageHeight), 0, 0);
         virtualPhoto.Apply();
         RenderTexture.active = null; //can help avoid errors 
-        // TODO: Abstract this into socket, use Pixel32 in web player
         latestCameraData = virtualPhoto.GetPixelData<uint>(0).ToArray();
     }
 
