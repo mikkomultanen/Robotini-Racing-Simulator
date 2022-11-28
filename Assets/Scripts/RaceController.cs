@@ -356,8 +356,6 @@ public class RaceController : MonoBehaviour
 
     public class FreePractice: Racing
     {
-        int i = 0;
-
         public FreePractice(RaceController c): base(c) {
         }
 
@@ -371,7 +369,7 @@ public class RaceController : MonoBehaviour
                 try {
                     Debug.Log("Car connected, adding on track");
                     var car = c.addCarOnTrack(e);
-                    var controllers = FindObjectsOfType<CarController>();
+                    var i = FindObjectsOfType<CarController>().Length;
                     float totalLength = c.track.Length;
                     float spacing = totalLength / (float)10; // always 10 segments                                        
                     var curveSample = c.track.GetSampleAtDistance(c.track.Length - (i * spacing));
