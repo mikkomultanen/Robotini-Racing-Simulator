@@ -371,8 +371,9 @@ public class RaceController : MonoBehaviour
                     var car = c.addCarOnTrack(e);
                     var i = FindObjectsOfType<CarController>().Length;
                     float totalLength = c.track.Length;
-                    float spacing = totalLength / (float)10; // always 10 segments                                        
-                    var curveSample = c.track.GetSampleAtDistance(c.track.Length - (i * spacing));
+                    float spacing = totalLength / (float)10; // always 10 segments
+                    var randomOffset = UnityEngine.Random.Range(0, spacing / 2);
+                    var curveSample = c.track.GetSampleAtDistance(c.track.Length - (i * spacing) - randomOffset);
                     car.transform.position = curveSample.location + 0.1f * Vector3.up;
                     car.transform.rotation = curveSample.Rotation;
                     car.GetComponent<Rigidbody>().velocity = Vector3.zero;
