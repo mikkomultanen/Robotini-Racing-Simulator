@@ -207,8 +207,8 @@ public class CarController : MonoBehaviour
             stationarySince = DateTime.MaxValue;
             started = false;
             returnToTrack();
-        } else if (Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity) < 0.01f) {
-            if (started) {
+        } else if (Vector3.Dot(rigidBody.transform.forward, rigidBody.velocity) < 0.1f) {
+            if (started) {
                 if (stationarySince == DateTime.MaxValue) {
                     // Not moving, mark as colliding
                     stationarySince = DateTime.Now;
