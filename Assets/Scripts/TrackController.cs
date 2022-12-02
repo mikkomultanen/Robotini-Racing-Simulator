@@ -52,8 +52,6 @@ public class TrackController : MonoBehaviour
         Debug.Log("Using track " + raceParameters.track);
         if (raceParameters.track != null) {
             LoadTrack(raceParameters.track);
-            UpdateFinishLine();
-            UpdateTriggers();            
         }
     }
 
@@ -112,6 +110,8 @@ public class TrackController : MonoBehaviour
             });
             if (!trackLoaded) {
                 trackLoaded = true;
+                UpdateFinishLine();
+                UpdateTriggers();
                 track.NodeListChanged += NodeListChanged;
             }
         }

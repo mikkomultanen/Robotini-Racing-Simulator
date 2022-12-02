@@ -30,9 +30,6 @@ public class WebRaceController : MonoBehaviour
     private void Start()
     {
         raceController = FindObjectOfType<RaceController>();
-        // Uncomment to simulate what happens with a web bot
-        //SimulateWebClient();
-
 #if UNITY_WEBGL
         EventBus.Subscribe<LapCompleted>(this, SendToWeb);
 #endif
@@ -71,7 +68,7 @@ public class WebRaceController : MonoBehaviour
 
     void SimulateWebClient() {
         Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => {
-            FindObjectOfType<TrackController>().LoadTrack("Suzuka");
+            FindObjectOfType<TrackController>().LoadTrack("final_koira");
             StartFreePractice();
             SendFromWeb("{\"type\":\"CarLogin\",\"teamId\":\"j\u00E4s\u00E4\",\"name\":\"J\u00E4s\u00E4Bot\",\"color\":\"#FFFF00\",\"imageWidth\":8}");
         });
