@@ -26,7 +26,6 @@ public class RaceParameters : GameEvent
     {
 #if UNITY_WEBGL        
         var raceParams = new RaceParameters();
-        raceParams.track = "final_koira";
         return raceParams;
 #else
         try
