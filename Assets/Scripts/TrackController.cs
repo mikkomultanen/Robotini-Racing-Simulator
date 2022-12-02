@@ -11,6 +11,7 @@ public class TrackController : MonoBehaviour
     public Transform trackTriggerPrefab;
 
     private SplineMesh.Spline track;
+    private Boolean trackLoaded = false;
 
     private Transform finishLine;
     private Transform finishLineTrigger;
@@ -45,11 +46,15 @@ public class TrackController : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("Start TrackController");
         track = GetComponent<SplineMesh.Spline>();
-        LoadTrack(RaceParameters.readRaceParameters().track);
-        UpdateFinishLine();
-        UpdateTriggers();
-        track.NodeListChanged += NodeListChanged;
+        var raceParameters = RaceParameters.readRaceParameters();
+        Debug.Log("Using track " + raceParameters.track);
+        if (raceParameters.track != null) {
+            LoadTrack(raceParameters.track);
+            UpdateFinishLine();
+            UpdateTriggers();            
+        }
     }
 
     public void LoadTrack(string fileName)
@@ -105,7 +110,10 @@ public class TrackController : MonoBehaviour
             Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => {
                 EventBus.Publish(new CameraFollow(null));
             });
-            
+            if (!trackLoaded) {
+                trackLoaded = true;
+                track.NodeListChanged += NodeListChanged;
+            }
         }
     }
 

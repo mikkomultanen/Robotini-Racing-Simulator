@@ -12,7 +12,7 @@ public class RaceParameters : GameEvent
     public int raceTimeoutSeconds = 300;
     public int raceTimeoutAfterWinnerSeconds = 60;
     public CarInfo[] cars;
-    public string track;
+    public string track = "oval";
     public string visibility = "team";
 
     public string mode = "development";
@@ -24,18 +24,22 @@ public class RaceParameters : GameEvent
 
     public static RaceParameters readRaceParameters()
     {
-#if UNITY_WEBGL        
+#if UNITY_WEBGL
+        Debug.Log("WebGL -> No default track");
         var raceParams = new RaceParameters();
+        raceParams.track = null;
         return raceParams;
 #else
         try
         {
+            Debug.Log("Reading RaceParameters.json");
             var reader = new StreamReader("RaceParameters.json");
             var p = JsonUtility.FromJson<RaceParameters>(reader.ReadToEnd());
             return p;
         }
         catch (FileNotFoundException)
         {
+            Debug.Log("RaceParameters.json not found");
             return new RaceParameters();
         }
 #endif

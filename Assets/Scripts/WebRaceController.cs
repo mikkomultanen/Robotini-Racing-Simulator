@@ -36,6 +36,9 @@ public class WebRaceController : MonoBehaviour
 #if UNITY_WEBGL
         EventBus.Subscribe<LapCompleted>(this, SendToWeb);
 #endif
+#if UNITY_WEBGL && UNITY_EDITOR
+        SimulateWebClient(); // Simulate event sequence from WebGL client when running in editor.
+#endif
 
     }
 
@@ -68,6 +71,7 @@ public class WebRaceController : MonoBehaviour
 
     void SimulateWebClient() {
         Observables.Delay(TimeSpan.FromSeconds(1)).Subscribe(_ => {
+            FindObjectOfType<TrackController>().LoadTrack("Suzuka");
             StartFreePractice();
             SendFromWeb("{\"type\":\"CarLogin\",\"teamId\":\"j\u00E4s\u00E4\",\"name\":\"J\u00E4s\u00E4Bot\",\"color\":\"#FFFF00\",\"imageWidth\":8}");
         });
