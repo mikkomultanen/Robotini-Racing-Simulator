@@ -48,19 +48,25 @@ public class RaceController : MonoBehaviour
         }
         raceParameters = RaceParameters.readRaceParameters();
         Observables.Delay(TimeSpan.FromMilliseconds(0)).Subscribe(_ => {
+            EventBus.Publish(new CameraFollow(null));
+            if (state != null) {
+                return;
+            }
             if (ModeController.Mode == SimulatorMode.Playback || ModeController.Mode == SimulatorMode.RemoteControl)
             {
+                Debug.Log("Delayed init: Playback");
                 setState(new Playback(this));
             }
             else if (ModeController.Mode == SimulatorMode.Race)
             {
+                Debug.Log("Delayed init: RaceLog");
                 setState(new RaceLobby(this));
             }
             else
             {
+                Debug.Log("Delayed init: FreePractice");
                 setState(new FreePractice(this));
             }
-            EventBus.Publish(new CameraFollow(null));
         }).AddTo(this);        
     }
 
@@ -120,7 +126,9 @@ public class RaceController : MonoBehaviour
         {
 
         }
-        public override void OnEnable() { }
+        public override void OnEnable() {
+            Debug.Log("Starting Playback mode.");
+        }
         public override void CarHitTrigger(GameObject car, int segment) { }
         public override void OnSessionFinish() {
             // Never gonna stop
@@ -141,7 +149,7 @@ public class RaceController : MonoBehaviour
         
         public override void OnEnable() {
             
-            Debug.Log("RaceParameters:" + JsonUtility.ToJson(c.raceParameters));
+            Debug.Log("Starting RaceLobby. RaceParameters:" + JsonUtility.ToJson(c.raceParameters));
 
             EventBus.Publish(new RaceLobbyInit(c.raceParameters));            
             Subscribe<CarDisconnected>(e =>
