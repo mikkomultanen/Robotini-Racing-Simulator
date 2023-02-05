@@ -63,6 +63,12 @@ public class FPSLogger : MonoBehaviour
         carStat.inc();
     }
 
+    public void Remove(CarInfo car) {
+        if (carFrameSent.ContainsKey(car.name)) {
+            carFrameSent.Remove(car.name);
+        }
+    }
+
     public void LogFrameRendered() {
         frameRender.inc();
     }
