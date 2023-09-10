@@ -24,7 +24,7 @@ public class SpectatorSocket : MonoBehaviour
     {
         if (raceEnded) return;
         CarController[] cars = FindObjectsOfType<CarController>();
-        CarStatus[] statuses = cars.Select(c => new CarStatus(c.name, c.rigidBody.position, c.rigidBody.velocity, c.rigidBody.rotation)).ToArray();
+        CarStatus[] statuses = cars.Select(c => new CarStatus(c)).ToArray();
 
         var newGameStatus = new GameStatus(statuses);
 
